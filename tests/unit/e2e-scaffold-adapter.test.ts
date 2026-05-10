@@ -73,6 +73,12 @@ describe('E2E scaffold Adapter', () => {
 		expect(result.contractAnchor).toBe('golden-consumer-setup-contract');
 		expect(result.filesWritten).toContain('src/routes/+layout.svelte');
 		expect(result.filesWritten).toContain('src/layout.css');
+		expect(result.filesWritten).toContain('AGENTS.md');
+		expect(result.filesWritten).toContain('CLAUDE.md');
+		expect(result.filesWritten).toContain('skills');
+		expect(result.filesWritten).toContain('.agents/skills');
+		expect(result.filesWritten).toContain('.claude/skills');
+		expect(result.filesWritten).toContain('.codex/skills');
 		expect(existsSync(logPath)).toBe(true);
 		expect(readFileSync(logPath, 'utf8')).toContain(
 			'contract: skills/dryui-init/SKILL.md#golden-consumer-setup-contract'
@@ -124,6 +130,12 @@ describe('E2E scaffold Adapter', () => {
 		expect(read(projectDir, 'src/app.css')).toContain('container-type: inline-size;');
 		expect(read(projectDir, 'src/app.css')).toContain('container-name: page;');
 		expect(read(projectDir, 'src/routes/+page.svelte')).toContain('@dryui/ui/heading');
+		expect(read(projectDir, 'AGENTS.md')).toContain('skills/dryui-build/SKILL.md');
+		expect(read(projectDir, 'CLAUDE.md')).toContain('skills/dryui-build/SKILL.md');
+		expect(read(projectDir, 'skills/dryui-build/SKILL.md')).toContain('## Theme');
+		expect(read(projectDir, '.agents/skills/dryui-build/SKILL.md')).toContain('## Theme');
+		expect(read(projectDir, '.claude/skills/dryui-build/SKILL.md')).toContain('## Theme');
+		expect(read(projectDir, '.codex/skills/dryui-build/SKILL.md')).toContain('## Theme');
 	});
 
 	test('fails fast when the manifest does not contain every local DryUI package', () => {

@@ -11,6 +11,7 @@ import { spawn, type ChildProcess } from 'node:child_process';
 import { Buffer } from 'node:buffer';
 import {
 	closeSync,
+	copyFileSync,
 	existsSync,
 	mkdirSync,
 	mkdtempSync,
@@ -51,14 +52,23 @@ const CODEX_STDIN_NOTICE = 'Reading additional input from stdin...';
 export interface ScenarioDefinition {
 	readonly name: string;
 	readonly prompt: string;
+	readonly assets?: readonly ScenarioImageAsset[];
 	readonly assertions: readonly ScenarioAssertion[];
 	readonly codexTimeoutMs?: number;
 	readonly codexModel?: string;
 }
 
+export interface ScenarioImageAsset {
+	readonly label: string;
+	readonly sourcePath: string;
+	readonly targetPath: string;
+	readonly purpose: string;
+}
+
 export type ScenarioAssertion =
 	| { kind: 'file-exists'; path: string }
 	| { kind: 'file-contains'; path: string; needle: string }
+	| { kind: 'file-matches'; path: string; regex: string }
 	| { kind: 'html-contains'; urlPath?: string; needle: string }
 	| { kind: 'html-matches'; urlPath?: string; regex: string };
 
@@ -77,6 +87,7 @@ export interface ScenarioScreenshot {
 
 export interface ScenarioResult {
 	readonly name: string;
+	readonly runLabel: string | null;
 	readonly ok: boolean;
 	readonly startedAt: string;
 	readonly finishedAt: string;
@@ -140,6 +151,7 @@ export interface RunScenarioOptions {
 	readonly permissionMode?: string;
 	readonly effort?: string;
 	readonly codexTimeoutMs?: number;
+	readonly runLabel?: string;
 }
 
 const RESULT_SCHEMA_VERSION = 1;
@@ -185,14 +197,26 @@ async function time<T>(p: ScenarioPhase, fn: () => Promise<T>): Promise<T | null
 	}
 }
 
-function createLogDir(name: string): string {
-	const dir = resolve(repoRoot, 'reports/e2e-runs', `${name}-${Date.now()}`);
+function slugPart(value: string): string {
+	return (
+		value
+			.toLowerCase()
+			.replace(/[^a-z0-9]+/g, '-')
+			.replace(/^-+|-+$/g, '')
+			.slice(0, 80) || 'run'
+	);
+}
+
+function createLogDir(name: string, runLabel: string | null): string {
+	const labelPart = runLabel ? `-${slugPart(runLabel)}` : '';
+	const dir = resolve(repoRoot, 'reports/e2e-runs', `${slugPart(name)}${labelPart}-${Date.now()}`);
 	mkdirSync(dir, { recursive: true });
 	return dir;
 }
 
-function createProjectDir(name: string): string {
-	return mkdtempSync(resolve(tmpdir(), `dryui-e2e-${name}-`));
+function createProjectDir(name: string, runLabel: string | null): string {
+	const labelPart = runLabel ? `${slugPart(runLabel)}-` : '';
+	return mkdtempSync(resolve(tmpdir(), `dryui-e2e-${slugPart(name)}-${labelPart}`));
 }
 
 function scaffold(projectDir: string, tarballsDir: string, logDir: string): void {
@@ -201,6 +225,52 @@ function scaffold(projectDir: string, tarballsDir: string, logDir: string): void
 		tarballsDir,
 		logPath: resolve(logDir, 'scaffold.log')
 	});
+}
+
+function publicAssetPath(targetPath: string): string {
+	const trimmed = targetPath.replace(/^\/+/, '');
+	return trimmed.startsWith('static/') ? `/${trimmed.slice('static/'.length)}` : `/${trimmed}`;
+}
+
+function copyScenarioAssets(
+	projectDir: string,
+	assets: readonly ScenarioImageAsset[]
+): readonly string[] {
+	const copied: string[] = [];
+	for (const asset of assets) {
+		if (!existsSync(asset.sourcePath)) {
+			throw new Error(`scenario asset missing: ${asset.sourcePath}`);
+		}
+		if (asset.targetPath.startsWith('/') || asset.targetPath.split('/').includes('..')) {
+			throw new Error(`scenario asset target must be project-relative: ${asset.targetPath}`);
+		}
+		const targetPath = resolve(projectDir, asset.targetPath);
+		if (!targetPath.startsWith(projectDir + '/')) {
+			throw new Error(`scenario asset target escapes project: ${asset.targetPath}`);
+		}
+		mkdirSync(dirname(targetPath), { recursive: true });
+		copyFileSync(asset.sourcePath, targetPath);
+		copied.push(asset.targetPath);
+	}
+	return copied;
+}
+
+function buildScenarioPrompt(scenario: ScenarioDefinition): string {
+	const assets = scenario.assets ?? [];
+	if (assets.length === 0) return scenario.prompt;
+
+	const assetLines = assets.map(
+		(asset) =>
+			`- ${asset.label}: use ${publicAssetPath(asset.targetPath)} (${asset.purpose}; project file ${asset.targetPath}).`
+	);
+	return [
+		scenario.prompt,
+		'',
+		'Supplied PNG assets are already present in this generated project. Use these files for product, destination, hero, thumbnail, or other photographic media placeholders instead of random inline SVGs, generated data URIs, or external stock URLs.',
+		'Do not crop, screenshot, or derive media assets from the mockup files; mockups are layout references only.',
+		'Reference them from Svelte markup with these public URLs:',
+		...assetLines
+	].join('\n');
 }
 
 async function startFeedbackServer(
@@ -433,6 +503,17 @@ async function runAssertions(
 				if (!content.includes(assertion.needle)) {
 					failures.push(`file-contains: ${assertion.path} missing "${assertion.needle}"`);
 				}
+			} else if (assertion.kind === 'file-matches') {
+				const abs = resolve(projectDir, assertion.path);
+				if (!existsSync(abs)) {
+					failures.push(`file-matches: missing ${assertion.path}`);
+					continue;
+				}
+				const content = readFileSync(abs, 'utf8');
+				const re = new RegExp(assertion.regex, 'i');
+				if (!re.test(content)) {
+					failures.push(`file-matches: ${assertion.path} failed /${assertion.regex}/i`);
+				}
 			} else if (assertion.kind === 'html-contains') {
 				const urlPath = assertion.urlPath ?? '/';
 				const html = await visit(urlPath);
@@ -646,6 +727,23 @@ function formatCodexStreamLine(line: string): string | null {
 	}
 }
 
+function assertDryuiBuildSkillAvailable(result: CodexRunResult): void {
+	const transcript = [
+		result.lastMessage,
+		...result.events.map((event) => JSON.stringify(event))
+	].join('\n');
+	const unavailablePatterns = [
+		/don[’']?t have (?:a )?`?dryui-build`? skill/i,
+		/no `?dryui-build`? skill/i,
+		/`?dryui-build`? skill (?:is )?(?:not installed|unavailable|missing)/i
+	];
+	if (unavailablePatterns.some((pattern) => pattern.test(transcript))) {
+		throw new Error(
+			`${result.backend} reported that dryui-build was unavailable; generated projects must expose the DryUI skill bundle`
+		);
+	}
+}
+
 function buildVisualFeedbackPrompt(submissionId: string): string {
 	return [
 		`Apply DryUI feedback submission ${submissionId}.`,
@@ -668,8 +766,11 @@ export async function runScenario(
 		);
 	}
 
-	const projectDir = createProjectDir(scenario.name);
-	const logDir = createLogDir(scenario.name);
+	const runLabel = options.runLabel ?? null;
+	const displayName = runLabel ? `${scenario.name}/${runLabel}` : scenario.name;
+	const scenarioPrompt = buildScenarioPrompt(scenario);
+	const projectDir = createProjectDir(scenario.name, runLabel);
+	const logDir = createLogDir(scenario.name, runLabel);
 	const phases: ScenarioPhase[] = [];
 	let codex: CodexRunResult | null = null;
 	let feedbackChild: ChildProcess | null = null;
@@ -682,10 +783,10 @@ export async function runScenario(
 	const agentModel = options.agentModel ?? scenario.codexModel;
 
 	const log = (msg: string) => {
-		if (options.verbose) console.log(`[${scenario.name}] ${msg}`);
+		if (options.verbose) console.log(`[${displayName}] ${msg}`);
 	};
 	const progress = (msg: string) => {
-		console.log(`[${scenario.name}] ${msg}`);
+		console.log(`[${displayName}] ${msg}`);
 	};
 	const runPhase = async <T>(p: ScenarioPhase, fn: () => Promise<T>): Promise<T | null> => {
 		progress(`${p.name}…`);
@@ -707,6 +808,16 @@ export async function runScenario(
 		});
 		if (!pScaffold.ok) return finalize(false);
 
+		if ((scenario.assets?.length ?? 0) > 0) {
+			const pAssets = phase('assets');
+			phases.push(pAssets);
+			await runPhase(pAssets, async () => {
+				const copied = copyScenarioAssets(projectDir, scenario.assets ?? []);
+				pAssets.note = `${copied.length} image${copied.length === 1 ? '' : 's'}`;
+			});
+			if (!pAssets.ok) return finalize(false);
+		}
+
 		const pFeedbackUp = phase('feedback-up');
 		phases.push(pFeedbackUp);
 		feedbackChild = await runPhase(pFeedbackUp, async () => {
@@ -717,7 +828,7 @@ export async function runScenario(
 		const pSubmission = phase('feedback-submission');
 		phases.push(pSubmission);
 		await runPhase(pSubmission, async () => {
-			const submission = await postSyntheticFeedback(feedbackPort, scenario.prompt);
+			const submission = await postSyntheticFeedback(feedbackPort, scenarioPrompt);
 			await assertPendingSubmission(feedbackPort, submission.id);
 			pSubmission.note = `id=${submission.id}`;
 		});
@@ -742,6 +853,7 @@ export async function runScenario(
 				progress(`${agentBackend} config: isolated without feedback MCP`);
 			}
 			if (agentModel) progress(`${agentBackend} model: ${agentModel}`);
+			if (options.effort) progress(`${agentBackend} effort: ${options.effort}`);
 			if (options.usageLimitUsd !== undefined) {
 				progress(`${agentBackend} usage limit: $${options.usageLimitUsd}`);
 			}
@@ -755,7 +867,7 @@ export async function runScenario(
 				const result = await runAgentExec({
 					backend: agentBackend,
 					projectDir,
-					prompt: scenario.prompt,
+					prompt: scenarioPrompt,
 					logDir,
 					...(agentModel ? { model: agentModel } : {}),
 					...(options.usageLimitUsd !== undefined ? { usageLimitUsd: options.usageLimitUsd } : {}),
@@ -768,26 +880,27 @@ export async function runScenario(
 						const description = describeCodexLine(line);
 						if (description) lastAgentEvent = description;
 						if (streamRawCodex) {
-							console.log(`[${scenario.name}] ${agentBackend} json: ${line}`);
+							console.log(`[${displayName}] ${agentBackend} json: ${line}`);
 						} else if (streamCodex) {
 							const formatted = formatCodexStreamLine(line);
-							if (formatted) console.log(`[${scenario.name}] ${agentBackend} ${formatted}`);
+							if (formatted) console.log(`[${displayName}] ${agentBackend} ${formatted}`);
 						}
 					},
 					onStderrLine: (line) => {
 						lastAgentEvent = line;
 						if (line.trim() === CODEX_STDIN_NOTICE) {
 							if (streamCodex || streamRawCodex || options.verbose) {
-								console.log(`[${scenario.name}] ${agentBackend} info: ${line}`);
+								console.log(`[${displayName}] ${agentBackend} info: ${line}`);
 							}
 							return;
 						}
-						console.error(`[${scenario.name}] ${agentBackend} stderr: ${line}`);
+						console.error(`[${displayName}] ${agentBackend} stderr: ${line}`);
 					}
 				});
 				if (!result.ok) {
 					throw new Error(`${agentBackend} exec failed\n${summarizeCodexRun(result)}`);
 				}
+				assertDryuiBuildSkillAvailable(result);
 				return result;
 			} finally {
 				clearInterval(heartbeat);
@@ -889,19 +1002,19 @@ export async function runScenario(
 					onStdoutLine: (line) => {
 						if (options.streamCodex === true) {
 							const formatted = formatCodexStreamLine(line);
-							if (formatted)
-								console.log(`[${scenario.name}] feedback ${agentBackend} ${formatted}`);
+							if (formatted) console.log(`[${displayName}] feedback ${agentBackend} ${formatted}`);
 						}
 					},
 					onStderrLine: (line) => {
 						if (line.trim() && line.trim() !== CODEX_STDIN_NOTICE) {
-							console.error(`[${scenario.name}] feedback ${agentBackend} stderr: ${line}`);
+							console.error(`[${displayName}] feedback ${agentBackend} stderr: ${line}`);
 						}
 					}
 				});
 				if (!result.ok) {
 					throw new Error(`feedback ${agentBackend} exec failed\n${summarizeCodexRun(result)}`);
 				}
+				assertDryuiBuildSkillAvailable(result);
 				pCodexFeedback.note = summarizeCodexRun(result).split('\n').slice(0, 2).join('; ');
 			});
 			if (!pCodexFeedback.ok) return finalize(false);
@@ -959,6 +1072,7 @@ export async function runScenario(
 				: null;
 		const baseResult: ScenarioResultDraft = {
 			name: scenario.name,
+			runLabel,
 			ok,
 			startedAt,
 			finishedAt: new Date().toISOString(),
@@ -1025,6 +1139,7 @@ function writeResultJson(result: ScenarioResult): void {
 	const payload = {
 		schemaVersion: RESULT_SCHEMA_VERSION,
 		name: result.name,
+		runLabel: result.runLabel,
 		ok: result.ok,
 		startedAt: result.startedAt,
 		finishedAt: result.finishedAt,
@@ -1041,6 +1156,7 @@ function writeResultJson(result: ScenarioResult): void {
 			? {
 					backend: result.codex.backend,
 					model: result.codex.model,
+					effort: result.codex.effort,
 					exitCode: result.codex.exitCode,
 					durationMs: result.codex.durationMs,
 					eventCount: result.codex.events.length,
@@ -1303,7 +1419,8 @@ function relativeToLogDir(absPath: string, logDir: string): string {
 
 export function formatScenarioResult(result: ScenarioResult): string {
 	const lines: string[] = [];
-	lines.push(`${result.ok ? 'PASS' : 'FAIL'}  ${result.name}`);
+	const displayName = result.runLabel ? `${result.name} / ${result.runLabel}` : result.name;
+	lines.push(`${result.ok ? 'PASS' : 'FAIL'}  ${displayName}`);
 	for (const p of result.phases) {
 		const flag = p.ok ? '✓' : '✗';
 		const duration = `${(p.durationMs / 1000).toFixed(1)}s`.padStart(6);

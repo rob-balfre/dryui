@@ -1,10 +1,11 @@
 import type { ScenarioDefinition } from '../../../scripts/e2e/scenario-harness.ts';
-import { mockupPath } from './mockups.ts';
+import { mockupPath, scenarioAssets } from './mockups.ts';
 
 const shoppingMockup = mockupPath('shopping');
 
 export const shoppingScenario: ScenarioDefinition = {
 	name: 'shopping',
+	assets: scenarioAssets('shopping'),
 	prompt: [
 		'Use the dryui-build skill to build a simple shopping page. Brand: Atelier. Heading: "Shop the New Collection". Products: Merino Wool Sweater, Canvas Tote, Leather Loafer. Each product has an Add to Cart button.',
 		`Open and use this local design mockup as a visual reference for layout, density, hierarchy, and tone: ${shoppingMockup}. Keep the textual requirements above authoritative if the mockup differs.`

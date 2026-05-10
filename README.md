@@ -126,11 +126,12 @@ To exercise the install flow end-to-end without publishing packages, use the tar
 
 ```bash
 bun run e2e:full                 # pack local packages, then run every scenario
-bun run e2e:one dashboard        # run a single scenario
+bun run e2e:one dashboard        # run a single scenario across the agent matrix
+bun run e2e:assets               # verify generated PNG fixtures used by scenarios
 bun run e2e:pack                 # build and pack local package tarballs only
 ```
 
-The E2E runner packs the current workspace packages into `reports/e2e-tarballs/`, scaffolds fresh projects against those tarballs, and writes the HTML run report to `reports/e2e-runs/index.html`.
+The E2E runner packs the current workspace packages into `reports/e2e-tarballs/`, scaffolds fresh projects against those tarballs, and writes the HTML run report to `reports/e2e-runs/index.html`. The default `e2e:full` and `e2e:one` wrappers run the agent matrix in parallel: Codex `gpt-5.5` at low, medium, high, and xhigh reasoning; Claude Sonnet 4.6; and Claude Opus 4.7 at low, medium, high, xhigh, and max effort. Pass `--max-parallel <count>` after the script args to throttle local runs.
 
 The scaffold step goes through `scripts/e2e/scaffold-adapter.ts`, the concrete Adapter for the `dryui-init` golden consumer setup contract.
 

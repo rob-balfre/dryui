@@ -1,5 +1,5 @@
 import { spawnSync } from 'node:child_process';
-import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -65,6 +65,13 @@ export const REQUIRED_DRYUI_PACKAGES: readonly DryuiConsumerPackage[] = [
 
 const PACKAGE_JSON = 'package.json';
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
+const DRYUI_SKILLS_SOURCE = 'skills';
+const AGENT_SKILL_TARGETS = [
+	'skills',
+	'.agents/skills',
+	'.claude/skills',
+	'.codex/skills'
+] as const;
 
 function fileDependency(tarballPath: string): string {
 	return `file:${tarballPath}`;
@@ -133,6 +140,31 @@ function writeProjectFile(
 	mkdirSync(dirname(absPath), { recursive: true });
 	writeFileSync(absPath, content);
 	files.push(path);
+}
+
+function copyProjectDirectory(
+	projectDir: string,
+	sourcePath: string,
+	targetPath: string,
+	files: string[]
+): void {
+	const absSource = resolve(repoRoot, sourcePath);
+	if (!existsSync(absSource)) {
+		throw new Error(`E2E scaffold source missing at ${absSource}`);
+	}
+	const absTarget = resolve(projectDir, targetPath);
+	mkdirSync(dirname(absTarget), { recursive: true });
+	cpSync(absSource, absTarget, {
+		recursive: true,
+		filter: (path) => !path.endsWith('/.DS_Store')
+	});
+	files.push(targetPath);
+}
+
+function copyDryuiAgentSkillBundle(projectDir: string, files: string[]): void {
+	for (const target of AGENT_SKILL_TARGETS) {
+		copyProjectDirectory(projectDir, DRYUI_SKILLS_SOURCE, target, files);
+	}
 }
 
 function installDependencies(projectDir: string): string {
@@ -306,6 +338,23 @@ const HOME_PAGE = `<script lang="ts">
 </main>
 `;
 
+const AGENTS_MD = `# AGENTS.md
+
+Generated DryUI E2E consumer project.
+
+- Before editing UI, load \`skills/dryui-build/SKILL.md\`.
+- For setup context only, use \`skills/dryui-init/SKILL.md\`.
+- Canonical DryUI skills are vendored into \`skills/\`, \`.agents/skills/\`, \`.claude/skills/\`, and \`.codex/skills/\` so isolated Codex and Claude runs do not depend on machine-local skill installs.
+- Keep route layout hooks in \`src/layout.css\`; keep visual styling in route/component CSS using DryUI tokens.
+`;
+
+const CLAUDE_MD = `# CLAUDE.md
+
+Generated DryUI E2E consumer project.
+
+Load \`skills/dryui-build/SKILL.md\` before implementing the requested UI. The same DryUI skills are also copied to \`.claude/skills/\` for Claude Code skill discovery.
+`;
+
 export function scaffoldDryuiConsumerProject(
 	options: ScaffoldDryuiConsumerProjectOptions
 ): ScaffoldDryuiConsumerProjectResult {
@@ -320,6 +369,9 @@ export function scaffoldDryuiConsumerProject(
 	ensureEmptyProjectDir(projectDir);
 
 	writeProjectFile(projectDir, PACKAGE_JSON, scaffoldPackageJson(packages), filesWritten);
+	writeProjectFile(projectDir, 'AGENTS.md', AGENTS_MD, filesWritten);
+	writeProjectFile(projectDir, 'CLAUDE.md', CLAUDE_MD, filesWritten);
+	copyDryuiAgentSkillBundle(projectDir, filesWritten);
 	writeProjectFile(projectDir, 'svelte.config.js', SVELTE_CONFIG, filesWritten);
 	writeProjectFile(projectDir, 'vite.config.ts', VITE_CONFIG, filesWritten);
 	writeProjectFile(projectDir, 'tsconfig.json', TSCONFIG, filesWritten);

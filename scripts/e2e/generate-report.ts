@@ -3,7 +3,7 @@
  *
  * Scans reports/e2e-runs/ * /result.json (written by the scenario harness),
  * sorts newest-first by startedAt, and emits:
- *   - reports/e2e-runs/index.html    (full report, grouped by scenario name)
+ *   - reports/e2e-runs/index.html    (full report, grouped by scenario/run label)
  *   - reports/e2e-runs/latest.html   (copy of index.html for bookmarking)
  *
  * All CSS/JS is inlined so the file works over file:// with no server.
@@ -42,6 +42,7 @@ interface Phase {
 interface CodexSummary {
 	backend?: string;
 	model?: string | null;
+	effort?: string | null;
 	exitCode: number | null;
 	durationMs: number;
 	eventCount: number;
@@ -61,6 +62,7 @@ interface Screenshot {
 interface ResultFile {
 	schemaVersion: number;
 	name: string;
+	runLabel: string | null;
 	ok: boolean;
 	startedAt: string;
 	finishedAt: string;
@@ -209,6 +211,7 @@ function coerceCodex(raw: unknown): CodexSummary | null {
 	return {
 		backend: safeString(obj.backend) || undefined,
 		model: safeString(obj.model) || null,
+		effort: safeString(obj.effort) || null,
 		exitCode: safeNumberOrNull(obj.exitCode),
 		durationMs: safeNumberOrNull(obj.durationMs) ?? 0,
 		eventCount: safeNumberOrNull(obj.eventCount) ?? 0,
@@ -444,6 +447,7 @@ function coerceResult(raw: unknown, dirName: string): ResultFile | null {
 	return {
 		schemaVersion: safeNumberOrNull(obj.schemaVersion) ?? 1,
 		name,
+		runLabel: safeString(obj.runLabel) || null,
 		ok: safeBool(obj.ok),
 		startedAt,
 		finishedAt: safeString(obj.finishedAt),
@@ -570,12 +574,24 @@ function runStartedMs(run: LoadedRun): number {
 	return Number.isFinite(time) ? time : 0;
 }
 
+function runDisplayName(result: ResultFile): string {
+	return result.runLabel ? `${result.name} / ${result.runLabel}` : result.name;
+}
+
+function scenarioAnchor(name: string): string {
+	return `scenario-${name
+		.toLowerCase()
+		.replace(/[^a-z0-9_-]+/g, '-')
+		.replace(/^-+|-+$/g, '')}`;
+}
+
 function groupByScenario(runs: LoadedRun[]): Map<string, LoadedRun[]> {
 	const groups = new Map<string, LoadedRun[]>();
 	for (const run of runs) {
-		const list = groups.get(run.result.name) ?? [];
+		const name = runDisplayName(run.result);
+		const list = groups.get(name) ?? [];
 		list.push(run);
-		groups.set(run.result.name, list);
+		groups.set(name, list);
 	}
 	return groups;
 }
@@ -874,7 +890,12 @@ function renderRunCard(run: LoadedRun, now: number, cache: ShotCache): string {
 	const codexBlock = r.codex
 		? (() => {
 				const c = r.codex!;
-				const agentLabel = c.backend ? `${c.backend}${c.model ? ` · ${c.model}` : ''}` : 'agent';
+				const agentDetails = [c.model, c.effort ? `effort ${c.effort}` : null].filter(
+					(value): value is string => value !== null
+				);
+				const agentLabel = c.backend
+					? `${c.backend}${agentDetails.length ? ` · ${agentDetails.join(' · ')}` : ''}`
+					: 'agent';
 				const lm = truncate(c.lastMessage || '', 500);
 				const fileChanges = c.fileChanges.length
 					? `<ul class="file-changes">${c.fileChanges
@@ -945,10 +966,11 @@ function renderRunCard(run: LoadedRun, now: number, cache: ShotCache): string {
 			)}</code></div>`
 		: '';
 
-	return `<article class="run ${statusClass}" data-scenario="${attr(r.name)}">
+	const displayName = runDisplayName(r);
+	return `<article class="run ${statusClass}" data-scenario="${attr(displayName)}">
 		<header class="run-head">
 			<span class="badge ${statusClass}">${statusLabel}</span>
-			<h3>${htmlEscape(r.name)}</h3>
+			<h3>${htmlEscape(displayName)}</h3>
 			<time datetime="${attr(r.startedAt)}" title="${attr(r.startedAt)}">${htmlEscape(
 				formatAgo(r.startedAt, now)
 			)}</time>
@@ -993,7 +1015,7 @@ function renderScenarioSection(
 	const totalCount = runs.length;
 	const olderLabel = hidden.length ? ` · ${hidden.length} older collapsed` : '';
 
-	return `<section class="scenario" id="scenario-${attr(name)}">
+	return `<section class="scenario" id="${attr(scenarioAnchor(name))}">
 		<header class="scenario-head">
 			<h2>${htmlEscape(name)} ${headerBadge}</h2>
 			<span class="muted">latest shown · ${passCount}/${totalCount} total passing · ${totalCount} run${
@@ -1038,7 +1060,7 @@ function renderDocument(runs: LoadedRun[], now: number): string {
 	const latest = runs[0]?.result;
 
 	const latestLine = latest
-		? `latest: <code>${htmlEscape(latest.name)}</code> <span class="muted">${htmlEscape(
+		? `latest: <code>${htmlEscape(runDisplayName(latest))}</code> <span class="muted">${htmlEscape(
 				formatAgo(latest.startedAt, now)
 			)}</span>`
 		: '';
@@ -1061,8 +1083,8 @@ function renderDocument(runs: LoadedRun[], now: number): string {
 				.map((name) => {
 					const latestRun = groups.get(name)?.[0];
 					const ok = latestRun?.result.ok ?? false;
-					return `<a class="scenario-link ${ok ? 'status-ok' : 'status-fail'}" href="#scenario-${attr(
-						name
+					return `<a class="scenario-link ${ok ? 'status-ok' : 'status-fail'}" href="#${attr(
+						scenarioAnchor(name)
 					)}">${htmlEscape(name)}<span>${ok ? 'PASS' : 'FAIL'}</span></a>`;
 				})
 				.join('')}

@@ -30,6 +30,7 @@ Terminal Saved Output*.txt
 .github/skills/
 .opencode/
 opencode.json
+skills/.system/
 .dryui/
 tmp-*.png
 [data-theme-switch].png

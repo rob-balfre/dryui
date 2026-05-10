@@ -62,6 +62,7 @@ export interface CodexRunOptions {
 export interface CodexRunResult {
 	readonly backend: AgentBackend;
 	readonly model: string | null;
+	readonly effort: string | null;
 	readonly ok: boolean;
 	readonly exitCode: number | null;
 	readonly signal: NodeJS.Signals | null;
@@ -81,6 +82,8 @@ const CLAUDE_GENERATED_PROJECT_PREFIX = [
 	'Claude generated-project harness notes:',
 	'- Do not inspect node_modules, package tarballs, generated .d.ts files, or dist internals. Those paths are intentionally blocked.',
 	'- The outer harness runs build/assertions after you finish. Do not run a dev server or build command.',
+	'- The generated project vendors DryUI skills under ./skills plus agent-specific hidden skill folders.',
+	'- Load ./skills/dryui-build/SKILL.md before editing UI. If native skill discovery does not trigger, read that file directly.',
 	'- Make the page edit directly in src/routes/+page.svelte. If layout hooks need grid/flex rules, edit src/layout.css too.',
 	'- For native wrappers, use meaningful data-layout/data-layout-area hooks. Put display: grid and display: flex only in src/layout.css.',
 	'- Keep generated UI code compact. Prefer arrays and {#each} loops over repeated markup; avoid giant one-off files.',
@@ -88,6 +91,15 @@ const CLAUDE_GENERATED_PROJECT_PREFIX = [
 	'- Compound examples: <Sidebar.Root><Sidebar.Item active>Analytics</Sidebar.Item></Sidebar.Root>, <Toolbar.Root>...</Toolbar.Root>, <Chart.Root data={chartData} width={760} height={260}><Chart.Line /><Chart.XAxis /><Chart.YAxis /></Chart.Root>, <Table.Root><Table.Header><Table.Row><Table.Head>Name</Table.Head></Table.Row></Table.Header><Table.Body><Table.Row><Table.Cell>Value</Table.Cell></Table.Row></Table.Body></Table.Root>, <SegmentedControl.Root value="7d"><SegmentedControl.Item value="7d">7d</SegmentedControl.Item></SegmentedControl.Root>.',
 	'- Simple examples: <Sparkline data={[1,2,3]} />, <ProgressRing value={99} max={100} />, <Progress value={42} />, <Badge>Healthy</Badge>, <Avatar initials="RB" />, <Input placeholder="Search" />, <Separator />, <Kbd>Cmd+K</Kbd>.',
 	'- If an advanced DryUI API is uncertain, use a plain native wrapper with scoped CSS instead of continuing discovery.',
+	''
+].join('\n');
+
+const CODEX_GENERATED_PROJECT_PREFIX = [
+	'Codex generated-project harness notes:',
+	'- The generated project vendors DryUI skills under ./skills plus agent-specific hidden skill folders.',
+	'- Load ./skills/dryui-build/SKILL.md before editing UI. If native skill discovery does not trigger, read that file directly.',
+	'- Make the page edit directly in src/routes/+page.svelte. If layout hooks need grid/flex rules, edit src/layout.css too.',
+	'- For native wrappers, use meaningful data-layout/data-layout-area hooks. Put display: grid and display: flex only in src/layout.css.',
 	''
 ].join('\n');
 
@@ -102,19 +114,28 @@ function getCodexHomeSource(): string {
 	return process.env.CODEX_HOME ? resolve(process.env.CODEX_HOME) : resolve(homedir(), '.codex');
 }
 
-function prepareLocalFeedbackCodexHome(feedbackBaseUrl?: string): string {
+function prepareIsolatedCodexHome(options: {
+	readonly feedbackBaseUrl?: string;
+	readonly includeFeedbackMcp: boolean;
+}): string {
 	const sourceCodexHome = getCodexHomeSource();
 	const sourceAuthPath = resolve(sourceCodexHome, 'auth.json');
 	if (!existsSync(sourceAuthPath)) {
 		throw new Error(`Codex auth missing at ${sourceAuthPath} — run \`codex login\` first`);
 	}
 
-	// Keep the e2e Codex home isolated while still exposing the visual feedback
-	// MCP server through the in-tree bun entrypoint.
-	const feedbackEnv = feedbackBaseUrl ? `DRYUI_FEEDBACK_URL=${tomlString(feedbackBaseUrl)} ` : '';
-	const feedbackCmd = `cd ${tomlString(repoRoot)} && ${feedbackEnv}exec bun packages/feedback-server/src/mcp.ts`;
+	// Keep the e2e Codex home isolated while still exposing the canonical DryUI
+	// skill bundle. The real user home contains large logs, history, plugins,
+	// and machine-local settings that make runs non-reproducible.
 	const codexHome = mkdtempSync(resolve(tmpdir(), 'dryui-e2e-codex-home-'));
 	symlinkSync(sourceAuthPath, resolve(codexHome, 'auth.json'));
+	symlinkSync(resolve(repoRoot, 'skills'), resolve(codexHome, 'skills'), 'dir');
+	if (!options.includeFeedbackMcp) return codexHome;
+
+	const feedbackEnv = options.feedbackBaseUrl
+		? `DRYUI_FEEDBACK_URL=${tomlString(options.feedbackBaseUrl)} `
+		: '';
+	const feedbackCmd = `cd ${tomlString(repoRoot)} && ${feedbackEnv}exec bun packages/feedback-server/src/mcp.ts`;
 	writeFileSync(
 		resolve(codexHome, 'config.toml'),
 		[
@@ -125,6 +146,14 @@ function prepareLocalFeedbackCodexHome(feedbackBaseUrl?: string): string {
 		].join('\n')
 	);
 	return codexHome;
+}
+
+function withGeneratedProjectSkillPrompt(
+	prompt: string,
+	prefix: string,
+	allowShell?: boolean
+): string {
+	return allowShell === true ? prompt : `${prefix}\n${prompt}`;
 }
 
 function prepareClaudeMcpConfig(feedbackBaseUrl?: string): string {
@@ -271,9 +300,13 @@ export async function runCodexExec(options: CodexRunOptions): Promise<CodexRunRe
 	if (logDir) mkdirSync(logDir, { recursive: true });
 	const useLocalFeedbackMcp =
 		options.useUserConfig !== true && options.useLocalFeedbackMcp !== false;
-	const isolatedCodexHome = useLocalFeedbackMcp
-		? prepareLocalFeedbackCodexHome(options.feedbackBaseUrl)
-		: null;
+	const isolatedCodexHome =
+		options.useUserConfig !== true
+			? prepareIsolatedCodexHome({
+					feedbackBaseUrl: options.feedbackBaseUrl,
+					includeFeedbackMcp: useLocalFeedbackMcp
+				})
+			: null;
 	const transcriptPath = logDir ? resolve(logDir, 'codex-transcript.jsonl') : null;
 	const lastMessagePath = logDir ? resolve(logDir, 'codex-last-message.txt') : null;
 	const effectiveLastMessagePath =
@@ -294,13 +327,19 @@ export async function runCodexExec(options: CodexRunOptions): Promise<CodexRunRe
 		'--color',
 		'never'
 	];
-	if (options.useUserConfig !== true && !useLocalFeedbackMcp) {
-		args.push('--ignore-user-config');
-	}
 	if (options.model) {
 		args.push('--model', options.model);
 	}
-	args.push(options.prompt);
+	if (options.effort && options.effort !== 'auto') {
+		args.push('--config', `model_reasoning_effort=${tomlString(options.effort)}`);
+	}
+	args.push(
+		withGeneratedProjectSkillPrompt(
+			options.prompt,
+			CODEX_GENERATED_PROJECT_PREFIX,
+			options.allowShell
+		)
+	);
 
 	const startedAt = Date.now();
 	const events: CodexEvent[] = [];
@@ -395,6 +434,7 @@ export async function runCodexExec(options: CodexRunOptions): Promise<CodexRunRe
 			resolvePromise({
 				backend: 'codex',
 				model: options.model ?? null,
+				effort: options.effort ?? null,
 				ok: code === 0 && !timedOut,
 				exitCode: code,
 				signal,
@@ -420,7 +460,11 @@ export async function runClaudeExec(options: CodexRunOptions): Promise<CodexRunR
 	const prompt =
 		options.allowShell === true
 			? options.prompt
-			: `${CLAUDE_GENERATED_PROJECT_PREFIX}\n\n${options.prompt}`;
+			: withGeneratedProjectSkillPrompt(
+					options.prompt,
+					CLAUDE_GENERATED_PROJECT_PREFIX,
+					options.allowShell
+				);
 
 	const args = [
 		'-p',
@@ -557,6 +601,7 @@ export async function runClaudeExec(options: CodexRunOptions): Promise<CodexRunR
 			resolvePromise({
 				backend: 'claude',
 				model: resolvedModel,
+				effort: options.effort ?? null,
 				ok: code === 0 && !timedOut && !isClaudeResultError(events),
 				exitCode: code,
 				signal,
@@ -585,7 +630,10 @@ export function summarizeCodexRun(result: CodexRunResult): string {
 				: null;
 
 	const lines: string[] = [];
-	lines.push(`  agent: ${result.backend}${result.model ? ` (${result.model})` : ''}`);
+	const details = [result.model, result.effort ? `effort ${result.effort}` : null].filter(
+		(value): value is string => value !== null
+	);
+	lines.push(`  agent: ${result.backend}${details.length > 0 ? ` (${details.join(', ')})` : ''}`);
 	lines.push(
 		`  exit code: ${result.exitCode ?? 'null'}${result.signal ? ` (signal ${result.signal})` : ''}`
 	);
