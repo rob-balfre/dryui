@@ -203,7 +203,7 @@
 	{@render docsShell()}
 {/if}
 
-{#if dev && feedbackEnabled && feedbackComponentPromise}
+{#if dev && feedbackEnabled && feedbackComponentPromise && !isHomeRoute}
 	{#await feedbackComponentPromise then Feedback}
 		<Feedback serverUrl={feedbackServerUrl} scrollRoot="main.docs-content" />
 	{/await}

@@ -1,6 +1,7 @@
 @import '@dryui/ui/themes/default.css';
 @import '@dryui/ui/themes/dark.css';
 @import 'mapbox-gl/dist/mapbox-gl.css';
+@import url('https://fonts.bunny.net/css?family=caveat:600&display=swap');
 
 @font-face {
 	font-family: 'Monaspace Neon';

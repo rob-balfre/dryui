@@ -1,8 +1,16 @@
 <script lang="ts">
 	import { Button, CodeBlock } from '@dryui/ui';
+	import { browser } from '$app/environment';
+	import { goto } from '$app/navigation';
 	import { DRYUI_SKILLS_INSTALL_COMMAND } from '$lib/ai-setup';
 	import { SITE_DESCRIPTION } from '$lib/site-meta';
 	import { withBase } from '$lib/utils';
+
+	const feedbackPromise = browser ? import('@dryui/feedback').then((mod) => mod.Feedback) : null;
+
+	function handleDemoSubmit() {
+		return goto(withBase('/feedback-loop'));
+	}
 </script>
 
 <svelte:head>
@@ -16,8 +24,8 @@
 			<p class="home-kicker">Human-led, agent-assisted</p>
 			<h1 id="home-title">Better web apps with agents in the loop.</h1>
 			<p class="home-lede">
-				DryUI gives engineers reusable components, themes, and route patterns so teams can move
-				faster while keeping interfaces clear, accessible, and consistent.
+				A component library for agentic developers. Skills your agent can load. Lint rules it can't
+				sneak past. Theme tokens that hold the line.
 			</p>
 
 			<div class="home-actions" data-layout-area="actions">
@@ -34,6 +42,43 @@
 		</div>
 	</section>
 </div>
+
+{#snippet feedbackHint()}
+	<div class="home-feedback-hint" data-layout="home-hint">
+		<p class="home-feedback-hint-text" data-layout-area="message">
+			oh, and we have live feedback as well
+		</p>
+		<svg
+			class="home-feedback-hint-arrow"
+			data-layout-area="arrow"
+			viewBox="0 0 60 66"
+			role="presentation"
+		>
+			<path
+				d="M 6 8 Q 50 20 48 58"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2.5"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+			/>
+			<path
+				d="M 42 47 L 48 58 L 54 47"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2.5"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+			/>
+		</svg>
+	</div>
+{/snippet}
+
+{#if feedbackPromise}
+	{#await feedbackPromise then Feedback}
+		<Feedback onSubmit={handleDemoSubmit} hint={feedbackHint} />
+	{/await}
+{/if}
 
 <style>
 	.home-page {
@@ -97,5 +142,35 @@
 		font-weight: 800;
 		letter-spacing: 0.04em;
 		text-transform: uppercase;
+	}
+
+	.home-feedback-hint {
+		inline-size: 13rem;
+		color: var(--home-hint-ink, oklch(78% 0.13 54));
+		font-family: 'Caveat', cursive;
+		text-align: start;
+		transform: translateX(-48px) rotate(-3deg);
+		transform-origin: 100% 100%;
+	}
+
+	.home-feedback-hint-text {
+		font-size: 1.65rem;
+		font-weight: 600;
+		line-height: 1.1;
+		letter-spacing: 0.01em;
+	}
+
+	.home-feedback-hint-arrow {
+		display: block;
+		margin-block-start: var(--dry-space-2);
+		margin-inline-start: auto;
+		inline-size: 80px;
+		block-size: auto;
+	}
+
+	@media (max-width: 720px) {
+		.home-feedback-hint {
+			display: none;
+		}
 	}
 </style>

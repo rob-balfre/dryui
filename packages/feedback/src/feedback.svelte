@@ -86,7 +86,9 @@
 		shortcut = '$mod+m',
 		serverUrl: configuredServerUrl,
 		scrollRoot,
-		class: className
+		class: className,
+		onSubmit,
+		hint
 	}: FeedbackProps = $props();
 	const feedbackDisabled = $derived(disabled || feedbackDisabledByProcess);
 
@@ -1714,12 +1716,27 @@
 	}
 
 	async function handleSubmit() {
-		const serverUrl = resolveFeedbackServerUrl(configuredServerUrl);
-		if (!serverUrl || submitStatus !== 'idle' || sent) return;
+		if (submitStatus !== 'idle' || sent) return;
+		if (onSubmit) {
+			try {
+				await onSubmit();
+			} catch (e) {
+				console.error('Failed to run custom feedback onSubmit handler:', e);
+				showToast(
+					'error',
+					'Feedback failed',
+					submissionErrorDescription(e),
+					ERROR_TOAST_DURATION_MS
+				);
+			}
+			return;
+		}
 		if (!hasFeedback) {
 			showToast('error', 'No feedback', 'Add feedback first.', ERROR_TOAST_DURATION_MS);
 			return;
 		}
+		const serverUrl = resolveFeedbackServerUrl(configuredServerUrl);
+		if (!serverUrl) return;
 		try {
 			const payload = await captureSubmission({
 				url: currentPageUrl,
@@ -2278,6 +2295,7 @@
 				onremoveselected={removeSelectedElement}
 				{canBreakApart}
 				onbreakapart={breakApartSelected}
+				{hint}
 			/>
 
 			{#if inspectingComponents}

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { AlertDialog, Button, Field, InputGroup, Kbd, Label } from '@dryui/ui';
+	import type { Snippet } from 'svelte';
 	import type { Attachment } from 'svelte/attachments';
 	import {
 		ArrowLeft,
@@ -58,6 +59,7 @@
 		oncancelplacement?: () => void;
 		onremoveselected?: () => void;
 		onbreakapart?: () => void;
+		hint?: Snippet;
 	}
 
 	let {
@@ -86,7 +88,8 @@
 		onaddcomponent,
 		oncancelplacement,
 		onremoveselected,
-		onbreakapart
+		onbreakapart,
+		hint
 	}: Props = $props();
 
 	const inspecting = $derived(mode === 'components');
@@ -416,6 +419,12 @@
 	aria-hidden={hidden}
 	aria-label="Feedback toolbar"
 >
+	{#if hint}
+		<div class="toolbar-hint" aria-hidden="true">
+			{@render hint()}
+		</div>
+	{/if}
+
 	<div class="toolbar-row">
 		<div class="history-pill" role="group" aria-label="History">
 			{@render historyButtons()}
@@ -818,6 +827,18 @@
 		border-radius: 10px;
 		background: var(--pill-bg);
 		box-shadow: var(--pill-shadow);
+	}
+
+	.toolbar-hint {
+		position: absolute;
+		right: 0;
+		bottom: 100%;
+		margin-block-end: 12px;
+		pointer-events: none;
+	}
+
+	.toolbar[data-hidden] .toolbar-hint {
+		visibility: hidden;
 	}
 
 	.tool-row {
