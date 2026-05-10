@@ -22,6 +22,7 @@ dryui/layout-css-at-rule	error	src/layout.css only allows @container wrappers. R
 dryui/layout-css-selector	error	src/layout.css selectors must target [data-layout] or [data-layout-area] hooks. Invalid selector: {selector}	Use a [data-layout] or [data-layout-area] selector.
 dryui/layout-css-property	error	src/layout.css only supports page layout properties: display, grid, flex, container, spacing, block sizing, and box alignment. Invalid property: {property}	Move visual styling, positioning, typography, color, border, and effects out of src/layout.css.
 dryui/layout-css-value	error	src/layout.css only accepts layout-safe values for grid, flex, containers, spacing, block sizing, and alignment. Invalid {property}: {value}	Use grid/flex/container syntax, DryUI spacing tokens for spacing, margin auto, block-size values, or standard box-alignment keywords.
+dryui/require-body-font-family	error	src/app.css must set body font-family so popovers, dialogs, and native top-layer content inherit app typography.	Add body { font-family: var(--dry-font-sans); } to src/app.css.
 bare-compound	error	<{name}> is a {variant} component — use {target}	{target}
 unknown-component	error	<{name}> is not a known DryUI component	
 invalid-part	error	<{root}.{part}> — "{part}" is not a valid part of {root}. Valid parts: {validParts}	

@@ -10,6 +10,7 @@ export {
 	type Violation
 } from './rules.js';
 export {
+	checkAppCss,
 	checkLayoutCss,
 	dryuiLayoutCss,
 	type DryuiLayoutCssPluginOptions,

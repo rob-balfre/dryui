@@ -60,6 +60,7 @@
 		background: var(--dry-link-preview-bg, var(--dry-color-bg-overlay));
 		color: var(--dry-color-text-strong);
 		box-shadow: var(--dry-link-preview-shadow, var(--dry-shadow-lg));
+		font-family: var(--dry-font-sans);
 		line-height: 1.55;
 		overflow: hidden;
 		transition:

@@ -3,7 +3,7 @@ import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { resolve } from 'node:path';
 import { evaluateLayoutContract } from './layout-contract.js';
-import { checkLayoutCss, dryuiLayoutCss } from './layout-css.js';
+import { checkAppCss, checkLayoutCss, dryuiLayoutCss } from './layout-css.js';
 
 describe('checkLayoutCss', () => {
 	test('accepts valid layout.css page layout rules', () => {
@@ -159,6 +159,61 @@ describe('evaluateLayoutContract', () => {
 	});
 });
 
+describe('checkAppCss', () => {
+	test('accepts body font-family', () => {
+		const violations = checkAppCss(`
+body {
+  container-type: inline-size;
+  container-name: page;
+  font-family: var(--dry-font-sans);
+}`);
+		expect(violations).toHaveLength(0);
+	});
+
+	test('accepts comma selectors that include body', () => {
+		const violations = checkAppCss(`
+html,
+body {
+  font-family: Inter, system-ui, sans-serif;
+}`);
+		expect(violations).toHaveLength(0);
+	});
+
+	test('accepts body font-family inside cascade layers', () => {
+		const violations = checkAppCss(`
+@layer base {
+  body {
+    font-family: var(--dry-font-sans);
+  }
+}`);
+		expect(violations).toHaveLength(0);
+	});
+
+	test('rejects app css without body font-family', () => {
+		const violations = checkAppCss(`
+body {
+  container-type: inline-size;
+  container-name: page;
+}`);
+		expect(violations).toEqual([
+			expect.objectContaining({
+				rule: 'dryui/require-body-font-family',
+				line: 2
+			})
+		]);
+	});
+
+	test('rejects html-only font-family', () => {
+		const violations = checkAppCss('html { font-family: var(--dry-font-sans); }');
+		expect(violations).toEqual([
+			expect.objectContaining({
+				rule: 'dryui/require-body-font-family',
+				line: 1
+			})
+		]);
+	});
+});
+
 describe('dryuiLayoutCss Vite plugin', () => {
 	test('warns when src/layout.css is missing', () => {
 		const root = mkdtempSync(resolve(tmpdir(), 'dryui-layout-css-missing-'));
@@ -180,7 +235,7 @@ describe('dryuiLayoutCss Vite plugin', () => {
 			const watched: string[] = [];
 			const plugin = dryuiLayoutCss({ root });
 			plugin.configureServer!({ watcher: { add: (path) => watched.push(path) } });
-			expect(watched).toEqual([resolve(root, 'src/layout.css')]);
+			expect(watched).toEqual([resolve(root, 'src/layout.css'), resolve(root, 'src/app.css')]);
 		} finally {
 			rmSync(root, { recursive: true, force: true });
 		}
@@ -193,6 +248,19 @@ describe('dryuiLayoutCss Vite plugin', () => {
 			writeFileSync(resolve(root, 'src/layout.css'), "[data-layout='stack'] { width: 100%; }");
 			const plugin = dryuiLayoutCss({ root });
 			expect(() => plugin.buildStart!()).toThrow('dryui/layout-css-property');
+		} finally {
+			rmSync(root, { recursive: true, force: true });
+		}
+	});
+
+	test('throws on app.css body font violations during build', () => {
+		const root = mkdtempSync(resolve(tmpdir(), 'dryui-app-css-invalid-'));
+		try {
+			mkdirSync(resolve(root, 'src'), { recursive: true });
+			writeFileSync(resolve(root, 'src/layout.css'), "[data-layout='stack'] { display: grid; }");
+			writeFileSync(resolve(root, 'src/app.css'), 'body { container-type: inline-size; }');
+			const plugin = dryuiLayoutCss({ root });
+			expect(() => plugin.buildStart!()).toThrow('dryui/require-body-font-family');
 		} finally {
 			rmSync(root, { recursive: true, force: true });
 		}
@@ -212,6 +280,19 @@ describe('dryuiLayoutCss Vite plugin', () => {
 			writeFileSync(file, "[data-layout='stack'] { gap: 12px; }");
 			const plugin = dryuiLayoutCss({ root });
 			expect(() => plugin.handleHotUpdate!({ file })).toThrow('dryui/layout-css-value');
+		} finally {
+			rmSync(root, { recursive: true, force: true });
+		}
+	});
+
+	test('checks app.css during hot updates', () => {
+		const root = mkdtempSync(resolve(tmpdir(), 'dryui-app-css-hmr-'));
+		try {
+			mkdirSync(resolve(root, 'src'), { recursive: true });
+			const file = resolve(root, 'src/app.css');
+			writeFileSync(file, 'body { container-type: inline-size; }');
+			const plugin = dryuiLayoutCss({ root });
+			expect(() => plugin.handleHotUpdate!({ file })).toThrow('dryui/require-body-font-family');
 		} finally {
 			rmSync(root, { recursive: true, force: true });
 		}

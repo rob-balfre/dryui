@@ -115,6 +115,7 @@
 		border: 1px solid var(--dry-menubar-border, var(--dry-color-stroke-weak));
 		border-radius: var(--dry-menubar-radius, var(--dry-radius-popover));
 		box-shadow: var(--dry-shadow-overlay);
+		font-family: var(--dry-font-sans);
 		padding: var(--dry-space-1);
 
 		transition:

@@ -141,6 +141,7 @@
 		border: 1px solid var(--dry-overlay-border, var(--dry-color-stroke-weak));
 		border-radius: var(--dry-overlay-radius, var(--dry-radius-md));
 		box-shadow: var(--dry-overlay-shadow, var(--dry-shadow-lg));
+		font-family: var(--dry-font-sans);
 		padding: var(--dry-space-1);
 		max-height: 200px;
 		overflow-y: auto;

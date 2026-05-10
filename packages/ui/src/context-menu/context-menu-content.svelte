@@ -86,6 +86,7 @@
 		border: 1px solid var(--dry-menu-border);
 		border-radius: var(--dry-menu-radius);
 		box-shadow: var(--dry-menu-shadow);
+		font-family: var(--dry-font-sans);
 		padding: var(--dry-menu-padding);
 
 		transition:

@@ -65,6 +65,7 @@
 		max-inline-size: 28ch;
 		padding: var(--dry-tooltip-padding-y, var(--dry-space-1))
 			var(--dry-tooltip-padding-x, var(--dry-padding-tooltip, var(--dry-space-2)));
+		font-family: var(--dry-font-sans);
 		font-size: var(--dry-tooltip-font-size, var(--dry-type-ui-caption-size));
 		font-weight: var(--dry-tooltip-font-weight, var(--dry-font-weight-medium));
 		line-height: var(--dry-tooltip-line-height, var(--dry-type-ui-caption-leading));

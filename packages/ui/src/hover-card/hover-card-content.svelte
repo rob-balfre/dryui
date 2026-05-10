@@ -113,6 +113,7 @@
 		border-radius: var(--dry-hover-card-radius);
 		box-shadow: var(--dry-hover-card-shadow);
 		padding: var(--dry-hover-card-padding);
+		font-family: var(--dry-font-sans);
 		font-size: var(--dry-type-small-size, var(--dry-text-sm-size));
 		line-height: var(--dry-type-small-leading, var(--dry-text-sm-leading));
 		z-index: var(--dry-layer-overlay);

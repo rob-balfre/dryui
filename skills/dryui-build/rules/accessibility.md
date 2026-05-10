@@ -1,59 +1,47 @@
 # Accessibility
 
-## Field.Root for Form Inputs
+Use this file when building forms, dialogs, controls, tables, loading states, or icon-only interactions with DryUI.
 
-Field.Root generates unique IDs and links Label to the input via `for`/`id` attributes. Always use it instead of raw `<label>` elements.
+## Fields
+
+Every form control gets `Field.Root` and `Label`. `Field.Root` wires IDs, `aria-describedby`, errors, and descriptions.
 
 ```svelte
-<!-- Incorrect: label not linked to input -->
-<label>Email</label>
-<Input bind:value={email} />
-
-<!-- Correct: Field.Root handles accessible linking -->
 <Field.Root>
 	<Label>Email</Label>
-	<Input bind:value={email} />
+	<Input bind:value={email} type="email" />
+	<Field.Description>Used for account notices.</Field.Description>
+	<Field.Error>{emailError}</Field.Error>
 </Field.Root>
 ```
 
-Field.Root also connects Description and Error parts via `aria-describedby`:
+Do not use raw `<label>` with raw `<input>` in route markup.
+
+## Buttons and Links
+
+- Use `Button` for actions.
+- Use `<a>` for navigation.
+- Add `aria-label` to every icon-only button.
+- Use `type="submit"` on the primary form action.
+- Use `aria-disabled` only when an element cannot be truly disabled; otherwise use the real disabled state.
 
 ```svelte
-<Field.Root>
-	<Label>Password</Label>
-	<Input type="password" bind:value={password} />
-	<Field.Description>Must be at least 8 characters.</Field.Description>
-	<Field.Error>Password is too short.</Field.Error>
-</Field.Root>
+<Button variant="ghost" aria-label="Open menu" onclick={openMenu}>
+	<MenuIcon />
+</Button>
 ```
 
-This produces the correct ARIA relationships automatically:
+## Dialogs
 
-- Label is linked to the input via `for`/`id`
-- Description is linked via `aria-describedby`
-- Error is linked via `aria-describedby` and sets `aria-invalid` on the input
-
-## Dialog and AlertDialog
-
-### Dialog
-
-Dialog traps focus inside the overlay. Always provide a title and a way to close.
+Use `Dialog.Root` for modal tasks and `AlertDialog.Root` for destructive confirmation.
 
 ```svelte
-<!-- Incorrect: dialog without header or close mechanism -->
-<Dialog.Root bind:open={show}>
-	<Dialog.Content>
-		<p>Some content</p>
-	</Dialog.Content>
-</Dialog.Root>
-
-<!-- Correct: header provides accessible title, close button available -->
-<Dialog.Root bind:open={show}>
+<Dialog.Root bind:open={editing}>
 	<Dialog.Trigger>
-		<Button>Open</Button>
+		<Button>Edit profile</Button>
 	</Dialog.Trigger>
 	<Dialog.Content>
-		<Dialog.Header>Edit Profile</Dialog.Header>
+		<Dialog.Header>Edit profile</Dialog.Header>
 		<Dialog.Body>
 			<Field.Root>
 				<Label>Name</Label>
@@ -61,36 +49,23 @@ Dialog traps focus inside the overlay. Always provide a title and a way to close
 			</Field.Root>
 		</Dialog.Body>
 		<Dialog.Footer>
-			<Button variant="outline" onclick={() => (show = false)}>Cancel</Button>
-			<Button variant="solid">Save</Button>
+			<Button variant="outline" onclick={() => (editing = false)}>Cancel</Button>
+			<Button type="submit" variant="solid">Save</Button>
 		</Dialog.Footer>
 	</Dialog.Content>
 </Dialog.Root>
 ```
 
-### AlertDialog
-
-Use AlertDialog (not Dialog) for destructive confirmations. It requires explicit user action and cannot be dismissed by clicking the overlay.
+Destructive actions need explicit cancel/action affordances:
 
 ```svelte
-<!-- Incorrect: using Dialog for destructive confirmation -->
-<Dialog.Root bind:open={showDelete}>
-	<Dialog.Content>
-		<p>Delete this item?</p>
-		<Button onclick={handleDelete}>Delete</Button>
-	</Dialog.Content>
-</Dialog.Root>
-
-<!-- Correct: AlertDialog with Action and Cancel parts -->
 <AlertDialog.Root>
 	<AlertDialog.Trigger>
 		<Button variant="outline">Delete</Button>
 	</AlertDialog.Trigger>
 	<AlertDialog.Content>
-		<AlertDialog.Header>Delete Item</AlertDialog.Header>
-		<AlertDialog.Body>
-			<p>This action cannot be undone.</p>
-		</AlertDialog.Body>
+		<AlertDialog.Header>Delete customer?</AlertDialog.Header>
+		<AlertDialog.Body>This cannot be undone.</AlertDialog.Body>
 		<AlertDialog.Footer>
 			<AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
 			<AlertDialog.Action>Delete</AlertDialog.Action>
@@ -99,117 +74,28 @@ Use AlertDialog (not Dialog) for destructive confirmations. It requires explicit
 </AlertDialog.Root>
 ```
 
-## Button vs Anchor
+## Keyboard Behavior
 
-Use Button for actions. Use `<a>` for navigation.
+DryUI handles standard keyboard behavior for compound widgets such as Tabs, Accordion, DropdownMenu, Select, Dialog, and AlertDialog. Do not override keyboard handlers unless the product interaction requires it and the replacement is fully accessible.
 
-```svelte
-<!-- Incorrect: anchor styled as action button -->
-<a href="#" onclick={handleSave}>Save</a>
+## Loading and Async States
 
-<!-- Correct: Button for actions -->
-<Button onclick={handleSave}>Save</Button>
+- Keep the triggering control in place while work runs.
+- Set disabled or busy state on controls that cannot be used during the operation.
+- Use status text or a progress component for operations that last long enough to need feedback.
+- Do not rely on color alone for error, warning, or success state.
 
-<!-- Correct: anchor for navigation -->
-<a href="/settings">Go to Settings</a>
-```
+## Images and Avatars
 
-## Icon-Only Buttons
-
-Always add `aria-label` to buttons that contain only an icon and no visible text.
-
-```svelte
-<!-- Incorrect: icon button without accessible name -->
-<Button variant="ghost" onclick={toggleMenu}>
-	<MenuIcon />
-</Button>
-
-<!-- Correct: aria-label provides accessible name -->
-<Button variant="ghost" onclick={toggleMenu} aria-label="Open menu">
-	<MenuIcon />
-</Button>
-```
-
-## Avatar
-
-Always provide `alt` text for Avatar images.
-
-```svelte
-<!-- Incorrect: no alt text -->
-<Avatar src="/photo.jpg" />
-
-<!-- Correct: descriptive alt text -->
-<Avatar src="/photo.jpg" alt="Jane Doe's profile photo" />
-```
-
-## Keyboard Navigation
-
-DryUI components handle keyboard navigation automatically:
-
-- **Tabs**: Arrow keys move between triggers, Enter/Space activates
-- **Accordion**: Arrow keys navigate triggers, Enter/Space toggles
-- **DropdownMenu**: Arrow keys navigate items, Enter selects, Escape closes
-- **Select**: Arrow keys navigate items, Enter selects, Escape closes
-- **Dialog/AlertDialog**: Tab cycles through focusable elements, Escape closes (Dialog only)
-
-No extra code needed for standard keyboard behavior. Avoid overriding `onkeydown` on these components unless you have a specific accessibility need.
-
-## Form Submission
-
-Use `type="submit"` on the primary form action button so that pressing Enter in any input submits the form.
-
-```svelte
-<!-- Incorrect: button without type, won't submit on Enter -->
-<form onsubmit={handleSubmit}>
-	<Field.Root>
-		<Label>Search</Label>
-		<Input bind:value={query} />
-	</Field.Root>
-	<Button variant="solid" onclick={handleSubmit}>Search</Button>
-</form>
-
-<!-- Correct: type="submit" enables Enter key submission -->
-<form onsubmit={handleSubmit}>
-	<Field.Root>
-		<Label>Search</Label>
-		<Input bind:value={query} />
-	</Field.Root>
-	<Button type="submit" variant="solid">Search</Button>
-</form>
-```
-
-## Loading States
-
-Use `disabled` and descriptive text or `aria-label` during loading states.
-
-```svelte
-<!-- Incorrect: no indication of loading -->
-<Button onclick={save}>
-	{#if saving}
-		<Spinner />
-	{:else}
-		Save
-	{/if}
-</Button>
-
-<!-- Correct: disabled and labeled during loading -->
-<Button onclick={save} disabled={saving} aria-label={saving ? 'Saving...' : undefined}>
-	{#if saving}
-		<Spinner /> Saving...
-	{:else}
-		Save
-	{/if}
-</Button>
-```
+- Provide meaningful `alt` text for informative avatars or images.
+- Use empty alt text only for decorative images.
+- Do not use initials-only avatars when the design or data provides profile imagery.
 
 ## Checklist
 
-Before shipping a page with DryUI components:
-
-1. Every form input is wrapped in `Field.Root` with a `Label`
-2. Every Dialog/AlertDialog has a header or `aria-label`
-3. Every icon-only Button has `aria-label`
-4. Destructive confirmations use `AlertDialog`, not `Dialog`
-5. Primary form buttons use `type="submit"`
-6. Avatar images have `alt` text
-7. No `<a href="#">` used as action buttons
+1. Inputs use `Field.Root` and `Label`.
+2. Destructive confirmation uses `AlertDialog`, not `Dialog`.
+3. Dialog content has a header or accessible name.
+4. Icon-only buttons have accessible names.
+5. Form submit buttons use `type="submit"`.
+6. Disabled, busy, error, and empty states are visible and announced where needed.

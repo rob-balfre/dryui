@@ -6,4 +6,5 @@
 body {
 	container-type: inline-size;
 	container-name: page;
+	font-family: var(--dry-font-sans);
 }

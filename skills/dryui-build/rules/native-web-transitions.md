@@ -1,99 +1,79 @@
 # Native Web Transitions
 
-Use this skill when a UI should animate with platform APIs first, not JS animation libraries.
+Use this file when adding motion to a DryUI interface. Motion must be progressive, native, accessible, and easy to remove.
 
-## Default approach
+## Default Approach
 
-1. Start from a fully functional no-animation version.
-2. Add JS feature detection for `document.startViewTransition` before calling it.
-3. Gate transition-specific CSS with `@supports (view-transition-name: foo)`.
-4. Gate scroll-driven CSS with `@supports (animation-timeline: view())`.
-5. Add `prefers-reduced-motion` handling that removes typewriter, transition, and scroll-linked animation.
-6. Keep fallback behavior immediate and complete rather than approximating the effect with extra JS.
+1. Build a fully functional no-animation version first.
+2. Use CSS transitions, the View Transitions API, scroll-driven animations, or small Svelte transitions only after layout and accessibility are correct.
+3. Keep motion local to the component or route that owns the interaction.
+4. Never use motion to hide missing loading, disabled, empty, or error states.
+5. Respect reduced motion.
 
-## View Transition pattern
+## View Transition Pattern
 
-Use when DOM changes should animate as a single state change.
+Use View Transitions for route or state changes where the old and new DOM are both meaningful.
 
 ```ts
-function runWithViewTransition(update: () => void) {
+function withViewTransition(update: () => void) {
 	if (!document.startViewTransition) {
 		update();
-		return Promise.resolve();
+		return;
 	}
 
-	const transition = document.startViewTransition(update);
-	return transition.finished.catch(() => {});
+	document.startViewTransition(update);
 }
 ```
 
-Use stable names only on the elements that should animate:
+```svelte
+<Button onclick={() => withViewTransition(() => (view = 'detail'))}>
+	Open detail
+</Button>
+```
+
+Keep `view-transition-name` specific and sparse. Do not name every node on the page.
+
+## CSS Transition Pattern
+
+Use tokenized durations and properties that do not disturb layout.
 
 ```css
-@supports (view-transition-name: foo) {
-	.message {
-		view-transition-name: var(--vt-name);
-	}
-
-	::view-transition-new(message-enter) {
-		animation: dry-slide-up 240ms ease-out;
-	}
+[data-state='open'] {
+	opacity: 1;
+	transform: translateY(0);
+	transition:
+		opacity var(--dry-duration-fast) var(--dry-ease-standard),
+		transform var(--dry-duration-fast) var(--dry-ease-standard);
 }
 ```
 
-Notes:
+Prefer opacity and transform. Avoid animating width, height, inline-size, grid tracks, or layout-critical spacing.
 
-- Assign unique `view-transition-name` values per inserted item.
-- Keep transitions short; they should clarify state changes, not delay interaction.
-- Trigger follow-up work such as `scrollIntoView` after `transition.finished`.
+## Reduced Motion
 
-## Scroll-driven reveal pattern
-
-Use for footer or section entry reveals tied to viewport position.
-
-```css
-@supports (animation-timeline: view()) {
-	.reveal {
-		animation: dry-fade-up linear both;
-		animation-timeline: view();
-		animation-range: entry 15% cover 35%;
-	}
-}
-```
-
-Fallback: leave the section fully visible with no animation.
-
-## Reduced motion
-
-Always include a reduced-motion override:
+Reduced-motion media queries are allowed for motion preferences. They are not layout breakpoints.
 
 ```css
 @media (prefers-reduced-motion: reduce) {
-	.typing-dot,
-	.reveal {
-		animation: none;
-	}
-
-	:root {
-		scroll-behavior: auto;
+	[data-state='open'] {
+		transition: none;
 	}
 }
 ```
 
-The `@media` block comes after the default rule in the same scoped stylesheet, so equal specificity plus source order handles the override without `!important` (banned by `@dryui/lint` via `dryui/no-important`). In JS, skip delayed typewriter/replay steps and render the final state immediately when reduced motion is active.
+In JavaScript, skip replay, typewriter, stagger, and delayed reveal effects when reduced motion is active.
 
-## Svelte notes
+## Svelte Notes
 
-- Keep DOM mutation orchestration in the component that owns the rendered list.
-- Use `$effect` or `onMount` for browser-only APIs.
-- Do not access `document` or `window` during SSR; guard with `browser` or call inside browser-only lifecycle.
-- Prefer state-driven rendering and wrap only the mutation boundary in `startViewTransition`.
+- Use Svelte transitions for local entrance/exit effects only.
+- Do not use transitions to compensate for unstable layout.
+- Avoid storing animation state in `$effect`; update state from user events or explicit lifecycle points.
+- Clean up timers, observers, and animation handles.
 
 ## Checklist
 
-- Feature-detected `document.startViewTransition`
-- `@supports` around transition CSS
-- `@supports` around `animation-timeline`
-- `prefers-reduced-motion` disables motion and delay
-- Fallback path is functional without animation
-- No dependency on third-party animation runtime
+1. The UI works with all animation removed.
+2. Motion uses native browser or Svelte primitives.
+3. Reduced motion produces an immediate or near-immediate final state.
+4. Animation does not change layout tracks or cause text overlap.
+5. Motion styles do not use `!important`, `:global()`, or inline style hacks.

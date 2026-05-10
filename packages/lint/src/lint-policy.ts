@@ -144,6 +144,10 @@ const LINT_RULE_DEFINITIONS = {
 		catalogId: 'dryui/layout-css-value',
 		targets: ['layout-css']
 	},
+	'dryui/require-body-font-family': {
+		catalogId: 'dryui/require-body-font-family',
+		targets: ['style']
+	},
 	'project/theme-import-order': {
 		catalogId: 'theme-import-order',
 		targets: ['script']

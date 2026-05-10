@@ -150,6 +150,7 @@
 		box-shadow: var(--dry-cmd-shadow);
 		margin: auto;
 		padding: 0;
+		font-family: var(--dry-font-sans);
 		overflow: hidden;
 		max-height: 24rem;
 		display: grid;

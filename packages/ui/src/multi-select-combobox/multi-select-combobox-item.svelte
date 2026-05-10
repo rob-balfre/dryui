@@ -101,6 +101,7 @@
 		gap: var(--dry-space-2);
 		padding: var(--dry-space-2) var(--dry-space-3);
 		border-radius: var(--dry-multi-select-item-radius);
+		font-family: var(--dry-font-sans);
 		font-size: var(--dry-type-small-size, var(--dry-text-sm-size));
 		cursor: pointer;
 		user-select: none;

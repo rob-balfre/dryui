@@ -76,6 +76,7 @@
 		background: var(--dry-color-bg-overlay);
 		box-shadow: var(--dry-shadow-lg);
 		color: var(--dry-color-text-strong);
+		font-family: var(--dry-font-sans);
 		transition:
 			opacity var(--dry-duration-fast) var(--dry-ease-emphasized),
 			transform var(--dry-duration-fast) var(--dry-ease-emphasized);

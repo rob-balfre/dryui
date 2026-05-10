@@ -263,6 +263,7 @@ body {
 	margin: 0;
 	container-type: inline-size;
 	container-name: page;
+	font-family: var(--dry-font-sans);
 }
 
 body > div {

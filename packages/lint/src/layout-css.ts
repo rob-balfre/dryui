@@ -1,5 +1,13 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import {
+	buildLineIndex,
+	declarationEntries,
+	lookupLine,
+	parseCssBlocks,
+	splitTopLevel,
+	stripCssComments
+} from './css-scan.js';
 import { checkStyle, type Violation } from './rules.js';
 import { createLintPolicy, type LintPolicy, type LintRuleId } from './lint-policy.js';
 import { evaluateLayoutContract, type LayoutContractDiagnostic } from './layout-contract.js';
@@ -17,6 +25,11 @@ export interface DryuiLayoutCssPluginOptions {
 	 * Canonical layout stylesheet relative to root.
 	 */
 	readonly file?: string;
+	/**
+	 * Canonical app stylesheet relative to root. Set to false to skip global
+	 * app CSS checks.
+	 */
+	readonly appFile?: string | false;
 }
 
 export interface VitePluginLike {
@@ -36,6 +49,7 @@ export interface VitePluginLike {
 }
 
 const DEFAULT_LAYOUT_CSS_FILE = 'src/layout.css';
+const DEFAULT_APP_CSS_FILE = 'src/app.css';
 
 const DIAGNOSTIC_RULE_IDS = {
 	'layout-css-at-rule': 'dryui/layout-css-at-rule',
@@ -92,6 +106,53 @@ export function checkLayoutCss(
 	});
 }
 
+function selectorTargetsBody(selector: string): boolean {
+	return splitTopLevel(selector, ',').some((part) =>
+		/(^|[\s>+~])body(?=$|[.#:[\s>+~])/.test(part.trim())
+	);
+}
+
+function isUnconditionalAtRule(selector: string): boolean {
+	return /^@layer\b/i.test(selector.trim());
+}
+
+export function checkAppCss(content: string, filename = DEFAULT_APP_CSS_FILE): Violation[] {
+	const stripped = stripCssComments(content);
+	const lineStarts = buildLineIndex(stripped);
+	const policy = createLintPolicy({ target: 'style', filename, source: content });
+	let firstBodyLine = 1;
+	let sawBodySelector = false;
+	let hasBodyFontFamily = false;
+
+	const scanBlocks = (start: number, end: number): void => {
+		for (const block of parseCssBlocks(stripped, start, end)) {
+			if (isUnconditionalAtRule(block.selector)) {
+				scanBlocks(block.bodyStart, block.bodyEnd);
+				continue;
+			}
+
+			if (!selectorTargetsBody(block.selector)) continue;
+			const selectorIndex = stripped.lastIndexOf(block.selector, block.bodyStart);
+			const line = lookupLine(lineStarts, selectorIndex >= 0 ? selectorIndex : block.bodyStart);
+			if (!sawBodySelector) firstBodyLine = line;
+			sawBodySelector = true;
+			if (
+				declarationEntries(stripped, block.bodyStart, block.bodyEnd).some(
+					(declaration) => declaration.property === 'font-family' && declaration.value.length > 0
+				)
+			) {
+				hasBodyFontFamily = true;
+			}
+		}
+	};
+
+	scanBlocks(0, stripped.length);
+	if (hasBodyFontFamily) return [];
+
+	const violation = policy.violation('dryui/require-body-font-family', firstBodyLine);
+	return violation ? [violation] : [];
+}
+
 function formatViolation(filename: string, violation: Violation): string {
 	return `[${violation.rule}] ${filename}:${violation.line} - ${violation.message}`;
 }
@@ -101,23 +162,31 @@ function layoutCssError(filename: string, violations: readonly Violation[]): Err
 	return new Error(`DryUI layout.css violations:\n${messages}`);
 }
 
+function appCssError(filename: string, violations: readonly Violation[]): Error {
+	const messages = violations.map((violation) => formatViolation(filename, violation)).join('\n');
+	return new Error(`DryUI app.css violations:\n${messages}`);
+}
+
 function normalizePath(path: string): string {
 	return path.replace(/\\/g, '/');
 }
 
 export function dryuiLayoutCss(options: DryuiLayoutCssPluginOptions = {}): VitePluginLike {
 	const relativeFile = options.file ?? DEFAULT_LAYOUT_CSS_FILE;
+	const relativeAppFile =
+		options.appFile === false ? null : (options.appFile ?? DEFAULT_APP_CSS_FILE);
 	let root = options.root ?? process.cwd();
 	let logger: { warn(message: string): void } = console;
 	let warnedMissing = false;
 
 	const absoluteFile = () => resolve(root, relativeFile);
+	const absoluteAppFile = () => (relativeAppFile ? resolve(root, relativeAppFile) : null);
 	const warnMissing = () => {
 		if (warnedMissing) return;
 		warnedMissing = true;
 		logger.warn(`[dryui/layout-css] ${relativeFile} was not found; skipping layout.css lint.`);
 	};
-	const checkFile = () => {
+	const checkLayoutFile = () => {
 		const file = absoluteFile();
 		if (!existsSync(file)) {
 			warnMissing();
@@ -126,6 +195,17 @@ export function dryuiLayoutCss(options: DryuiLayoutCssPluginOptions = {}): ViteP
 		warnedMissing = false;
 		const violations = checkLayoutCss(readFileSync(file, 'utf-8'), relativeFile);
 		if (violations.length > 0) throw layoutCssError(relativeFile, violations);
+	};
+	const checkAppFile = () => {
+		if (!relativeAppFile) return;
+		const file = absoluteAppFile();
+		if (!file || !existsSync(file)) return;
+		const violations = checkAppCss(readFileSync(file, 'utf-8'), relativeAppFile);
+		if (violations.length > 0) throw appCssError(relativeAppFile, violations);
+	};
+	const checkFiles = () => {
+		checkLayoutFile();
+		checkAppFile();
 	};
 
 	return {
@@ -146,16 +226,20 @@ export function dryuiLayoutCss(options: DryuiLayoutCssPluginOptions = {}): ViteP
 		configureServer(server) {
 			logger = server.config?.logger ?? logger;
 			server.watcher?.add(absoluteFile());
+			const appFile = absoluteAppFile();
+			if (appFile) server.watcher?.add(appFile);
 		},
 		buildStart() {
-			checkFile();
+			checkFiles();
 		},
 		handleHotUpdate(context) {
 			const changed = normalizePath(resolve(context.file));
 			const target = normalizePath(absoluteFile());
-			if (changed !== target) return;
+			const appTarget = absoluteAppFile();
+			if (changed !== target && (!appTarget || changed !== normalizePath(appTarget))) return;
 			logger = context.server?.config?.logger ?? logger;
-			checkFile();
+			if (changed === target) checkLayoutFile();
+			if (appTarget && changed === normalizePath(appTarget)) checkAppFile();
 		}
 	};
 }

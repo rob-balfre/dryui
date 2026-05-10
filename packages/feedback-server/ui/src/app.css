@@ -63,6 +63,7 @@ body {
 
 body {
 	min-block-size: 100dvh;
+	font-family: var(--dry-font-sans);
 }
 
 body::before {

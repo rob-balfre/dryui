@@ -1,234 +1,99 @@
-# Svelte 5 Standards
+# Svelte 5
 
-## Core Principle
+Use this file when writing or editing Svelte code for a DryUI interface. DryUI assumes Svelte 5 runes, snippets, typed props, and native browser APIs.
 
-Use Svelte 5 runes correctly. Use native browser APIs. No legacy patterns.
+## Runes
 
-## Rune Rules
-
-### `$state` -- Only for reactive variables
+Use `$state` only for reactive local state.
 
 ```svelte
-// GOOD: reactive variable that triggers UI updates let count = $state(0); // GOOD: use $state.raw
-for large objects that are reassigned, not mutated let items = $state.raw(await fetchItems()); //
-BAD: deep proxy overhead on large data let items = $state(await fetchItems());
+let count = $state(0);
+let items = $state.raw(await loadItems());
 ```
 
-### `$derived` -- For computed values, NOT `$effect`
+Use `$derived` for computed values.
 
 ```svelte
-// GOOD
-let doubled = $derived(count * 2);
-let filtered = $derived.by(() => items.filter(i => i.active));
-
-// BAD: never update state inside $effect
-let doubled;
-$effect(() => { doubled = count * 2; }); // WRONG
+let filtered = $derived.by(() => items.filter((item) => item.active));
 ```
 
-### `$effect` -- Escape hatch, mostly avoid
-
-Use `$effect` ONLY for:
-
-- Syncing with external libs (D3, maps, canvas)
-- Browser API setup that needs cleanup (observers, listeners)
-- NOT for derived state, NOT for event responses
-
-**Never use two `$effect`s for bidirectional sync.** They race: Effect A sees a derived value change, reads the stale prop, and overwrites the state back to the old value before Effect B can sync the prop.
+Do not use `$effect` to maintain derived state.
 
 ```svelte
-// BAD: two effects fighting over the same state
+<!-- Incorrect -->
 $effect(() => {
-  if (value !== hex && isValidHex(value)) internalHsv = rgbToHsv(hexToRgb(value));
-});
-$effect(() => { value = hex; }); // races with Effect 1
-
-// GOOD: sync prop directly in setter, single effect for external changes
-function updateHsv(hsv: HSV) {
-  internalHsv = hsv;
-  const newHex = rgbToHex(hsvToRgb(hsv));
-  lastSyncedValue = newHex;
-  value = newHex;
-}
-let lastSyncedValue = value;
-$effect.pre(() => {
-  if (value !== lastSyncedValue && isValid(value)) {
-    lastSyncedValue = value;
-    internalState = parse(value);
-  }
+	filtered = items.filter((item) => item.active);
 });
 ```
 
-Prefer `{@attach}` for DOM element lifecycle:
+Use `$effect` only for browser lifecycle work, external libraries, observers, listeners, canvas, maps, and cleanup. Avoid paired effects for two-way sync; update bindable props in setter functions instead.
+
+## Props
+
+Props are typed and destructured.
 
 ```svelte
-<!-- GOOD: attach for element lifecycle -->
-<canvas {@attach node => { const ctx = node.getContext('2d'); ... }}></canvas>
-
-<!-- BAD: $effect + bind:this -->
-<script>
-  let canvas;
-  $effect(() => { if (canvas) { ... } });
-</script>
-<canvas bind:this={canvas}></canvas>
-```
-
-### `$props` -- Always typed, always destructured
-
-```svelte
-<script lang="ts">
-	interface Props extends HTMLButtonAttributes {
-		variant?: 'solid' | 'outline' | 'ghost';
-		size?: 'sm' | 'md' | 'lg';
-	}
-	let { variant = 'solid', size = 'md', children, ...rest }: Props = $props();
-</script>
-```
-
-### `$bindable` -- For two-way binding props
-
-```svelte
-<script lang="ts">
-	interface Props {
-		value: string;
-	}
-	let { value = $bindable('') }: Props = $props();
-</script>
-```
-
-When a component has internal state derived from a `$bindable` prop, sync the prop in setter functions -- never via `$effect` chains.
-
-## Component Patterns
-
-### Snippets replace slots
-
-```svelte
-<!-- Component receives snippet as prop -->
 <script lang="ts">
 	import type { Snippet } from 'svelte';
+
 	interface Props {
-		icon?: Snippet;
-		children: Snippet;
+		value?: string;
+		label: string;
+		children?: Snippet;
 	}
-	let { icon, children }: Props = $props();
+
+	let { value = $bindable(''), label, children }: Props = $props();
 </script>
-
-{#snippet icon()}
-	<svg>...</svg>
-{/snippet}
-<Button {icon}>Click me</Button>
-<button>
-	{#if icon}{@render icon()}{/if}
-	{@render children()}
-</button>
 ```
 
-### Compound components via context
+Use `$bindable` only for props that support two-way binding.
 
-```typescript
-// context.svelte.ts
-import { getContext, setContext } from 'svelte';
-const KEY = Symbol('accordion');
+## Snippets
 
-export function setAccordionCtx(ctx: AccordionState) {
-	setContext(KEY, ctx);
-}
-export function getAccordionCtx(): AccordionState {
-	return getContext(KEY);
-}
-```
-
-### Shared reactive logic in `.svelte.ts` files
-
-```typescript
-export function createCounter(initial = 0) {
-	let count = $state(initial);
-	return {
-		get count() {
-			return count;
-		},
-		increment() {
-			count++;
-		},
-		reset() {
-			count = initial;
-		}
-	};
-}
-```
-
-### Event handling in component libraries
-
-Svelte 5 compiles `onclick` on elements into event delegation. This can fail on `<div>` elements in published packages. Use actions for reliable native event binding on non-button elements:
+Use snippets instead of legacy slots.
 
 ```svelte
-// BAD: onclick on <div> in component library
-<div onclick={handleClick} {...rest}></div>
+{#snippet icon()}
+	<SearchIcon />
+{/snippet}
 
-// GOOD: Svelte action with native addEventListener
-<script>
-  function interactive(node: HTMLElement) {
-    function handleClick() { /* ... */ }
-    node.addEventListener('click', handleClick);
-    return { destroy() { node.removeEventListener('click', handleClick); } };
-  }
-</script>
-<div use:interactive {...rest}></div>
+<Button {icon}>Search</Button>
 ```
 
-## Native Browser APIs -- No Libraries
+When authoring components, receive snippets as typed props and render them with `{@render ...}`.
 
-| Need        | Use                              | NOT                   |
-| ----------- | -------------------------------- | --------------------- |
-| Modals      | `<dialog>` + `showModal()`       | JS modal libs         |
-| Dropdowns   | Popover API (`popover="auto"`)   | Floating UI           |
-| Positioning | CSS Anchor Positioning           | Floating UI/Popper    |
-| Responsive  | Container queries (`@container`) | Media queries         |
-| Focus trap  | `<dialog>` + `inert` attribute   | focus-trap libs       |
-| Scroll lock | `<dialog>` modal behavior        | body-scroll-lock      |
-| Accordions  | `<details name="group">`         | custom JS             |
-| Animations  | Web Animations API / CSS         | GSAP for simple cases |
-| Dates       | `Intl.DateTimeFormat`            | moment/date-fns       |
-| Copy/paste  | Clipboard API                    | clipboard.js          |
+## Events
 
-### Popover API: `auto` vs `manual`
+- Use modern event props such as `onclick`, `oninput`, and `onsubmit`.
+- Do not mix legacy `on:click` style with Svelte 5 component code.
+- For component libraries, expose explicit callbacks or bindable props instead of relying on DOM event forwarding.
 
-`popover="auto"` gives free light-dismiss but only works with `popovertarget` on `<button>`. Components that open programmatically must use `popover="manual"` with explicit dismiss logic.
+## Browser APIs
 
-## Styling Rules
+Prefer native browser APIs over dependencies:
 
-- Svelte scoped `<style>` blocks -- no CSS modules
-- CSS variables (`--dry-*`) for theming
-- Container queries for responsive layout -- never media queries for sizing
-- `data-state`, `data-disabled` attributes for state-based styling
-- No inline styles except dynamic values from props
-- Never use `!important` or `:global()`
+| Need | Prefer |
+| --- | --- |
+| Dialog semantics | `Dialog` / `AlertDialog` components |
+| Popover behavior | Popover API-backed components |
+| Resize work | `ResizeObserver` |
+| Clipboard | `navigator.clipboard` |
+| Dates | `Intl.DateTimeFormat` where possible |
+| Responsive layout | CSS container queries |
 
-### CSS custom property tokens: use `var()` fallbacks
+## Styling
 
-```css
-/* BAD: local declaration blocks parent overrides */
-.root {
-	--row-gap: var(--dry-space-4);
-	gap: var(--row-gap);
-}
-
-/* GOOD: fallback lets parents override */
-.root {
-	gap: var(--row-gap, var(--dry-space-4));
-}
-```
+- Use CSS custom properties with fallbacks when authoring reusable components.
+- Do not use route-level CSS for page grid/flex layout; use `src/layout.css`.
+- Do not use `:global()`, `!important`, or inline styles to bypass lint.
+- Keep component CSS local to component visuals, not page structure.
 
 ## SSR Safety
 
-Guard browser APIs with `onMount` or `{@attach}`:
+- Guard browser-only APIs with browser lifecycle code or environment checks.
+- Do not read `window`, `document`, `localStorage`, or layout measurements at module evaluation time.
+- Prefer progressive enhancement for browser-only interactions.
 
-```svelte
-<script>
-	import { onMount } from 'svelte';
-	let mounted = $state(false);
-	onMount(() => {
-		mounted = true;
-	});
-</script>
-```
+## Framework Questions
+
+For SvelteKit load functions, actions, routing, runes edge cases, compiler warnings, or syntax uncertainty, use the available Svelte documentation/MCP tooling first. If that tooling is unavailable, inspect local project examples and run the project Svelte check after editing.

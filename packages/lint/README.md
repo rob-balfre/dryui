@@ -17,6 +17,7 @@ import { dryuiLint, dryuiLayoutCss } from '@dryui/lint';
 - No inline styles
 - No `width` or `inline-size` layout sizing in scoped styles
 - Strict `src/layout.css` checks for page-level grid, flex, container, spacing, and alignment CSS
+- `src/app.css` must set a global `body` font family when present
 - No `<!-- svelte-ignore css_unused_selector -->`
 - Additional DryUI markup and component usage rules
 
@@ -56,9 +57,11 @@ export default {
 };
 ```
 
-`dryuiLayoutCss()` checks the canonical `src/layout.css` file during Vite dev
-startup, HMR updates, and builds. Missing `src/layout.css` logs a warning only.
-Violations throw because this file is reserved for page-level layout CSS.
+`dryuiLayoutCss()` checks the canonical `src/layout.css` file and the canonical
+`src/app.css` file during Vite dev startup, HMR updates, and builds. Missing
+`src/layout.css` logs a warning only. `src/app.css`, when present, must set
+`body { font-family: ... }` so popovers, dialogs, and native top-layer content
+inherit app typography. Violations throw.
 
 ## API
 
@@ -87,9 +90,16 @@ Spacing declarations still use `var(--dry-space-*)`, `0`, token-only `calc()`
 values, and `auto` for margins. Selectors must target `[data-layout]` or
 `[data-layout-area]` hooks. `@container` wrappers are allowed.
 
+### `checkAppCss(content, filename?)`
+
+Validates canonical app CSS. The current contract requires a `body` selector
+with a non-empty `font-family` declaration. The recommended value is
+`var(--dry-font-sans)`.
+
 ### `dryuiLayoutCss(options?)`
 
-Returns a Vite-compatible plugin that checks `src/layout.css` in dev and build.
+Returns a Vite-compatible plugin that checks `src/layout.css` and `src/app.css`
+in dev and build.
 
 Options:
 
@@ -97,6 +107,9 @@ Options:
   Project root. Defaults to Vite's resolved root.
 - `file?: string`
   Canonical layout CSS path relative to root. Defaults to `src/layout.css`.
+- `appFile?: string | false`
+  Canonical app CSS path relative to root. Defaults to `src/app.css`. Set to
+  `false` to skip global app CSS checks.
 
 ## Notes
 

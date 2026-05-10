@@ -1,296 +1,80 @@
 # Compound Components
 
+Use this file when selecting DryUI component APIs. Assume a component is compound until the component metadata, `index.ts`, or nearby usage proves otherwise.
+
 ## Core Rule
 
-Every compound component uses `.Root` as the container. Never use the bare name.
+Compound components use `.Root` as their container. Parts must be nested under the matching root.
 
 ```svelte
 <!-- Incorrect -->
-<Dialog>...</Dialog>
-<Tabs>...</Tabs>
+<Dialog>Content</Dialog>
 
 <!-- Correct -->
-<Dialog.Root>...</Dialog.Root>
-<Tabs.Root>...</Tabs.Root>
-```
-
-## Parts Reference
-
-Below are the parts for the most commonly used compound components. Prefer the component metadata and nearby existing usage for the full, up-to-date parts list.
-
-### Dialog
-
-Parts: Root, Trigger, Content, Overlay, Header, Body, Footer, Close
-
-```svelte
-<script>
-	let showDialog = $state(false);
-</script>
-
-<Dialog.Root bind:open={showDialog}>
-	<Dialog.Trigger>
-		<Button>Open Dialog</Button>
-	</Dialog.Trigger>
-	<Dialog.Content>
-		<Dialog.Header>Confirm Action</Dialog.Header>
-		<Dialog.Body>
-			<p>Are you sure you want to proceed?</p>
-		</Dialog.Body>
-		<Dialog.Footer>
-			<Button variant="outline" onclick={() => (showDialog = false)}>Cancel</Button>
-			<Button variant="solid">Confirm</Button>
-		</Dialog.Footer>
-	</Dialog.Content>
+<Dialog.Root>
+	<Dialog.Content>Content</Dialog.Content>
 </Dialog.Root>
 ```
 
-### Drawer
+## Common Parts
 
-Parts: Root, Trigger, Content, Overlay, Header, Body, Footer, Close
+Verify exact exports in `packages/ui/src/<component>/index.ts` when using an unfamiliar component.
 
-Same structure as Dialog but slides in from the side.
+| Component | Common structure |
+| --- | --- |
+| `Dialog` | `Root`, `Trigger`, `Content`, `Header`, `Body`, `Footer` |
+| `Drawer` | `Root`, `Trigger`, `Content`, `Header`, `Body`, `Footer` |
+| `AlertDialog` | `Root`, `Trigger`, `Content`, `Header`, `Body`, `Footer`, `Cancel`, `Action` |
+| `Tabs` | `Root`, `List`, `Trigger`, `Content` |
+| `Accordion` | `Root`, `Item`, `Trigger`, `Content` |
+| `DropdownMenu` | `Root`, `Trigger`, `Content`, `Item`, `Separator` |
+| `Select` | `Root`, `Trigger`, `Content`, `Item`, `Value` |
+| `Field` | `Root`, `Description`, `Error` with separate `Label` and input component |
+| `Table` | `Root`, `Header`, `Body`, `Row`, `Head`, `Cell` |
+| `Popover` | `Root`, `Trigger`, `Content` |
+| `Combobox` | `Root`, `Input`, `List`, `Option` |
 
-```svelte
-<script>
-	let showDrawer = $state(false);
-</script>
-
-<Drawer.Root bind:open={showDrawer}>
-	<Drawer.Trigger>
-		<Button>Open Drawer</Button>
-	</Drawer.Trigger>
-	<Drawer.Content>
-		<Drawer.Header>Settings</Drawer.Header>
-		<Drawer.Body>
-			<p>Drawer content here.</p>
-		</Drawer.Body>
-		<Drawer.Footer>
-			<Button variant="solid">Save</Button>
-		</Drawer.Footer>
-	</Drawer.Content>
-</Drawer.Root>
-```
-
-### Tabs
-
-Parts: Root, List, Trigger, Content
-
-Use `bind:value` on Root to track the active tab.
+## Examples
 
 ```svelte
-<script>
-	let activeTab = $state('one');
-</script>
-
-<Tabs.Root bind:value={activeTab}>
+<Tabs.Root value={tab} onValueChange={(next) => (tab = next)}>
 	<Tabs.List>
-		<Tabs.Trigger value="one">Tab 1</Tabs.Trigger>
-		<Tabs.Trigger value="two">Tab 2</Tabs.Trigger>
+		<Tabs.Trigger value="overview">Overview</Tabs.Trigger>
+		<Tabs.Trigger value="billing">Billing</Tabs.Trigger>
 	</Tabs.List>
-	<Tabs.Content value="one">First panel</Tabs.Content>
-	<Tabs.Content value="two">Second panel</Tabs.Content>
+	<Tabs.Content value="overview">Summary</Tabs.Content>
+	<Tabs.Content value="billing">Invoices</Tabs.Content>
 </Tabs.Root>
 ```
 
-### Accordion
-
-Parts: Root, Item, Trigger, Content
-
 ```svelte
-<Accordion.Root>
-	<Accordion.Item value="a">
-		<Accordion.Trigger>Section A</Accordion.Trigger>
-		<Accordion.Content>Content for section A.</Accordion.Content>
-	</Accordion.Item>
-	<Accordion.Item value="b">
-		<Accordion.Trigger>Section B</Accordion.Trigger>
-		<Accordion.Content>Content for section B.</Accordion.Content>
-	</Accordion.Item>
-</Accordion.Root>
-```
-
-### AlertDialog
-
-Parts: Root, Trigger, Content, Overlay, Header, Body, Footer, Action, Cancel
-
-Use AlertDialog for destructive confirmations. It traps focus and requires explicit user action.
-
-```svelte
-<AlertDialog.Root>
-	<AlertDialog.Trigger>
-		<Button variant="outline">Delete Account</Button>
-	</AlertDialog.Trigger>
-	<AlertDialog.Content>
-		<AlertDialog.Header>Are you sure?</AlertDialog.Header>
-		<AlertDialog.Body>
-			<p>This action cannot be undone.</p>
-		</AlertDialog.Body>
-		<AlertDialog.Footer>
-			<AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
-			<AlertDialog.Action>Delete</AlertDialog.Action>
-		</AlertDialog.Footer>
-	</AlertDialog.Content>
-</AlertDialog.Root>
-```
-
-### DropdownMenu
-
-Parts: Root, Trigger, Content, Item, Separator, Group, Label
-
-```svelte
-<DropdownMenu.Root>
-	<DropdownMenu.Trigger>
-		<Button variant="outline">Options</Button>
-	</DropdownMenu.Trigger>
-	<DropdownMenu.Content>
-		<DropdownMenu.Item onclick={handleEdit}>Edit</DropdownMenu.Item>
-		<DropdownMenu.Item onclick={handleDuplicate}>Duplicate</DropdownMenu.Item>
-		<DropdownMenu.Separator />
-		<DropdownMenu.Item onclick={handleDelete}>Delete</DropdownMenu.Item>
-	</DropdownMenu.Content>
-</DropdownMenu.Root>
-```
-
-### Select
-
-Parts: Root, Trigger, Content, Item, Value
-
-```svelte
-<script>
-	let selected = $state('');
-</script>
-
-<Select.Root bind:value={selected}>
+<Select.Root bind:value={status}>
 	<Select.Trigger>
-		<Select.Value placeholder="Choose..." />
+		<Select.Value placeholder="Status" />
 	</Select.Trigger>
 	<Select.Content>
-		<Select.Item value="a">Alpha</Select.Item>
-		<Select.Item value="b">Beta</Select.Item>
-		<Select.Item value="c">Gamma</Select.Item>
+		<Select.Item value="open">Open</Select.Item>
+		<Select.Item value="closed">Closed</Select.Item>
 	</Select.Content>
 </Select.Root>
 ```
 
-### Field
-
-Parts: Root, Description, Error
-
-Field.Root wraps a Label and input component. The Label and input (Input, Select, Textarea, etc.) are direct children, not Field parts.
-
 ```svelte
 <Field.Root>
-	<Label>Username</Label>
-	<Input bind:value={username} />
-	<Field.Description>Choose a unique username.</Field.Description>
-	<Field.Error>Username is already taken.</Field.Error>
+	<Label>Project</Label>
+	<Input bind:value={projectName} />
+	<Field.Description>Visible to teammates.</Field.Description>
 </Field.Root>
 ```
 
-### Table
+## Mistakes
 
-Parts: Root, Header, Body, Footer, Row, Head, Cell, Caption
+- Using the bare component name for a compound component.
+- Rendering parts outside their root.
+- Mixing parts from different components.
+- Passing `class=` to style compound internals.
+- Guessing `bind:value`, `bind:open`, or `bind:checked` without checking the component API.
 
-```svelte
-<Table.Root>
-	<Table.Caption>User list</Table.Caption>
-	<Table.Header>
-		<Table.Row>
-			<Table.Head>Name</Table.Head>
-			<Table.Head>Email</Table.Head>
-		</Table.Row>
-	</Table.Header>
-	<Table.Body>
-		{#each users as user (user.id)}
-			<Table.Row>
-				<Table.Cell>{user.name}</Table.Cell>
-				<Table.Cell>{user.email}</Table.Cell>
-			</Table.Row>
-		{/each}
-	</Table.Body>
-</Table.Root>
-```
+## Full Compound Set
 
-### Popover
-
-Parts: Root, Trigger, Content
-
-```svelte
-<Popover.Root>
-	<Popover.Trigger>
-		<Button variant="ghost">Info</Button>
-	</Popover.Trigger>
-	<Popover.Content>
-		<p>Additional details here.</p>
-	</Popover.Content>
-</Popover.Root>
-```
-
-### Combobox
-
-Parts: Root, Input, Content, Item, Empty
-
-```svelte
-<script>
-	let query = $state('');
-</script>
-
-<Combobox.Root bind:value={query}>
-	<Combobox.Input placeholder="Search..." />
-	<Combobox.Content>
-		<Combobox.Item value="apple" index={0}>Apple</Combobox.Item>
-		<Combobox.Item value="banana" index={1}>Banana</Combobox.Item>
-		<Combobox.Empty>No results found.</Combobox.Empty>
-	</Combobox.Content>
-</Combobox.Root>
-```
-
-## Common Mistakes
-
-### Using bare compound name
-
-```svelte
-<!-- Incorrect: bare name -->
-<Tabs>...</Tabs>
-<Select>...</Select>
-
-<!-- Correct: always .Root -->
-<Tabs.Root>...</Tabs.Root>
-<Select.Root>...</Select.Root>
-```
-
-### Orphaned parts without Root
-
-```svelte
-<!-- Incorrect: parts without their Root wrapper -->
-<Dialog.Header>Title</Dialog.Header>
-<Dialog.Body>Body</Dialog.Body>
-
-<!-- Correct: parts inside Root -->
-<Dialog.Root>
-	<Dialog.Content>
-		<Dialog.Header>Title</Dialog.Header>
-		<Dialog.Body>Body</Dialog.Body>
-	</Dialog.Content>
-</Dialog.Root>
-```
-
-### Mixing parts from different components
-
-```svelte
-<!-- Incorrect: Dialog.Header inside Drawer -->
-<Drawer.Root>
-	<Dialog.Header>Title</Dialog.Header>
-</Drawer.Root>
-
-<!-- Correct: use matching parts -->
-<Drawer.Root>
-	<Drawer.Header>Title</Drawer.Header>
-</Drawer.Root>
-```
-
-## Full Compound Component List
-
-Use the component metadata for any component's complete parts list:
-
-Accordion, AlertDialog, Breadcrumb, Collapsible, ColorPicker, Combobox, CommandPalette, ContextMenu, DataGrid, DatePicker, Dialog, DragAndDrop, Drawer, DropdownMenu, EmptyState, Field, FileUpload, FloatButton, Pagination, Popover, RadioGroup, RichTextEditor, Select, Splitter, Stepper, Table, Tabs, TagsInput, Toast, ToggleGroup, Toolbar, Tooltip, Tour, Transfer
+Accordion, AlertDialog, Breadcrumb, Collapsible, ColorPicker, Combobox, CommandPalette, ContextMenu, DataGrid, DatePicker, Dialog, DragAndDrop, Drawer, DropdownMenu, EmptyState, Field, FileUpload, FloatButton, Pagination, Popover, RadioGroup, RichTextEditor, Select, Splitter, Stepper, Table, Tabs, TagsInput, Toast, ToggleGroup, Toolbar, Tooltip, Tour, Transfer.

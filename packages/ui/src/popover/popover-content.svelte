@@ -79,6 +79,7 @@
 		border: 1px solid var(--dry-popover-border);
 		border-radius: var(--dry-popover-radius);
 		box-shadow: var(--dry-popover-shadow);
+		font-family: var(--dry-font-sans);
 		padding: var(--dry-popover-padding);
 
 		transition:

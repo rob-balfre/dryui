@@ -53,6 +53,7 @@
 		gap: var(--dry-space-2);
 		padding: var(--dry-menu-item-padding, var(--dry-space-2_5) var(--dry-space-2));
 		border-radius: var(--dry-menu-item-radius, var(--dry-radius-nested-popover));
+		font-family: var(--dry-font-sans);
 		font-size: var(--dry-type-small-size, var(--dry-text-sm-size));
 		cursor: pointer;
 		user-select: none;

@@ -192,6 +192,13 @@ export const RULE_CATALOG = {
 		suggestedFix:
 			'Use grid/flex/container syntax, DryUI spacing tokens for spacing, margin auto, block-size values, or standard box-alignment keywords.'
 	},
+	'dryui/require-body-font-family': {
+		id: 'dryui/require-body-font-family',
+		severity: 'error',
+		message:
+			'src/app.css must set body font-family so popovers, dialogs, and native top-layer content inherit app typography.',
+		suggestedFix: 'Add body { font-family: var(--dry-font-sans); } to src/app.css.'
+	},
 	'bare-compound': {
 		id: 'bare-compound',
 		severity: 'error',

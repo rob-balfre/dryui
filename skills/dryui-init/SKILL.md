@@ -69,6 +69,7 @@ A valid DryUI consumer setup has:
 - `dryuiLayoutCss()` before `sveltekit()` in Vite plugins.
 - `src/app.html` ships bare `<html lang="en">` — no `class="theme-auto"`, no `data-theme`. Light tokens apply by default. Apps opt into dark or system mode by adding `class="theme-auto"` and/or `data-theme="…"` themselves.
 - `src/routes/+layout.svelte` importing `@dryui/ui/themes/default.css`, `@dryui/ui/themes/dark.css`, `../app.css`, and `../layout.css` (last), then rendering `{@render children()}`. No `<Feedback>` mount by default — opt in per "Live Feedback (Opt-In)".
+- `src/app.css` present with `body { container-type: inline-size; container-name: page; font-family: var(--dry-font-sans); }`.
 - `src/layout.css` present and minimal. Page/section grid and flex layout lands here, scoped under `[data-layout="<name>"]`, with `@container page (...)` for responsive shifts.
 
 ## Apply Setup
@@ -88,7 +89,8 @@ For an existing SvelteKit app:
 3. In `vite.config.*`, add `dryuiLayoutCss()` before `sveltekit()`.
 4. In `src/app.html`, leave `<html>` bare. Don't add `class="theme-auto"` or `data-theme` unless the app explicitly wants system-aware or forced dark mode — see `dryui-build` rules/theming.md for the opt-in recipes.
 5. In `src/routes/+layout.svelte`, import in this order: DryUI theme CSS, app CSS, then `../layout.css` last. Render `{@render children()}` and stop — no widget mounts by default.
-6. Create `src/layout.css` if missing. Keep it minimal — page/section grid blocks land here as routes need them.
+6. Create or update `src/app.css` so `body` owns the page container and app font: `container-type: inline-size; container-name: page; font-family: var(--dry-font-sans);`.
+7. Create `src/layout.css` if missing. Keep it minimal — page/section grid blocks land here as routes need them.
 
 ## UI Pipeline After Setup
 

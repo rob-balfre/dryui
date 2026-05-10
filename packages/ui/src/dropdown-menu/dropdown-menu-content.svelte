@@ -80,6 +80,7 @@
 		border-radius: var(--dry-menu-radius, var(--dry-overlay-radius, var(--dry-radius-popover)));
 		box-shadow: var(--dry-menu-shadow, var(--dry-overlay-shadow, var(--dry-shadow-overlay)));
 		display: grid;
+		font-family: var(--dry-font-sans);
 		grid-template-columns: minmax(12rem, auto);
 		padding: var(--dry-menu-padding, var(--dry-space-2));
 		--dry-radius-nested: max(

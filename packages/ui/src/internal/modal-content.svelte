@@ -97,6 +97,7 @@
 		border: none;
 		background: transparent;
 		color: var(--dry-color-text-strong);
+		font-family: var(--dry-font-sans);
 		padding: 0;
 	}
 

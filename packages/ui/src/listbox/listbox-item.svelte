@@ -54,6 +54,7 @@
 			min(var(--dry-control-radius, var(--dry-radius-md)), var(--dry-space-4))
 		);
 		color: var(--dry-color-text-strong);
+		font-family: var(--dry-font-sans);
 		cursor: pointer;
 		user-select: none;
 		outline: none;
