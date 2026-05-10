@@ -26,9 +26,7 @@ function withViewTransition(update: () => void) {
 ```
 
 ```svelte
-<Button onclick={() => withViewTransition(() => (view = 'detail'))}>
-	Open detail
-</Button>
+<Button onclick={() => withViewTransition(() => (view = 'detail'))}>Open detail</Button>
 ```
 
 Keep `view-transition-name` specific and sparse. Do not name every node on the page.

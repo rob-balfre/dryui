@@ -7,8 +7,7 @@ Use this file when writing or editing Svelte code for a DryUI interface. DryUI a
 Use `$state` only for reactive local state.
 
 ```svelte
-let count = $state(0);
-let items = $state.raw(await loadItems());
+let count = $state(0); let items = $state.raw(await loadItems());
 ```
 
 Use `$derived` for computed values.
@@ -72,14 +71,14 @@ When authoring components, receive snippets as typed props and render them with 
 
 Prefer native browser APIs over dependencies:
 
-| Need | Prefer |
-| --- | --- |
-| Dialog semantics | `Dialog` / `AlertDialog` components |
-| Popover behavior | Popover API-backed components |
-| Resize work | `ResizeObserver` |
-| Clipboard | `navigator.clipboard` |
-| Dates | `Intl.DateTimeFormat` where possible |
-| Responsive layout | CSS container queries |
+| Need              | Prefer                               |
+| ----------------- | ------------------------------------ |
+| Dialog semantics  | `Dialog` / `AlertDialog` components  |
+| Popover behavior  | Popover API-backed components        |
+| Resize work       | `ResizeObserver`                     |
+| Clipboard         | `navigator.clipboard`                |
+| Dates             | `Intl.DateTimeFormat` where possible |
+| Responsive layout | CSS container queries                |
 
 ## Styling
 

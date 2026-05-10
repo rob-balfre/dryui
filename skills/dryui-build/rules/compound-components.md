@@ -20,19 +20,19 @@ Compound components use `.Root` as their container. Parts must be nested under t
 
 Verify exact exports in `packages/ui/src/<component>/index.ts` when using an unfamiliar component.
 
-| Component | Common structure |
-| --- | --- |
-| `Dialog` | `Root`, `Trigger`, `Content`, `Header`, `Body`, `Footer` |
-| `Drawer` | `Root`, `Trigger`, `Content`, `Header`, `Body`, `Footer` |
-| `AlertDialog` | `Root`, `Trigger`, `Content`, `Header`, `Body`, `Footer`, `Cancel`, `Action` |
-| `Tabs` | `Root`, `List`, `Trigger`, `Content` |
-| `Accordion` | `Root`, `Item`, `Trigger`, `Content` |
-| `DropdownMenu` | `Root`, `Trigger`, `Content`, `Item`, `Separator` |
-| `Select` | `Root`, `Trigger`, `Content`, `Item`, `Value` |
-| `Field` | `Root`, `Description`, `Error` with separate `Label` and input component |
-| `Table` | `Root`, `Header`, `Body`, `Row`, `Head`, `Cell` |
-| `Popover` | `Root`, `Trigger`, `Content` |
-| `Combobox` | `Root`, `Input`, `List`, `Option` |
+| Component      | Common structure                                                             |
+| -------------- | ---------------------------------------------------------------------------- |
+| `Dialog`       | `Root`, `Trigger`, `Content`, `Header`, `Body`, `Footer`                     |
+| `Drawer`       | `Root`, `Trigger`, `Content`, `Header`, `Body`, `Footer`                     |
+| `AlertDialog`  | `Root`, `Trigger`, `Content`, `Header`, `Body`, `Footer`, `Cancel`, `Action` |
+| `Tabs`         | `Root`, `List`, `Trigger`, `Content`                                         |
+| `Accordion`    | `Root`, `Item`, `Trigger`, `Content`                                         |
+| `DropdownMenu` | `Root`, `Trigger`, `Content`, `Item`, `Separator`                            |
+| `Select`       | `Root`, `Trigger`, `Content`, `Item`, `Value`                                |
+| `Field`        | `Root`, `Description`, `Error` with separate `Label` and input component     |
+| `Table`        | `Root`, `Header`, `Body`, `Row`, `Head`, `Cell`                              |
+| `Popover`      | `Root`, `Trigger`, `Content`                                                 |
+| `Combobox`     | `Root`, `Input`, `List`, `Option`                                            |
 
 ## Examples
 
