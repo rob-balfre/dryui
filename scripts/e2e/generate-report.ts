@@ -562,13 +562,12 @@ function discoverRunLinks(dirName: string): EvalAnalysis {
 }
 
 function sortNewestFirst(runs: LoadedRun[]): LoadedRun[] {
-	return [...runs].sort((a, b) => {
-		const ta = Date.parse(a.result.startedAt);
-		const tb = Date.parse(b.result.startedAt);
-		const safeA = Number.isFinite(ta) ? ta : 0;
-		const safeB = Number.isFinite(tb) ? tb : 0;
-		return safeB - safeA;
-	});
+	return [...runs].sort((a, b) => runStartedMs(b) - runStartedMs(a));
+}
+
+function runStartedMs(run: LoadedRun): number {
+	const time = Date.parse(run.result.startedAt);
+	return Number.isFinite(time) ? time : 0;
 }
 
 function groupByScenario(runs: LoadedRun[]): Map<string, LoadedRun[]> {
@@ -974,8 +973,8 @@ function renderScenarioSection(
 	now: number,
 	cache: ShotCache
 ): string {
-	const visible = runs.slice(0, 10);
-	const hidden = runs.slice(10);
+	const visible = runs.slice(0, 1);
+	const hidden = runs.slice(1);
 	const visibleHtml = visible.map((r) => renderRunCard(r, now, cache)).join('\n');
 	const hiddenHtml = hidden.length
 		? `<details class="history">
@@ -992,13 +991,14 @@ function renderScenarioSection(
 
 	const passCount = runs.filter((r) => r.result.ok).length;
 	const totalCount = runs.length;
+	const olderLabel = hidden.length ? ` · ${hidden.length} older collapsed` : '';
 
-	return `<section class="scenario">
+	return `<section class="scenario" id="scenario-${attr(name)}">
 		<header class="scenario-head">
 			<h2>${htmlEscape(name)} ${headerBadge}</h2>
-			<span class="muted">${passCount}/${totalCount} passing · ${totalCount} run${
+			<span class="muted">latest shown · ${passCount}/${totalCount} total passing · ${totalCount} run${
 				totalCount === 1 ? '' : 's'
-			}</span>
+			}${olderLabel}</span>
 		</header>
 		<div class="grid">${visibleHtml}</div>
 		${hiddenHtml}
@@ -1020,11 +1020,21 @@ function renderDocument(runs: LoadedRun[], now: number): string {
 
 	const cache = buildShotCache(runs);
 	const groups = groupByScenario(runs);
-	const scenarioNames = [...groups.keys()].sort((a, b) => a.localeCompare(b));
+	const scenarioNames = [...groups.keys()].sort((a, b) => {
+		const aLatest = groups.get(a)?.[0];
+		const bLatest = groups.get(b)?.[0];
+		const newest = (bLatest ? runStartedMs(bLatest) : 0) - (aLatest ? runStartedMs(aLatest) : 0);
+		return newest || a.localeCompare(b);
+	});
 
 	const totalRuns = runs.length;
 	const totalPass = runs.filter((r) => r.result.ok).length;
 	const totalFail = totalRuns - totalPass;
+	const latestRuns = scenarioNames
+		.map((name) => groups.get(name)?.[0])
+		.filter((run): run is LoadedRun => Boolean(run));
+	const latestPass = latestRuns.filter((run) => run.result.ok).length;
+	const latestFail = latestRuns.length - latestPass;
 	const latest = runs[0]?.result;
 
 	const latestLine = latest
@@ -1039,11 +1049,24 @@ function renderDocument(runs: LoadedRun[], now: number): string {
 			<span class="generated muted">generated ${htmlEscape(new Date(now).toISOString())}</span>
 		</div>
 		<div class="summary">
-			<span class="badge status-ok">${totalPass} pass</span>
-			<span class="badge status-fail">${totalFail} fail</span>
-			<span class="muted">${totalRuns} total run${totalRuns === 1 ? '' : 's'}</span>
+			<span class="badge status-ok">${latestPass} latest pass</span>
+			<span class="badge status-fail">${latestFail} latest fail</span>
+			<span class="muted">${totalPass} pass / ${totalFail} fail across ${totalRuns} historical run${
+				totalRuns === 1 ? '' : 's'
+			}</span>
 			${latestLine ? `<span class="dot">·</span><span>${latestLine}</span>` : ''}
 		</div>
+		<nav class="scenario-nav" aria-label="Scenarios">
+			${scenarioNames
+				.map((name) => {
+					const latestRun = groups.get(name)?.[0];
+					const ok = latestRun?.result.ok ?? false;
+					return `<a class="scenario-link ${ok ? 'status-ok' : 'status-fail'}" href="#scenario-${attr(
+						name
+					)}">${htmlEscape(name)}<span>${ok ? 'PASS' : 'FAIL'}</span></a>`;
+				})
+				.join('')}
+		</nav>
 	</header>`;
 
 	const body = scenarioNames
@@ -1162,6 +1185,33 @@ h4 {
 
 .summary code { font-family: var(--mono); background: var(--bg-2); padding: 2px 6px; border-radius: 4px; border: 1px solid var(--border); }
 
+.scenario-nav {
+	margin-top: 16px;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	flex-wrap: wrap;
+}
+
+.scenario-link {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	padding: 6px 10px;
+	border-radius: 6px;
+	border: 1px solid var(--border);
+	background: var(--bg-2);
+	color: var(--text);
+	font-family: var(--mono);
+	font-size: 12px;
+	text-decoration: none;
+	text-transform: capitalize;
+}
+
+.scenario-link:hover { border-color: var(--border-strong); color: var(--text-strong); }
+.scenario-link.status-ok span { color: var(--ok); }
+.scenario-link.status-fail span { color: var(--fail); }
+
 .dot { color: var(--muted); padding: 0 4px; }
 
 .badge {
@@ -1180,7 +1230,7 @@ h4 {
 .badge.status-ok { color: var(--ok); background: var(--ok-soft); }
 .badge.status-fail { color: var(--fail); background: var(--fail-soft); }
 
-section.scenario { margin-top: 36px; }
+section.scenario { margin-top: 36px; scroll-margin-top: 18px; }
 
 .scenario-head {
 	display: flex;

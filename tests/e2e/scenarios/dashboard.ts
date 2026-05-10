@@ -1,39 +1,15 @@
 import type { ScenarioDefinition } from '../../../scripts/e2e/scenario-harness.ts';
+import { mockupPath } from './mockups.ts';
+
+const dashboardMockup = mockupPath('dashboard');
 
 export const dashboardScenario: ScenarioDefinition = {
 	name: 'dashboard',
 	prompt: [
-		'Build a data-dense admin analytics dashboard as the home page. This project is a freshly scaffolded SvelteKit + DryUI app - replace src/routes/+page.svelte with a single polished page and update src/layout.css for page layout.',
-		'',
-		'Character: it must LOOK like a real admin app, not a marketing page. Think Linear / Stripe Dashboard / Vercel. Dense information, structured, sidebar on the left, top bar on top, main region shows metrics + a chart + a recent activity feed. Dark UI, warm accent, tabular numbers.',
-		'',
-		'Use the DryUI component surface generously. Pick from:',
-		'  Sidebar, AppFrame, NavigationMenu, Toolbar, Heading, Text, Container,',
-		'  Chart, Sparkline, Gauge, Progress, ProgressRing, DataGrid, Table, Badge, Chip,',
-		'  ChipGroup, Avatar, SegmentedControl, Input, Icon, ThemeToggle, Separator, Kbd.',
-		'DryUI no longer ships a Card component - for panel-style containers use native <div> / <section> wrappers with meaningful data-layout or data-layout-area hooks, styled with --dry-radius-card, --dry-padding-card, and --dry-shadow-sm. Do NOT import Card from @dryui/ui (it does not exist).',
-		"Import lucide-svelte icons where DryUI Icon needs one (it's already installed).",
-		'',
-		'Build rules that must pass the scaffolded DryUI lint/build pipeline:',
-		'  - Do not pass class= to any Svelte component imported from @dryui/ui, including compound parts such as Sidebar.Root, Toolbar.Root, Chart.Root, Table.Root, etc.',
-		'  - Native HTML elements such as div, section, header, nav, main, span, and wrappers around DryUI components must carry meaningful data-layout or data-layout-area hooks unless there is a direct DryUI replacement.',
-		'  - Put every display: grid and display: flex declaration in src/layout.css, scoped to [data-layout] and [data-layout-area] selectors. Do not put grid/flex declarations in +page.svelte.',
-		'  - Style native wrappers with data-* attributes, src/layout.css layout rules, component props, and --dry-* CSS custom properties. Do not rely on component class attributes.',
-		'  - Use DryUI Heading for headings instead of raw h1/h2/h3 elements.',
-		'  - Keep the implementation compact: prefer arrays + {#each} loops over repeated markup, keep +page.svelte under 220 lines, and keep src/layout.css under 160 lines.',
-		'',
-		'Required structure (but make it tasteful):',
-		'  1. A left-hand Sidebar with navigation entries: "Overview", "Analytics", "Customers", "Billing", "Settings". Mark "Analytics" as active.',
-		'  2. A top toolbar / top bar with a search Input, a SegmentedControl for a time range ("24h" / "7d" / "30d" / "90d"), and an Avatar on the far right.',
-		'  3. A Heading (level={1}) with the exact text "Analytics Dashboard".',
-		'  4. A row of four metric panels (native tiles with meaningful data-layout hooks and token styling). Each panel must include the exact labels "Revenue", "Active Users", "Conversions", "Uptime", a large numeric value, a small delta (with a direction icon from lucide), and a tiny Sparkline or ProgressRing.',
-		'  5. A larger panel below (same div + token treatment) labelled "Traffic" that holds a Chart or Sparkline (taller, filling width).',
-		'  6. A "Recent Activity" Table or DataGrid with a handful of synthetic rows: user name (with Avatar), event, status Badge, RelativeTime.',
-		'',
-		'Do not edit any source file other than src/routes/+page.svelte and src/layout.css. Do not run the dev server. After editing, run `bun run build` if shell access is available and fix any failure before finalizing. You MUST use at least 8 distinct DryUI components beyond the 5 you used in previous attempts (Container, Heading, Text, Button, Badge). The previous output was flat and generic - this one must feel like a genuine admin app.',
-		'',
-		"If a specific component is not exported from @dryui/ui in this version, pick a sensible substitute from the inventory above — don't fail the task over it."
-	].join('\n'),
+		'Use the dryui-build skill to build a simple admin dashboard. Heading: "Analytics Dashboard". Sidebar: Overview, Analytics, Customers, Billing, Settings. Metrics: Revenue, Active Users, Conversions, Uptime. Recent Activity section.',
+		`Use this local design mockup as a loose visual reference for layout, density, hierarchy, and tone: ${dashboardMockup}. Keep the textual requirements above authoritative if the mockup differs; do not try to match the mockup pixel-for-pixel.`,
+		'Keep the implementation static and compact. Update only src/routes/+page.svelte and src/layout.css. In src/layout.css, use only structural layout rules: display, grid, flex, container, tokenized spacing, alignment, and block-size constraints. Put visual styling in the route style block with scoped selectors on native elements only. Do not use :global(), inline style attributes, style: directives, or class= on @dryui/ui components. Do not run the dev server; after a successful bun run build, finish.'
+	].join(' '),
 	codexTimeoutMs: 10 * 60 * 1_000,
 	assertions: [
 		{ kind: 'file-exists', path: 'src/routes/+page.svelte' },
