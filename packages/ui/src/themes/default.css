@@ -9,7 +9,7 @@
 :root {
 	/* ─── Public aliases (Tier 2, documented) ──────────────────────────
 	   Override at `:root` to retheme. Tier 3 tokens below derive via
-	   `var(--alias)` so overrides cascade. See theming.md. */
+	   `var(--alias)` so overrides cascade. See skills/dryui-build/SKILL.md. */
 	--dry-color-primary: hsl(230, 64%, 57%);
 	--dry-color-primary-hover: hsl(230, 64%, 49%);
 	--dry-color-text: hsla(230, 100%, 7%, 0.9);

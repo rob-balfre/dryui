@@ -17,7 +17,7 @@ Claude Code-specific notes for this repository. Repo-wide rules live in [`AGENTS
 ## Canonical Links
 
 - Repo-wide agent rules: [`AGENTS.md`](./AGENTS.md)
-- CSS discipline and token rules: [`skills/dryui-build/rules/theming.md`](./skills/dryui-build/rules/theming.md)
+- CSS discipline and token rules: [`skills/dryui-build/SKILL.md`](./skills/dryui-build/SKILL.md)
 - Contributor workflow: [`CONTRIBUTING.md`](./CONTRIBUTING.md)
 - Accessibility policy: [`ACCESSIBILITY.md`](./ACCESSIBILITY.md)
 - Release flow: [`RELEASING.md`](./RELEASING.md)

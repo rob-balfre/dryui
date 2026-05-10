@@ -6,7 +6,7 @@ Repo-wide instructions for AI coding agents working in this repository.
 
 - Public overview: [`README.md`](./README.md)
 - Contributor workflow: [`CONTRIBUTING.md`](./CONTRIBUTING.md)
-- CSS discipline and token rules: [`skills/dryui-build/rules/theming.md`](./skills/dryui-build/rules/theming.md)
+- CSS discipline and token rules: [`skills/dryui-build/SKILL.md`](./skills/dryui-build/SKILL.md)
 - Accessibility policy: [`ACCESSIBILITY.md`](./ACCESSIBILITY.md)
 - Release flow: [`RELEASING.md`](./RELEASING.md)
 

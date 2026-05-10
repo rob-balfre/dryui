@@ -87,7 +87,7 @@ For an existing SvelteKit app:
 
 2. In `svelte.config.*`, add `dryuiLint({ strict: true })` as the first preprocessor while preserving existing preprocessors.
 3. In `vite.config.*`, add `dryuiLayoutCss()` before `sveltekit()`.
-4. In `src/app.html`, leave `<html>` bare. Don't add `class="theme-auto"` or `data-theme` unless the app explicitly wants system-aware or forced dark mode — see `dryui-build` rules/theming.md for the opt-in recipes.
+4. In `src/app.html`, leave `<html>` bare. Don't add `class="theme-auto"` or `data-theme` unless the app explicitly wants system-aware or forced dark mode — see `dryui-build` for the opt-in recipes.
 5. In `src/routes/+layout.svelte`, import in this order: DryUI theme CSS, app CSS, then `../layout.css` last. Render `{@render children()}` and stop — no widget mounts by default.
 6. Create or update `src/app.css` so `body` owns the page container and app font: `container-type: inline-size; container-name: page; font-family: var(--dry-font-sans);`.
 7. Create `src/layout.css` if missing. Keep it minimal — page/section grid blocks land here as routes need them.
@@ -97,7 +97,7 @@ For an existing SvelteKit app:
 Use this order for the first real interface:
 
 1. Capture the user's brief in one line: what you are building, and for whom.
-2. Use the `dryui` skill rule files, component metadata, docs pages, and existing repo usage to confirm components, recipes, contracts, accessibility, and tokens.
+2. Use the `dryui-build` skill, component metadata, docs pages, and existing repo usage to confirm components, recipes, contracts, accessibility, and tokens.
 3. Build with DryUI + Svelte 5 runes, grid layout, and `--dry-*` tokens.
 4. Run the project's check/build/test command to validate contracts, a11y, tokens, and CSS discipline.
 

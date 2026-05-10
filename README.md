@@ -138,7 +138,7 @@ See the supporting docs for the rest:
 
 - [`CONTRIBUTING.md`](./CONTRIBUTING.md) for contributor workflow
 - [`ACCESSIBILITY.md`](./ACCESSIBILITY.md) for the accessibility baseline
-- [`skills/dryui-build/rules/theming.md`](./skills/dryui-build/rules/theming.md) for CSS and token rules
+- [`skills/dryui-build/SKILL.md`](./skills/dryui-build/SKILL.md) for CSS, token, layout, and component rules
 - [`RELEASING.md`](./RELEASING.md) for release and npm-auth guidance
 
 ## Design Principles

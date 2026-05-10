@@ -95,18 +95,6 @@ const LAYOUT_RULE_CONTRACT: SkillRuleContract = {
 				/style=/,
 				/style:/
 			]
-		},
-		{
-			file: 'skills/dryui-build/rules/composition.md',
-			label: 'composition layout rule',
-			patterns: [
-				/Page Layout in `src\/layout\.css`/,
-				/\[data-layout\]/,
-				/\[data-layout-area\]/,
-				/No page-level grid\/flex/i,
-				/no inline styles/i,
-				/no layout components/i
-			]
 		}
 	]
 };
