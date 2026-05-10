@@ -22,7 +22,6 @@ Repo-wide instructions for AI coding agents working in this repository.
 
 ## Repo Rules
 
-- Use `gh-axi` for GitHub and `chrome-devtools-axi` for browser automation.
 - DryUI is pre-alpha. Prefer the current shape over compatibility shims unless a task explicitly asks for backwards compatibility.
 - Use DryUI skills as the default entry point. For any DryUI component, route, template, styling, layout, docs, or feedback task, load the relevant top-level `skills/*/SKILL.md` before planning or editing files. If the task also involves Svelte or SvelteKit, load the `dryui-build` skill first, then use the Svelte MCP docs/autofixer flow.
 - Run the local feedback dashboard with `bunx dryui-feedback` (bin shipped from `@dryui/feedback-server`).

@@ -8,21 +8,29 @@
  */
 
 import { spawn, type ChildProcess } from 'node:child_process';
+import { Buffer } from 'node:buffer';
 import {
 	closeSync,
 	existsSync,
 	mkdirSync,
 	mkdtempSync,
 	openSync,
+	readdirSync,
 	readFileSync,
+	statSync,
 	writeFileSync
 } from 'node:fs';
 import { createServer } from 'node:net';
 import { tmpdir } from 'node:os';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { killOwnedProcess, waitForUrl } from '../../packages/cli/src/commands/launch-utils.ts';
-import { runCodexExec, summarizeCodexRun, type CodexRunResult } from './codex-runner.ts';
+import { waitForUrl } from '../../packages/feedback-server/src/cli/launch-dashboard.ts';
+import {
+	runAgentExec,
+	summarizeCodexRun,
+	type AgentBackend,
+	type CodexRunResult
+} from './codex-runner.ts';
 import { scaffoldDryuiConsumerProject } from './scaffold-adapter.ts';
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
@@ -79,6 +87,42 @@ export interface ScenarioResult {
 	readonly screenshots: ScenarioScreenshot[];
 	readonly assertionFailures: string[];
 	readonly devServer: { url: string; pid: number } | null;
+	readonly analysis: ScenarioAnalysis;
+}
+
+export interface ScenarioAnalysis {
+	readonly schemaVersion: 1;
+	readonly tokens: CodexTokenTotals;
+	readonly phaseTimings: readonly ScenarioPhaseTiming[];
+	readonly components: {
+		readonly requested: readonly string[];
+		readonly imported: readonly string[];
+		readonly rendered: readonly string[];
+		readonly hallucinatedDryuiUiImports: readonly string[];
+	};
+	readonly requestedLabels: readonly string[];
+	readonly missingRequestedLabels: readonly string[];
+	readonly assertionFailures: readonly string[];
+	readonly fileChanges: {
+		readonly count: number;
+		readonly paths: readonly string[];
+	};
+	readonly logs: Record<string, string>;
+	readonly judge: null;
+}
+
+export interface CodexTokenTotals {
+	readonly input: number | null;
+	readonly cached: number | null;
+	readonly output: number | null;
+	readonly total: number | null;
+	readonly turns: number;
+}
+
+export interface ScenarioPhaseTiming {
+	readonly name: string;
+	readonly ok: boolean;
+	readonly durationMs: number;
 }
 
 export interface RunScenarioOptions {
@@ -89,10 +133,17 @@ export interface RunScenarioOptions {
 	readonly codexStreamRaw?: boolean;
 	readonly useUserCodexConfig?: boolean;
 	readonly useLocalFeedbackMcp?: boolean;
+	readonly visualFeedbackPass?: boolean;
+	readonly agentBackend?: AgentBackend;
+	readonly agentModel?: string;
+	readonly usageLimitUsd?: number;
+	readonly permissionMode?: string;
+	readonly effort?: string;
 	readonly codexTimeoutMs?: number;
 }
 
 const RESULT_SCHEMA_VERSION = 1;
+const ANALYSIS_SCHEMA_VERSION = 1;
 
 async function getFreePort(): Promise<number> {
 	return await new Promise<number>((res, rej) => {
@@ -200,18 +251,34 @@ async function startFeedbackServer(
 	return child;
 }
 
-async function postSyntheticFeedback(port: number, prompt: string): Promise<{ id: string }> {
+interface FeedbackSubmissionPostOptions {
+	readonly url: string;
+	readonly prompt: string;
+	readonly viewport: { width: number; height: number };
+	readonly pngBase64?: string;
+	readonly webpBase64?: string;
+}
+
+async function postFeedbackSubmission(
+	port: number,
+	options: FeedbackSubmissionPostOptions
+): Promise<{ id: string }> {
 	const body = {
-		url: `http://127.0.0.1:${port}/synthetic-e2e`,
-		image: { webp: BLANK_WEBP_BASE64, png: BLANK_PNG_BASE64 },
-		viewport: { width: 1280, height: 800 },
+		url: options.url,
+		image: {
+			webp: options.webpBase64 ?? BLANK_WEBP_BASE64,
+			png: options.pngBase64 ?? BLANK_PNG_BASE64
+		},
+		viewport: options.viewport,
 		scroll: { x: 0, y: 0 },
 		drawings: [
 			{
+				id: 'synthetic-note',
 				kind: 'text',
-				x: 40,
-				y: 40,
-				value: prompt
+				color: '#0f766e',
+				position: { x: 40, y: 40 },
+				text: options.prompt,
+				fontSize: 16
 			}
 		]
 	};
@@ -226,6 +293,14 @@ async function postSyntheticFeedback(port: number, prompt: string): Promise<{ id
 	}
 	const submission = (await response.json()) as { id: string };
 	return submission;
+}
+
+async function postSyntheticFeedback(port: number, prompt: string): Promise<{ id: string }> {
+	return postFeedbackSubmission(port, {
+		url: `http://127.0.0.1:${port}/synthetic-e2e`,
+		prompt,
+		viewport: { width: 1280, height: 800 }
+	});
 }
 
 async function assertPendingSubmission(port: number, submissionId: string): Promise<void> {
@@ -292,11 +367,19 @@ interface AssertionRunResult {
 	readonly screenshots: ScenarioScreenshot[];
 }
 
+interface ScenarioResultDraft extends Omit<ScenarioResult, 'analysis'> {}
+
+interface DryuiImport {
+	readonly name: string;
+	readonly module: string;
+}
+
 async function runAssertions(
 	projectDir: string,
 	logDir: string,
 	devUrlBase: string,
-	assertions: readonly ScenarioAssertion[]
+	assertions: readonly ScenarioAssertion[],
+	screenshotLabelPrefix = ''
 ): Promise<AssertionRunResult> {
 	const { chromium } = await import('playwright');
 	const browser = await chromium.launch({ headless: true });
@@ -319,13 +402,14 @@ async function runAssertions(
 		}
 
 		async function shoot(label: string, pathname: string): Promise<void> {
+			const effectiveLabel = `${screenshotLabelPrefix}${label}`;
 			// Force a real navigation so `emulateMedia` changes are applied — the
 			// `visit()` cache would short-circuit and give us a light-mode snap
 			// under a dark backdrop.
 			await page.goto(devUrlBase + pathname, { waitUntil: 'networkidle', timeout: 30_000 });
-			const filePath = resolve(screenshotDir, `${label}.png`);
+			const filePath = resolve(screenshotDir, `${effectiveLabel}.png`);
 			await page.screenshot({ path: filePath, fullPage: false });
-			screenshots.push({ label, path: filePath, url: devUrlBase + pathname });
+			screenshots.push({ label: effectiveLabel, path: filePath, url: devUrlBase + pathname });
 		}
 
 		await shoot('home', '/');
@@ -370,28 +454,104 @@ async function runAssertions(
 	return { failures, screenshots };
 }
 
+async function captureFeedbackSubmissionScreenshot(
+	logDir: string,
+	devUrlBase: string
+): Promise<{ pngBase64: string; screenshot: ScenarioScreenshot }> {
+	const { chromium } = await import('playwright');
+	const browser = await chromium.launch({ headless: true });
+	const context = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+	const page = await context.newPage();
+	const screenshotDir = resolve(logDir, 'screenshots');
+	mkdirSync(screenshotDir, { recursive: true });
+	const filePath = resolve(screenshotDir, 'home-before-feedback.png');
+	try {
+		await page.goto(devUrlBase + '/', { waitUntil: 'networkidle', timeout: 30_000 });
+		const bytes = await page.screenshot({ path: filePath, fullPage: false });
+		return {
+			pngBase64: Buffer.from(bytes).toString('base64'),
+			screenshot: { label: 'home-before-feedback', path: filePath, url: devUrlBase + '/' }
+		};
+	} finally {
+		await browser.close();
+	}
+}
+
 function killChild(child: ChildProcess | null): void {
 	if (child?.pid) killOwnedProcess(child.pid);
+}
+
+function killOwnedProcess(pid: number): void {
+	try {
+		process.kill(-pid, 'SIGTERM');
+	} catch {
+		try {
+			process.kill(pid, 'SIGTERM');
+		} catch {
+			/* already exited */
+		}
+	}
 }
 
 function describeCodexLine(line: string): string | null {
 	const trimmed = line.trim();
 	if (!trimmed) return null;
 	try {
-		const event = JSON.parse(trimmed) as {
-			type?: string;
-			item?: { type?: string; title?: string; status?: string; text?: string };
-		};
-		if (!event.type) return null;
-		if (event.type === 'turn.started' || event.type === 'turn.completed') return event.type;
-		if (event.type === 'item.started' || event.type === 'item.completed') {
-			const itemType = event.item?.type ? ` ${event.item.type}` : '';
-			const status = event.item?.status ? ` ${event.item.status}` : '';
-			const title = event.item?.title ? `: ${event.item.title}` : '';
-			return `${event.type}${itemType}${status}${title}`;
+		const event = JSON.parse(trimmed) as Record<string, unknown>;
+		const type = stringValue(event.type);
+		if (!type) return null;
+		if (type === 'turn.started' || type === 'turn.completed') return type;
+		if (type === 'item.started' || type === 'item.completed') {
+			const item = asRecord(event.item);
+			const itemType = item ? firstString(item, ['type']) : null;
+			const status = item ? firstString(item, ['status']) : null;
+			const title = item ? firstString(item, ['title', 'path', 'command']) : null;
+			return [
+				type,
+				itemType ? ` ${itemType}` : '',
+				status ? ` ${status}` : '',
+				title ? `: ${compactText(title, 120)}` : ''
+			].join('');
 		}
-		if (event.type === 'error') return 'error';
-		return null;
+		if (type === 'assistant') {
+			const message = asRecord(event.message);
+			const content = Array.isArray(message?.content) ? message.content : [];
+			const toolUse = content.map(asRecord).find((part) => part?.type === 'tool_use');
+			if (toolUse) {
+				const name = stringValue(toolUse.name) ?? 'tool';
+				const input = asRecord(toolUse.input);
+				const detail = input
+					? (firstString(input, ['file_path', 'command', 'pattern', 'path']) ??
+						JSON.stringify(input).slice(0, 120))
+					: null;
+				return detail ? `tool ${name}: ${compactText(detail, 160)}` : `tool ${name}`;
+			}
+			const text = contentText(content);
+			return text ? `assistant: ${compactText(text, 160)}` : 'assistant';
+		}
+		if (type === 'system') {
+			const subtype = stringValue(event.subtype);
+			const description = stringValue(event.description);
+			if (subtype === 'task_progress' && description) return compactText(description, 160);
+			return subtype ? `system ${subtype}` : 'system';
+		}
+		if (type === 'user') {
+			const message = asRecord(event.message);
+			const content = Array.isArray(message?.content) ? message.content : [];
+			const toolResult = content.map(asRecord).find((part) => part?.type === 'tool_result');
+			if (toolResult) {
+				const isError = toolResult.is_error === true ? ' error' : '';
+				return `tool result${isError}`;
+			}
+			return 'user';
+		}
+		if (type === 'result') {
+			const subtype = stringValue(event.subtype);
+			const cost = typeof event.total_cost_usd === 'number' ? ` cost=$${event.total_cost_usd}` : '';
+			return `result${subtype ? ` ${subtype}` : ''}${cost}`;
+		}
+		if (type === 'error') return 'error';
+		return type;
 	} catch {
 		return null;
 	}
@@ -474,6 +634,9 @@ function formatCodexStreamLine(line: string): string | null {
 			const suffix = text ? `: ${compactText(text)}` : '';
 			return `${type}${details.length > 0 ? ` ${details.join(' ')}` : ''}${suffix}`;
 		}
+		if (type === 'assistant' || type === 'system' || type === 'user' || type === 'result') {
+			return describeCodexLine(line);
+		}
 		const text =
 			contentText(event.content) ??
 			firstString(event, ['text', 'message', 'delta', 'output', 'error', 'error_message']);
@@ -481,6 +644,17 @@ function formatCodexStreamLine(line: string): string | null {
 	} catch {
 		return compactText(trimmed);
 	}
+}
+
+function buildVisualFeedbackPrompt(submissionId: string): string {
+	return [
+		`Apply DryUI feedback submission ${submissionId}.`,
+		'',
+		'Use the dryui-feedback MCP tools: call feedback_get_submissions, read the preferredScreenshotPath, decode the text note, and make one focused visual or UX repair.',
+		'This is a generated SvelteKit + DryUI consumer project. Prefer editing src/routes/+page.svelte only unless the feedback clearly requires an adjacent app CSS or layout CSS change.',
+		'Do not replay the original build prompt. Improve the rendered UI that already exists.',
+		'Run `bun run build` after editing. If the build passes, call feedback_resolve_submission for the submission id before finalizing.'
+	].join('\n');
 }
 
 export async function runScenario(
@@ -504,6 +678,8 @@ export async function runScenario(
 	let assertionFailures: string[] = [];
 	const startedAt = new Date().toISOString();
 	const [feedbackPort, devPort] = await Promise.all([getFreePort(), getFreePort()]);
+	const agentBackend = options.agentBackend ?? 'codex';
+	const agentModel = options.agentModel ?? scenario.codexModel;
 
 	const log = (msg: string) => {
 		if (options.verbose) console.log(`[${scenario.name}] ${msg}`);
@@ -550,59 +726,67 @@ export async function runScenario(
 
 		if (!pSubmission.ok) return finalize(false);
 
-		const pCodex = phase('codex');
+		const pCodex = phase(`agent-${agentBackend}`);
 		phases.push(pCodex);
 		codex = await runPhase(pCodex, async () => {
-			let lastCodexEvent = 'starting';
+			let lastAgentEvent = 'starting';
 			const started = Date.now();
 			const codexTimeoutMs = options.codexTimeoutMs ?? scenario.codexTimeoutMs;
 			const streamCodex = options.streamCodex === true;
 			const streamRawCodex = options.codexStreamRaw === true || options.verbose === true;
 			if (options.useUserCodexConfig === true) {
-				progress('codex config: user ~/.codex');
+				progress(`${agentBackend} config: user config`);
 			} else if (options.useLocalFeedbackMcp !== false) {
-				progress('codex config: local feedback MCP');
+				progress(`${agentBackend} config: local feedback MCP`);
 			} else {
-				progress('codex config: isolated without feedback MCP');
+				progress(`${agentBackend} config: isolated without feedback MCP`);
+			}
+			if (agentModel) progress(`${agentBackend} model: ${agentModel}`);
+			if (options.usageLimitUsd !== undefined) {
+				progress(`${agentBackend} usage limit: $${options.usageLimitUsd}`);
 			}
 			const heartbeat = setInterval(() => {
 				progress(
-					`codex still running (${((Date.now() - started) / 1000).toFixed(0)}s): ${lastCodexEvent}`
+					`${agentBackend} still running (${((Date.now() - started) / 1000).toFixed(0)}s): ${lastAgentEvent}`
 				);
 			}, CODEX_HEARTBEAT_MS);
 			heartbeat.unref();
 			try {
-				const result = await runCodexExec({
+				const result = await runAgentExec({
+					backend: agentBackend,
 					projectDir,
 					prompt: scenario.prompt,
 					logDir,
-					...(scenario.codexModel ? { model: scenario.codexModel } : {}),
+					...(agentModel ? { model: agentModel } : {}),
+					...(options.usageLimitUsd !== undefined ? { usageLimitUsd: options.usageLimitUsd } : {}),
+					...(options.permissionMode ? { permissionMode: options.permissionMode } : {}),
+					...(options.effort ? { effort: options.effort } : {}),
 					...(codexTimeoutMs !== undefined ? { timeoutMs: codexTimeoutMs } : {}),
 					useUserConfig: options.useUserCodexConfig === true,
 					useLocalFeedbackMcp: options.useLocalFeedbackMcp !== false,
 					onStdoutLine: (line) => {
 						const description = describeCodexLine(line);
-						if (description) lastCodexEvent = description;
+						if (description) lastAgentEvent = description;
 						if (streamRawCodex) {
-							console.log(`[${scenario.name}] codex json: ${line}`);
+							console.log(`[${scenario.name}] ${agentBackend} json: ${line}`);
 						} else if (streamCodex) {
 							const formatted = formatCodexStreamLine(line);
-							if (formatted) console.log(`[${scenario.name}] codex ${formatted}`);
+							if (formatted) console.log(`[${scenario.name}] ${agentBackend} ${formatted}`);
 						}
 					},
 					onStderrLine: (line) => {
-						lastCodexEvent = line;
+						lastAgentEvent = line;
 						if (line.trim() === CODEX_STDIN_NOTICE) {
 							if (streamCodex || streamRawCodex || options.verbose) {
-								console.log(`[${scenario.name}] codex info: ${line}`);
+								console.log(`[${scenario.name}] ${agentBackend} info: ${line}`);
 							}
 							return;
 						}
-						console.error(`[${scenario.name}] codex stderr: ${line}`);
+						console.error(`[${scenario.name}] ${agentBackend} stderr: ${line}`);
 					}
 				});
 				if (!result.ok) {
-					throw new Error(`codex exec failed\n${summarizeCodexRun(result)}`);
+					throw new Error(`${agentBackend} exec failed\n${summarizeCodexRun(result)}`);
 				}
 				return result;
 			} finally {
@@ -644,6 +828,117 @@ export async function runScenario(
 			}
 			pAsserts.note = `${scenario.assertions.length} ok`;
 		});
+		if (!pAsserts.ok) return finalize(false);
+
+		if (options.visualFeedbackPass === true) {
+			const feedbackBaseUrl = `http://127.0.0.1:${feedbackPort}`;
+			let visualSubmissionId = '';
+
+			const pVisualFeedbackUp = phase('visual-feedback-up');
+			phases.push(pVisualFeedbackUp);
+			feedbackChild = await runPhase(pVisualFeedbackUp, async () => {
+				return await startFeedbackServer(projectDir, logDir, feedbackPort);
+			});
+			if (!pVisualFeedbackUp.ok) return finalize(false);
+
+			const pVisualFeedbackCapture = phase('visual-feedback-capture');
+			phases.push(pVisualFeedbackCapture);
+			await runPhase(pVisualFeedbackCapture, async () => {
+				const capture = await captureFeedbackSubmissionScreenshot(
+					logDir,
+					`http://127.0.0.1:${devPort}`
+				);
+				screenshots = [...screenshots, capture.screenshot];
+				const submission = await postFeedbackSubmission(feedbackPort, {
+					url: `http://127.0.0.1:${devPort}/`,
+					prompt: [
+						`Review this rendered ${scenario.name} UI against the scenario brief.`,
+						'Fix the most obvious visual, UX, or skipped-component issue only.',
+						'Keep the repair focused; do not rebuild the whole page.'
+					].join(' '),
+					viewport: { width: 1280, height: 900 },
+					pngBase64: capture.pngBase64
+				});
+				visualSubmissionId = submission.id;
+				await assertPendingSubmission(feedbackPort, submission.id);
+				pVisualFeedbackCapture.note = `id=${submission.id}`;
+			});
+			if (!pVisualFeedbackCapture.ok) return finalize(false);
+
+			const pCodexFeedback = phase(`feedback-${agentBackend}`);
+			phases.push(pCodexFeedback);
+			await runPhase(pCodexFeedback, async () => {
+				if (options.useLocalFeedbackMcp === false) {
+					throw new Error('--visual-feedback-pass requires feedback MCP');
+				}
+				const result = await runAgentExec({
+					backend: agentBackend,
+					projectDir,
+					prompt: buildVisualFeedbackPrompt(visualSubmissionId),
+					logDir: resolve(logDir, 'feedback-codex'),
+					...(agentModel ? { model: agentModel } : {}),
+					...(options.usageLimitUsd !== undefined ? { usageLimitUsd: options.usageLimitUsd } : {}),
+					...(options.permissionMode ? { permissionMode: options.permissionMode } : {}),
+					...(options.effort ? { effort: options.effort } : {}),
+					...((options.codexTimeoutMs ?? scenario.codexTimeoutMs)
+						? { timeoutMs: options.codexTimeoutMs ?? scenario.codexTimeoutMs }
+						: {}),
+					useUserConfig: options.useUserCodexConfig === true,
+					useLocalFeedbackMcp: true,
+					feedbackBaseUrl,
+					onStdoutLine: (line) => {
+						if (options.streamCodex === true) {
+							const formatted = formatCodexStreamLine(line);
+							if (formatted)
+								console.log(`[${scenario.name}] feedback ${agentBackend} ${formatted}`);
+						}
+					},
+					onStderrLine: (line) => {
+						if (line.trim() && line.trim() !== CODEX_STDIN_NOTICE) {
+							console.error(`[${scenario.name}] feedback ${agentBackend} stderr: ${line}`);
+						}
+					}
+				});
+				if (!result.ok) {
+					throw new Error(`feedback ${agentBackend} exec failed\n${summarizeCodexRun(result)}`);
+				}
+				pCodexFeedback.note = summarizeCodexRun(result).split('\n').slice(0, 2).join('; ');
+			});
+			if (!pCodexFeedback.ok) return finalize(false);
+
+			killChild(feedbackChild);
+			feedbackChild = null;
+
+			const pBuildAfterFeedback = phase('build-after-feedback');
+			phases.push(pBuildAfterFeedback);
+			await runPhase(pBuildAfterFeedback, async () => {
+				await runProjectBuild(projectDir, logDir);
+			});
+			if (!pBuildAfterFeedback.ok) return finalize(false);
+
+			const pAssertsAfterFeedback = phase('assertions-after-feedback');
+			phases.push(pAssertsAfterFeedback);
+			await runPhase(pAssertsAfterFeedback, async () => {
+				const result = await runAssertions(
+					projectDir,
+					logDir,
+					`http://127.0.0.1:${devPort}`,
+					scenario.assertions,
+					'after-feedback-'
+				);
+				screenshots = [...screenshots, ...result.screenshots];
+				const failures = result.failures.map((failure) => `after-feedback: ${failure}`);
+				assertionFailures = [...assertionFailures, ...failures];
+				if (failures.length > 0) {
+					pAssertsAfterFeedback.note = failures.join('; ');
+					throw new Error(
+						`${failures.length} post-feedback assertion(s) failed: ${failures.join('; ')}`
+					);
+				}
+				pAssertsAfterFeedback.note = `${scenario.assertions.length} ok`;
+			});
+			if (!pAssertsAfterFeedback.ok) return finalize(false);
+		}
 
 		return finalize(phases.every((p) => p.ok));
 	} finally {
@@ -662,7 +957,7 @@ export async function runScenario(
 			options.keepProject && devChild?.pid
 				? { url: `http://127.0.0.1:${devPort}/`, pid: devChild.pid }
 				: null;
-		const result: ScenarioResult = {
+		const baseResult: ScenarioResultDraft = {
 			name: scenario.name,
 			ok,
 			startedAt,
@@ -675,9 +970,55 @@ export async function runScenario(
 			assertionFailures,
 			devServer
 		};
+		const result: ScenarioResult = {
+			...baseResult,
+			analysis: buildScenarioAnalysis(scenario, baseResult)
+		};
 		writeResultJson(result);
 		return result;
 	}
+}
+
+function buildScenarioAnalysis(
+	scenario: ScenarioDefinition,
+	result: ScenarioResultDraft
+): ScenarioAnalysis {
+	const requestedComponents = extractRequestedComponents(scenario.prompt);
+	const sourceFiles = readProjectSourceFiles(result.projectDir);
+	const dryuiImports = extractDryuiImports(sourceFiles);
+	const imported = uniqueSorted(dryuiImports.map((entry) => entry.name));
+	const rendered = extractRenderedComponents(sourceFiles, imported);
+	const hallucinated = uniqueSorted(
+		dryuiImports
+			.filter((entry) => !getDryuiUiExports(entry.module).has(entry.name))
+			.map((entry) => entry.name)
+	);
+	const requestedLabels = extractRequestedLabels(scenario);
+
+	return {
+		schemaVersion: ANALYSIS_SCHEMA_VERSION,
+		tokens: result.codex ? extractCodexTokenTotals(result.codex) : emptyTokenTotals(),
+		phaseTimings: result.phases.map((p) => ({
+			name: p.name,
+			ok: p.ok,
+			durationMs: p.durationMs
+		})),
+		components: {
+			requested: requestedComponents,
+			imported,
+			rendered,
+			hallucinatedDryuiUiImports: hallucinated
+		},
+		requestedLabels,
+		missingRequestedLabels: extractMissingRequestedLabels(result.assertionFailures),
+		assertionFailures: result.assertionFailures,
+		fileChanges: {
+			count: result.codex?.fileChanges.length ?? 0,
+			paths: result.codex?.fileChanges ?? []
+		},
+		logs: collectLogPaths(result.logDir),
+		judge: null
+	};
 }
 
 function writeResultJson(result: ScenarioResult): void {
@@ -698,6 +1039,8 @@ function writeResultJson(result: ScenarioResult): void {
 		})),
 		codex: result.codex
 			? {
+					backend: result.codex.backend,
+					model: result.codex.model,
 					exitCode: result.codex.exitCode,
 					durationMs: result.codex.durationMs,
 					eventCount: result.codex.events.length,
@@ -713,9 +1056,14 @@ function writeResultJson(result: ScenarioResult): void {
 			path: relativeToLogDir(s.path, result.logDir),
 			url: s.url
 		})),
-		assertionFailures: result.assertionFailures
+		assertionFailures: result.assertionFailures,
+		analysis: result.analysis
 	};
 	writeFileSync(resolve(result.logDir, 'result.json'), JSON.stringify(payload, null, 2) + '\n');
+	writeFileSync(
+		resolve(result.logDir, 'analysis.json'),
+		JSON.stringify(result.analysis, null, 2) + '\n'
+	);
 }
 
 function extractCodexTokens(codex: CodexRunResult): {
@@ -723,16 +1071,229 @@ function extractCodexTokens(codex: CodexRunResult): {
 	cached: number | null;
 	output: number | null;
 } {
-	const turnCompleted = [...codex.events].reverse().find((e) => e.type === 'turn.completed');
-	if (!turnCompleted || typeof turnCompleted.usage !== 'object' || turnCompleted.usage === null) {
-		return { input: null, cached: null, output: null };
+	const totals = extractCodexTokenTotals(codex);
+	return { input: totals.input, cached: totals.cached, output: totals.output };
+}
+
+function emptyTokenTotals(): CodexTokenTotals {
+	return { input: null, cached: null, output: null, total: null, turns: 0 };
+}
+
+function extractCodexTokenTotals(codex: CodexRunResult): CodexTokenTotals {
+	let input = 0;
+	let cached = 0;
+	let output = 0;
+	let hasInput = false;
+	let hasCached = false;
+	let hasOutput = false;
+	let turns = 0;
+
+	for (const event of codex.events) {
+		const usage =
+			event.type === 'turn.completed' && typeof event.usage === 'object' && event.usage !== null
+				? (event.usage as Record<string, unknown>)
+				: event.type === 'assistant' &&
+					  typeof (event.message as Record<string, unknown> | undefined)?.usage === 'object' &&
+					  (event.message as Record<string, unknown> | undefined)?.usage !== null
+					? ((event.message as Record<string, unknown>).usage as Record<string, unknown>)
+					: null;
+		if (!usage) continue;
+		if (event.type === 'turn.completed' || event.type === 'assistant') turns++;
+		const inputTokens = numberValue(usage.input_tokens) ?? numberValue(usage.inputTokens) ?? 0;
+		const cacheCreation =
+			numberValue(usage.cache_creation_input_tokens) ??
+			numberValue(usage.cacheCreationInputTokens) ??
+			0;
+		const cacheRead =
+			numberValue(usage.cached_input_tokens) ??
+			numberValue(usage.cache_read_input_tokens) ??
+			numberValue(usage.cacheReadInputTokens) ??
+			0;
+		const outputTokens = numberValue(usage.output_tokens) ?? numberValue(usage.outputTokens) ?? 0;
+		if (inputTokens > 0 || cacheCreation > 0) {
+			input += inputTokens + cacheCreation;
+			hasInput = true;
+		}
+		if (cacheRead > 0) {
+			cached += cacheRead;
+			hasCached = true;
+		}
+		if (outputTokens > 0) {
+			output += outputTokens;
+			hasOutput = true;
+		}
 	}
-	const usage = turnCompleted.usage as Record<string, unknown>;
+
+	const resolvedInput = hasInput ? input : null;
+	const resolvedCached = hasCached ? cached : null;
+	const resolvedOutput = hasOutput ? output : null;
+	const total =
+		resolvedInput === null && resolvedOutput === null
+			? null
+			: (resolvedInput ?? 0) + (resolvedOutput ?? 0);
+
 	return {
-		input: typeof usage.input_tokens === 'number' ? usage.input_tokens : null,
-		cached: typeof usage.cached_input_tokens === 'number' ? usage.cached_input_tokens : null,
-		output: typeof usage.output_tokens === 'number' ? usage.output_tokens : null
+		input: resolvedInput,
+		cached: resolvedCached,
+		output: resolvedOutput,
+		total,
+		turns
 	};
+}
+
+function numberValue(value: unknown): number | null {
+	return typeof value === 'number' && Number.isFinite(value) ? value : null;
+}
+
+function extractRequestedLabels(scenario: ScenarioDefinition): string[] {
+	const labels = new Set<string>();
+	for (const assertion of scenario.assertions) {
+		if ('needle' in assertion) labels.add(assertion.needle);
+	}
+	for (const match of scenario.prompt.matchAll(/exact [^.\n:]*"([^"]+)"/gi)) {
+		labels.add(match[1]!);
+	}
+	for (const match of scenario.prompt.matchAll(
+		/\(([^()"]*(?:"[^"]+"(?:\s*\/\s*"[^"]+")+)[^()]*)\)/g
+	)) {
+		for (const label of match[1]!.matchAll(/"([^"]+)"/g)) labels.add(label[1]!);
+	}
+	const required =
+		scenario.prompt.match(/Required structure[\s\S]*?(?:\n\n|Do not edit)/i)?.[0] ?? '';
+	for (const match of required.matchAll(/"([^"]{1,60})"/g)) {
+		labels.add(match[1]!);
+	}
+	return [...labels].sort((a, b) => a.localeCompare(b));
+}
+
+function extractMissingRequestedLabels(assertionFailures: readonly string[]): string[] {
+	const missing = new Set<string>();
+	for (const failure of assertionFailures) {
+		for (const match of failure.matchAll(/missing "([^"]+)"/g)) {
+			missing.add(match[1]!);
+		}
+	}
+	return [...missing].sort((a, b) => a.localeCompare(b));
+}
+
+function extractRequestedComponents(prompt: string): string[] {
+	const names = new Set<string>();
+	const requestedBlocks = prompt.matchAll(
+		/Pick from:\n([\s\S]*?)(?:\nDryUI|\nImport|\nReal imagery|\n\n)/g
+	);
+	for (const block of requestedBlocks) {
+		const text = block[1] ?? '';
+		for (const match of text.matchAll(/\b[A-Z][A-Za-z0-9]*(?:\.[A-Z][A-Za-z0-9]*)?\b/g)) {
+			const name = match[0]!;
+			if (name !== 'DryUI') names.add(name.split('.')[0]!);
+		}
+	}
+	return [...names].sort((a, b) => a.localeCompare(b));
+}
+
+function readProjectSourceFiles(projectDir: string): string[] {
+	const srcDir = resolve(projectDir, 'src');
+	const files: string[] = [];
+	function walk(dir: string): void {
+		if (!existsSync(dir)) return;
+		for (const entry of readdirSync(dir)) {
+			const path = resolve(dir, entry);
+			const stat = statSync(path);
+			if (stat.isDirectory()) {
+				walk(path);
+			} else if (/\.(svelte|ts|js)$/.test(entry)) {
+				files.push(readFileSync(path, 'utf8'));
+			}
+		}
+	}
+	walk(srcDir);
+	return files;
+}
+
+function extractDryuiImports(files: readonly string[]): DryuiImport[] {
+	const imported: DryuiImport[] = [];
+	for (const content of files) {
+		for (const match of content.matchAll(
+			/import\s*\{([^}]+)\}\s*from\s*['"](@dryui\/ui(?:\/[^'"]*)?)['"]/g
+		)) {
+			for (const part of match[1]!.split(',')) {
+				const name = part
+					.trim()
+					.split(/\s+as\s+/i)[0]
+					?.trim();
+				if (name && /^[A-Z][A-Za-z0-9]*$/.test(name)) {
+					imported.push({ name, module: match[2]! });
+				}
+			}
+		}
+	}
+	return imported;
+}
+
+function extractRenderedComponents(
+	files: readonly string[],
+	imported: readonly string[]
+): string[] {
+	const rendered = new Set<string>();
+	const importedSet = new Set(imported);
+	for (const content of files) {
+		for (const match of content.matchAll(/<\/?([A-Z][A-Za-z0-9]*)(?:\.[A-Z][A-Za-z0-9]*)?\b/g)) {
+			const name = match[1]!;
+			if (importedSet.has(name)) rendered.add(name);
+		}
+	}
+	return [...rendered].sort((a, b) => a.localeCompare(b));
+}
+
+function getDryuiUiExports(moduleName: string): Set<string> {
+	const subpath = moduleName.replace(/^@dryui\/ui\/?/, '');
+	const indexPath =
+		subpath.length === 0
+			? resolve(repoRoot, 'packages/ui/src/index.ts')
+			: resolve(repoRoot, 'packages/ui/src', subpath, 'index.ts');
+	const exports = new Set<string>();
+	if (!existsSync(indexPath)) return exports;
+	const content = readFileSync(indexPath, 'utf8');
+	for (const match of content.matchAll(/export\s*\{([^}]+)\}/g)) {
+		for (const part of match[1]!.split(',')) {
+			const name = part
+				.trim()
+				.split(/\s+as\s+/i)
+				.pop()
+				?.trim();
+			if (name && /^[A-Z][A-Za-z0-9]*$/.test(name)) exports.add(name);
+		}
+	}
+	return exports;
+}
+
+function uniqueSorted(values: readonly string[]): string[] {
+	return [...new Set(values)].sort((a, b) => a.localeCompare(b));
+}
+
+function collectLogPaths(logDir: string): Record<string, string> {
+	const always = ['result.json', 'analysis.json'];
+	const known = [
+		'scaffold.log',
+		'feedback-server.log',
+		'codex-transcript.jsonl',
+		'codex-last-message.txt',
+		'build.log',
+		'dev-server.log'
+	];
+	const logs: Record<string, string> = {};
+	for (const file of always) {
+		logs[file.replace(/\W+/g, '_').replace(/_$/, '')] = resolve(logDir, file);
+	}
+	for (const file of known) {
+		const path = resolve(logDir, file);
+		if (existsSync(path)) logs[file.replace(/\W+/g, '_').replace(/_$/, '')] = path;
+	}
+	const screenshotDir = resolve(logDir, 'screenshots');
+	if (existsSync(screenshotDir)) logs.screenshots = screenshotDir;
+	const feedbackCodexDir = resolve(logDir, 'feedback-codex');
+	if (existsSync(feedbackCodexDir)) logs.feedback_codex = feedbackCodexDir;
+	return logs;
 }
 
 function relativeToLogDir(absPath: string, logDir: string): string {
@@ -758,7 +1319,7 @@ export function formatScenarioResult(result: ScenarioResult): string {
 		lines.push(`  shots:   ${result.screenshots.map((s) => s.label).join(', ')}`);
 	}
 	if (result.codex) {
-		lines.push('  codex:');
+		lines.push('  agent:');
 		for (const line of summarizeCodexRun(result.codex).split('\n')) {
 			lines.push(`    ${line.trimStart()}`);
 		}

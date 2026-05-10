@@ -50,6 +50,7 @@
     "release": "bun run release:gate && bun run version && bun run publish:packages",
     "dev:link": "bun run ./scripts/dev-link.ts",
     "dev:unlink": "bun run ./scripts/dev-link.ts --unlink",
+    "eval:loop": "bun run scripts/eval/run-loop.ts",
     "dev:ui:watch": "cd packages/feedback-server && vite build --watch --config ui/vite.config.ts",
     "e2e:pack": "bun run ./scripts/e2e/pack-dev-versions.ts",
     "e2e:full": "bun run ./scripts/e2e/run.ts",

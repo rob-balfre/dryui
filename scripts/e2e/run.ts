@@ -10,10 +10,12 @@
  *   bun run scripts/e2e/run.ts --codex-stream-raw # stream raw Codex JSONL
  *   bun run scripts/e2e/run.ts --no-codex-feedback # no feedback MCP, no user config
  *   bun run scripts/e2e/run.ts --codex-user-config # inherit ~/.codex/config.toml instead
+ *   bun run scripts/e2e/run.ts --agent claude --model sonnet --usage-limit-usd 5
  *   bun run scripts/e2e/run.ts --keep-project     # leave dev server running, print URL
  *   bun run scripts/e2e/run.ts --tarballs <dir>   # override tarball source
  *   bun run scripts/e2e/run.ts --skip-pack        # trust existing tarballs
  *   bun run scripts/e2e/run.ts --open             # open the HTML report when done
+ *   bun run scripts/e2e/run.ts --visual-feedback-pass # opt-in second feedback repair
  *
  * By default this script shells out to `pack-dev-versions.ts` first so the
  * tarballs match the current worktree. Pass `--skip-pack` if you've already
@@ -25,8 +27,9 @@ import { spawnSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { openBrowser } from '../../packages/cli/src/commands/launch-utils.ts';
+import { openBrowser } from '../../packages/feedback-server/src/cli/launch-dashboard.ts';
 import { formatScenarioResult, runScenario, type ScenarioResult } from './scenario-harness.ts';
+import type { AgentBackend } from './codex-runner.ts';
 import { SCENARIOS, findScenario } from '../../tests/e2e/scenarios/index.ts';
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
@@ -43,6 +46,12 @@ interface CliFlags {
 	useLocalFeedbackMcp: boolean;
 	skipPack: boolean;
 	open: boolean;
+	visualFeedbackPass: boolean;
+	agentBackend: AgentBackend;
+	agentModel: string | null;
+	usageLimitUsd: number | null;
+	permissionMode: string | null;
+	effort: string | null;
 	codexTimeoutMs: number | null;
 }
 
@@ -52,7 +61,10 @@ function printUsage(): void {
 			`                                   [--keep-project] [--verbose] [--stream-codex]\n` +
 			`                                   [--codex-stream-raw] [--codex-user-config]\n` +
 			`                                   [--no-codex-feedback] [--skip-pack] [--open]\n` +
-			`                                   [--codex-timeout-ms <ms>]\n\n` +
+			`                                   [--visual-feedback-pass]\n` +
+			`                                   [--agent codex|claude] [--model <name>]\n` +
+			`                                   [--usage-limit-usd <amount>] [--permission-mode <mode>]\n` +
+			`                                   [--effort <level>] [--codex-timeout-ms <ms>]\n\n` +
 			`Scenarios: ${SCENARIOS.map((s) => s.name).join(', ')}`
 	);
 }
@@ -74,6 +86,12 @@ function parseArgs(argv: string[]): CliFlags {
 		useLocalFeedbackMcp: true,
 		skipPack: false,
 		open: false,
+		visualFeedbackPass: false,
+		agentBackend: 'codex',
+		agentModel: null,
+		usageLimitUsd: null,
+		permissionMode: null,
+		effort: null,
 		codexTimeoutMs: null
 	};
 	for (let i = 0; i < argv.length; i++) {
@@ -87,12 +105,66 @@ function parseArgs(argv: string[]): CliFlags {
 			}
 			flags.only = next;
 			i++;
-		} else if (arg === '--tarballs' && next) {
+		} else if (arg === '--tarballs') {
+			if (!next || next.startsWith('-')) {
+				console.error('[e2e] missing path after --tarballs');
+				printUsage();
+				process.exit(2);
+			}
 			flags.tarballsDir = resolve(next);
 			i++;
-		} else if (arg === '--codex-timeout-ms') {
+		} else if (arg === '--agent' || arg === '--backend' || arg === '--runner') {
 			if (!next || next.startsWith('-')) {
-				console.error('[e2e] missing millisecond value after --codex-timeout-ms');
+				console.error(`[e2e] missing agent after ${arg}`);
+				printUsage();
+				process.exit(2);
+			}
+			if (next !== 'codex' && next !== 'claude') {
+				console.error(`[e2e] invalid agent "${next}" (expected codex or claude)`);
+				process.exit(2);
+			}
+			flags.agentBackend = next;
+			i++;
+		} else if (arg === '--model') {
+			if (!next || next.startsWith('-')) {
+				console.error('[e2e] missing model after --model');
+				printUsage();
+				process.exit(2);
+			}
+			flags.agentModel = next;
+			i++;
+		} else if (arg === '--usage-limit-usd') {
+			if (!next || next.startsWith('-')) {
+				console.error('[e2e] missing amount after --usage-limit-usd');
+				printUsage();
+				process.exit(2);
+			}
+			const limit = Number(next);
+			if (!Number.isFinite(limit) || limit <= 0) {
+				console.error(`[e2e] invalid --usage-limit-usd value: ${next}`);
+				process.exit(2);
+			}
+			flags.usageLimitUsd = limit;
+			i++;
+		} else if (arg === '--permission-mode') {
+			if (!next || next.startsWith('-')) {
+				console.error('[e2e] missing mode after --permission-mode');
+				printUsage();
+				process.exit(2);
+			}
+			flags.permissionMode = next;
+			i++;
+		} else if (arg === '--effort') {
+			if (!next || next.startsWith('-')) {
+				console.error('[e2e] missing effort after --effort');
+				printUsage();
+				process.exit(2);
+			}
+			flags.effort = next;
+			i++;
+		} else if (arg === '--codex-timeout-ms' || arg === '--agent-timeout-ms') {
+			if (!next || next.startsWith('-')) {
+				console.error(`[e2e] missing millisecond value after ${arg}`);
 				printUsage();
 				process.exit(2);
 			}
@@ -124,6 +196,8 @@ function parseArgs(argv: string[]): CliFlags {
 			flags.skipPack = true;
 		} else if (arg === '--open') {
 			flags.open = true;
+		} else if (arg === '--visual-feedback-pass') {
+			flags.visualFeedbackPass = true;
 		} else if (!arg.startsWith('-') && flags.only === null) {
 			flags.only = arg;
 		} else {
@@ -201,6 +275,12 @@ async function main(): Promise<void> {
 			codexStreamRaw: flags.codexStreamRaw,
 			useUserCodexConfig: flags.useUserCodexConfig,
 			useLocalFeedbackMcp: flags.useLocalFeedbackMcp,
+			visualFeedbackPass: flags.visualFeedbackPass,
+			agentBackend: flags.agentBackend,
+			...(flags.agentModel ? { agentModel: flags.agentModel } : {}),
+			...(flags.usageLimitUsd !== null ? { usageLimitUsd: flags.usageLimitUsd } : {}),
+			...(flags.permissionMode ? { permissionMode: flags.permissionMode } : {}),
+			...(flags.effort ? { effort: flags.effort } : {}),
 			...(flags.codexTimeoutMs !== null ? { codexTimeoutMs: flags.codexTimeoutMs } : {})
 		});
 		results.push(result);
@@ -238,7 +318,9 @@ async function main(): Promise<void> {
 	process.exit(flags.keepProject || allOk ? 0 : 1);
 }
 
-main().catch((err) => {
-	console.error('[e2e] unhandled error:', err);
-	process.exit(1);
-});
+if (import.meta.main) {
+	main().catch((err) => {
+		console.error('[e2e] unhandled error:', err);
+		process.exit(1);
+	});
+}

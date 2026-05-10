@@ -19,7 +19,7 @@ The gap between `prompt-plus-catalog` and `tool-calling` is the value of interac
 | smoke | every PR                           | free, no network | schema validation + deterministic local checks |
 | full  | nightly (`DRYUI_BENCHMARK_LIVE=1`) | real API         | all three formats × all tasks, with artifacts  |
 
-The smoke lane catches drift in the task manifests themselves, deterministic CLI outputs, and target-component references. The full lane measures real agent success.
+The smoke lane catches drift in the task manifests themselves, deterministic CLI outputs, and target-component references against `packages/ui/src/*/*.meta.ts` with package exports as a fallback. The full lane measures real agent success.
 
 ## Layout
 
@@ -91,7 +91,7 @@ Per task, per format:
 1. Copy an existing `benchmarks/tasks/<id>.json` as a starting point.
 2. Rename the file so it matches the new `id`.
 3. Update `claim`, `prompt`, `target_components`, `acceptance_checks`, and `budget`.
-4. Run `bun run scripts/benchmark/run.ts --smoke` to confirm the manifest validates and every target component exists in `spec.json`.
+4. Run `bun run scripts/benchmark/run.ts --smoke` to confirm the manifest validates and every target component exists in the current UI metadata or package exports.
 5. If the task ships a golden artifact, drop it under `reports/benchmarks/artifacts/<id>/golden/…`.
 
 ## Initial task set

@@ -80,3 +80,4 @@ reports/benchmarks/history/*.jsonl
 # E2E harness outputs — tarballs are per-run and logs are throwaway artifacts.
 reports/e2e-tarballs/
 reports/e2e-runs/
+reports/eval-loops/

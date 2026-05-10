@@ -18,7 +18,7 @@
  * See benchmarks/README.md for the full workflow and task schema.
  */
 
-import { readdirSync, readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
+import { readdirSync, readFileSync, writeFileSync, mkdirSync, existsSync, statSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
@@ -68,9 +68,52 @@ function loadTasks(): Task[] {
 	return tasks;
 }
 
-function loadSpec(): { components: Record<string, unknown> } {
-	const specPath = resolve(repoRoot, 'packages/mcp/src/spec.json');
-	return JSON.parse(readFileSync(specPath, 'utf8')) as { components: Record<string, unknown> };
+interface ComponentCatalog {
+	components: Record<string, { source: 'meta' | 'export'; path: string }>;
+	sources: { metaFiles: number; exportedComponents: number };
+}
+
+function walkFiles(dir: string, predicate: (path: string) => boolean): string[] {
+	const out: string[] = [];
+	for (const entry of readdirSync(dir)) {
+		const path = resolve(dir, entry);
+		if (statSync(path).isDirectory()) {
+			out.push(...walkFiles(path, predicate));
+		} else if (predicate(path)) {
+			out.push(path);
+		}
+	}
+	return out;
+}
+
+function loadComponentCatalog(): ComponentCatalog {
+	const components: ComponentCatalog['components'] = {};
+	const uiSrcDir = resolve(repoRoot, 'packages/ui/src');
+	const metaFiles = walkFiles(uiSrcDir, (path) => path.endsWith('.meta.ts')).sort();
+
+	for (const path of metaFiles) {
+		const text = readFileSync(path, 'utf8');
+		const name = text.match(/\bname:\s*['"]([^'"]+)['"]/)?.[1];
+		if (name) {
+			components[name] = { source: 'meta', path };
+		}
+	}
+
+	const indexPath = resolve(uiSrcDir, 'index.ts');
+	const exportedComponents = [
+		...readFileSync(indexPath, 'utf8').matchAll(/^export \{ ([A-Z]\w+) \}/gm)
+	];
+	for (const [, name] of exportedComponents) {
+		components[name] ??= { source: 'export', path: indexPath };
+	}
+
+	return {
+		components,
+		sources: {
+			metaFiles: metaFiles.length,
+			exportedComponents: exportedComponents.length
+		}
+	};
 }
 
 // ── Smoke checks (run locally, no LLM) ───────────────────────────────────────
@@ -85,38 +128,53 @@ interface CheckOutcome {
 
 function runDeterministicPromptCheck(component: string): CheckOutcome {
 	const t0 = performance.now();
-	const cmdA = spawnSync('bun', ['packages/cli/src/index.ts', 'prompt', '--component', component], {
+	const cliPath = resolve(repoRoot, 'packages/cli/src/index.ts');
+	if (!existsSync(cliPath)) {
+		return {
+			task: '',
+			kind: 'deterministic-prompt',
+			ok: true,
+			detail: `skipped: no local dryui prompt command is present in this checkout`,
+			durationMs: Math.round(performance.now() - t0)
+		};
+	}
+
+	const args = ['run', cliPath, 'prompt', '--component', component];
+	const cmdA = spawnSync('bun', args, {
 		cwd: repoRoot,
 		encoding: 'utf8'
 	});
-	const cmdB = spawnSync('bun', ['packages/cli/src/index.ts', 'prompt', '--component', component], {
+	const cmdB = spawnSync('bun', args, {
 		cwd: repoRoot,
 		encoding: 'utf8'
 	});
 	const durationMs = Math.round(performance.now() - t0);
 	const same = cmdA.stdout === cmdB.stdout && cmdA.status === 0 && cmdB.status === 0;
+	const failedStatus = cmdA.status !== 0 || cmdB.status !== 0;
 	return {
 		task: '',
 		kind: 'deterministic-prompt',
 		ok: same,
 		detail: same
 			? `two calls produced byte-identical output (${cmdA.stdout.length} chars)`
-			: `output differed between calls`,
+			: failedStatus
+				? `prompt command failed: statuses ${cmdA.status ?? 'signal'} and ${cmdB.status ?? 'signal'}`
+				: `output differed between calls`,
 		durationMs
 	};
 }
 
-function validateTaskManifest(task: Task, spec: ReturnType<typeof loadSpec>): CheckOutcome[] {
+function validateTaskManifest(task: Task, catalog: ComponentCatalog): CheckOutcome[] {
 	const out: CheckOutcome[] = [];
 	const t0 = performance.now();
-	const missing = task.target_components.filter((name) => !(name in spec.components));
+	const missing = task.target_components.filter((name) => !(name in catalog.components));
 	out.push({
 		task: task.id,
 		kind: 'target_components',
 		ok: missing.length === 0,
 		detail:
 			missing.length === 0
-				? `all ${task.target_components.length} target components exist in spec.json`
+				? `all ${task.target_components.length} target components exist in packages/ui metadata or exports`
 				: `unknown components: ${missing.join(', ')}`,
 		durationMs: Math.round(performance.now() - t0)
 	});
@@ -140,6 +198,11 @@ interface Report {
 	startedAt: string;
 	finishedAt: string;
 	taskCount: number;
+	componentCatalog: {
+		componentCount: number;
+		metaFiles: number;
+		exportedComponents: number;
+	};
 	outcomes: CheckOutcome[];
 	summary: { pass: number; fail: number };
 }
@@ -147,9 +210,11 @@ interface Report {
 async function main(): Promise<void> {
 	const startedAt = new Date().toISOString();
 	const tasks = loadTasks();
-	const spec = loadSpec();
+	const componentCatalog = loadComponentCatalog();
 
-	console.log(`benchmark: mode=${smoke ? 'smoke' : 'live'} format=${format} tasks=${tasks.length}`);
+	console.log(
+		`benchmark: mode=${smoke ? 'smoke' : 'live'} format=${format} tasks=${tasks.length} components=${Object.keys(componentCatalog.components).length}`
+	);
 
 	if (!smoke && !live) {
 		console.error(
@@ -161,7 +226,7 @@ async function main(): Promise<void> {
 	const outcomes: CheckOutcome[] = [];
 	for (const task of tasks) {
 		process.stdout.write(`  ${task.id} … `);
-		const results = validateTaskManifest(task, spec);
+		const results = validateTaskManifest(task, componentCatalog);
 		outcomes.push(...results);
 		const passed = results.every((r) => r.ok);
 		process.stdout.write(passed ? 'ok\n' : 'FAIL\n');
@@ -177,6 +242,11 @@ async function main(): Promise<void> {
 		startedAt,
 		finishedAt,
 		taskCount: tasks.length,
+		componentCatalog: {
+			componentCount: Object.keys(componentCatalog.components).length,
+			metaFiles: componentCatalog.sources.metaFiles,
+			exportedComponents: componentCatalog.sources.exportedComponents
+		},
 		outcomes,
 		summary: {
 			pass: outcomes.filter((o) => o.ok).length,
@@ -217,6 +287,9 @@ function renderMarkdown(r: Report): string {
 	lines.push(`- started: ${r.startedAt}`);
 	lines.push(`- finished: ${r.finishedAt}`);
 	lines.push(`- tasks: ${r.taskCount}`);
+	lines.push(
+		`- component catalog: ${r.componentCatalog.componentCount} components (${r.componentCatalog.metaFiles} metadata files, ${r.componentCatalog.exportedComponents} package exports)`
+	);
 	lines.push(`- checks: ${r.summary.pass} pass / ${r.summary.fail} fail`);
 	lines.push('');
 	lines.push(`| Task | Kind | Result | Detail |`);

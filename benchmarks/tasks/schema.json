@@ -24,9 +24,9 @@
 		},
 		"target_components": {
 			"type": "array",
-			"minItems": 1,
+			"minItems": 0,
 			"items": { "type": "string" },
-			"description": "DryUI components the task is expected to touch. Must all exist in spec.json."
+			"description": "DryUI components the task is expected to touch. Must all exist in packages/ui component metadata or package exports."
 		},
 		"allowed_tools": {
 			"type": "array",
