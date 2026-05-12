@@ -108,4 +108,4 @@ jobs:
           # --branch=main is required because Actions checks out a detached SHA,
           # so wrangler would otherwise fall back to a "head" preview alias
           # instead of promoting to the dryui.dev production env.
-          command: pages deploy build --project-name=dryui-docs --branch=main
+          command: pages deploy .svelte-kit/cloudflare --project-name=dryui-docs --branch=main
