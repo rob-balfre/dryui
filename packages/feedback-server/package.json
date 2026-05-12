@@ -1,6 +1,6 @@
 {
   "name": "@dryui/feedback-server",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "author": "Rob Balfre",
   "license": "MIT",
   "repository": {
@@ -40,7 +40,11 @@
       "default": "./dist/config-probe.js"
     }
   },
-  "files": ["dist", "hooks", "bin"],
+  "files": [
+    "dist",
+    "hooks",
+    "bin"
+  ],
   "publishConfig": {
     "access": "public",
     "exports": {

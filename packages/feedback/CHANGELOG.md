@@ -1,5 +1,19 @@
 # @dryui/feedback
 
+## 1.1.0
+
+### Minor Changes
+
+- [`cc17c68`](https://github.com/rob-balfre/dryui/commit/cc17c688fafb1c52045d9f50bc98597fcc635e94) Thanks [@rob-balfre](https://github.com/rob-balfre)! - Remove the retired Card component from the primitive and UI packages, retire the theme wizard package surface, and document native wrapper/card-token usage instead.
+
+  Add safer feedback component defaults for required-prop components and include the layout CSS lint surface in the release plan.
+
+### Patch Changes
+
+- Updated dependencies [[`cc17c68`](https://github.com/rob-balfre/dryui/commit/cc17c688fafb1c52045d9f50bc98597fcc635e94)]:
+  - @dryui/primitives@4.0.0
+  - @dryui/ui@4.0.0
+
 ## 1.0.0
 
 ### Major Changes

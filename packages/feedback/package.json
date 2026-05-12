@@ -1,6 +1,6 @@
 {
   "name": "@dryui/feedback",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "author": "Rob Balfre",
   "license": "MIT",
   "repository": {
@@ -28,7 +28,10 @@
       "default": "./dist/index.js"
     }
   },
-  "files": ["dist", "src"],
+  "files": [
+    "dist",
+    "src"
+  ],
   "scripts": {
     "generate:names": "bun ../../scripts/extract-feedback-names.ts",
     "prebuild": "bun run generate:names",
@@ -39,8 +42,8 @@
     "check:publish-hygiene": "bun run check:publint && bun run check:attw"
   },
   "dependencies": {
-    "@dryui/primitives": "^3.0.0",
-    "@dryui/ui": "^3.0.0"
+    "@dryui/primitives": "^4.0.0",
+    "@dryui/ui": "^4.0.0"
   },
   "peerDependencies": {
     "svelte": "^5.55.5",
