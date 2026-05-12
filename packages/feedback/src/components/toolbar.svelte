@@ -322,12 +322,13 @@
 	});
 
 	function handleHandlePointerDown(e: PointerEvent) {
+		const handle = e.currentTarget as HTMLButtonElement;
 		pendingDrag = { id: e.pointerId, x: e.clientX, y: e.clientY };
+		handle.setPointerCapture(e.pointerId);
 	}
 
 	function handleHandlePointerMove(e: PointerEvent) {
 		if (!pendingDrag || !toolbarEl) return;
-		const handle = e.currentTarget as HTMLButtonElement;
 
 		if (!dragging) {
 			const dx = e.clientX - pendingDrag.x;
@@ -335,7 +336,6 @@
 			if (Math.hypot(dx, dy) < DRAG_THRESHOLD_PX) return;
 			const rect = toolbarEl.getBoundingClientRect();
 			dragOffset = { x: pendingDrag.x - rect.left, y: pendingDrag.y - rect.top };
-			handle.setPointerCapture(pendingDrag.id);
 			dragging = true;
 		}
 

@@ -1036,6 +1036,7 @@
 	let sent = $state(false);
 	let toasts: FeedbackToast[] = $state([]);
 	let toastLayerEl: HTMLDivElement | undefined = $state();
+	let feedbackRootEl: HTMLDivElement | undefined = $state();
 	let layoutStageEl: HTMLDivElement | undefined = $state();
 	let toolbarHiddenForCapture = $state(false);
 	let scrollRootEl: HTMLElement | null = $state(null);
@@ -2028,6 +2029,28 @@
 		};
 	});
 
+	// Promote the feedback root into the browser top-layer while annotating so
+	// drawings paint above page popovers (date pickers, dropdowns, etc).
+	$effect(() => {
+		const node = feedbackRootEl;
+		if (!node) return;
+		if (!annotationActive) {
+			tryHidePopover(node);
+			return;
+		}
+
+		if (layerHostEl && !layerHostEl.isConnected) return;
+
+		const frame = requestAnimationFrame(() => {
+			if (node.isConnected) tryShowPopover(node);
+		});
+
+		return () => {
+			cancelAnimationFrame(frame);
+			tryHidePopover(node);
+		};
+	});
+
 	$effect(() => {
 		return () => {
 			for (const timer of Object.values(toastTimers)) clearTimeout(timer);
@@ -2078,10 +2101,12 @@
 
 	<Portal target={layerHostEl ?? 'body'}>
 		<div
+			bind:this={feedbackRootEl}
 			class="feedback-root {className ?? ''}"
 			data-dryui-feedback
 			data-dismiss-ignore
 			data-layer-hosted={layerHostEl ? '' : undefined}
+			popover="manual"
 			style={feedbackRootStyle()}
 		>
 			<div {@attach captureLayoutStage} class="layout-stage" aria-hidden="true"></div>
@@ -2377,6 +2402,12 @@
 		background: transparent;
 		overflow: visible;
 		pointer-events: none;
+	}
+
+	/* Keep the root rendering in regular flow when not promoted into the
+	   top-layer; popover="manual" otherwise sets display:none. */
+	.feedback-root:not(:popover-open) {
+		display: block;
 	}
 
 	.feedback-root[data-layer-hosted] {
