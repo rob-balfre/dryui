@@ -1,0 +1,247 @@
+[
+  {
+    "variant": "v19a-panel-budget",
+    "case": "settings",
+    "formalOk": true,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-stage123-v19a-panel-budget-settings-stage123-pass9-f6XZ2L",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/stage123-v19a-panel-budget-settings-stage123-pass9-1778478905842",
+    "devServer": {
+      "url": "http://127.0.0.1:49703/",
+      "pid": 72165
+    },
+    "agentSeconds": 190.5,
+    "source": {
+      "failures": [],
+      "dryuiComponents": [
+        "Badge",
+        "Button",
+        "Heading",
+        "Image",
+        "Input",
+        "Link",
+        "Separator",
+        "Text"
+      ],
+      "visibleWords": 94
+    },
+    "visual": [
+      {
+        "viewport": "mobile",
+        "screenshot": "/Users/robertbalfre/dryui/reports/skill-experiments/2026-05-11/batch-8/screenshots-pass9/v19a-panel-budget-settings-mobile.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.061224489795918366,
+        "scrollHeight": 2670
+      },
+      {
+        "viewport": "tablet",
+        "screenshot": "/Users/robertbalfre/dryui/reports/skill-experiments/2026-05-11/batch-8/screenshots-pass9/v19a-panel-budget-settings-tablet.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.061224489795918366,
+        "scrollHeight": 1263
+      },
+      {
+        "viewport": "desktop",
+        "screenshot": "/Users/robertbalfre/dryui/reports/skill-experiments/2026-05-11/batch-8/screenshots-pass9/v19a-panel-budget-settings-desktop.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.061224489795918366,
+        "scrollHeight": 1113
+      }
+    ],
+    "assertionFailures": [],
+    "score": 100,
+    "auditOk": true,
+    "visualOk": true,
+    "ok": true
+  },
+  {
+    "variant": "v19a-panel-budget",
+    "case": "crm",
+    "formalOk": true,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-stage123-v19a-panel-budget-crm-stage123-pass9-YuNdii",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/stage123-v19a-panel-budget-crm-stage123-pass9-1778479118248",
+    "devServer": {
+      "url": "http://127.0.0.1:50001/",
+      "pid": 77613
+    },
+    "agentSeconds": 124.6,
+    "source": {
+      "failures": [
+        "flex layout in app.css"
+      ],
+      "dryuiComponents": [
+        "Badge",
+        "Button",
+        "Heading",
+        "Input",
+        "Link",
+        "Separator",
+        "Text"
+      ],
+      "visibleWords": 99
+    },
+    "visual": [
+      {
+        "viewport": "mobile",
+        "screenshot": "/Users/robertbalfre/dryui/reports/skill-experiments/2026-05-11/batch-8/screenshots-pass9/v19a-panel-budget-crm-mobile.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.026785714285714284,
+        "scrollHeight": 3290
+      },
+      {
+        "viewport": "tablet",
+        "screenshot": "/Users/robertbalfre/dryui/reports/skill-experiments/2026-05-11/batch-8/screenshots-pass9/v19a-panel-budget-crm-tablet.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.026785714285714284,
+        "scrollHeight": 1469
+      },
+      {
+        "viewport": "desktop",
+        "screenshot": "/Users/robertbalfre/dryui/reports/skill-experiments/2026-05-11/batch-8/screenshots-pass9/v19a-panel-budget-crm-desktop.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.026785714285714284,
+        "scrollHeight": 1032
+      }
+    ],
+    "assertionFailures": [],
+    "score": 88,
+    "auditOk": false,
+    "visualOk": false,
+    "ok": false
+  },
+  {
+    "variant": "v19a-panel-budget",
+    "case": "analytics",
+    "formalOk": false,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-stage123-v19a-panel-budget-analytics-stage123-pass9-oAlPR7",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/stage123-v19a-panel-budget-analytics-stage123-pass9-1778478905839",
+    "devServer": null,
+    "agentSeconds": 210.2,
+    "source": {
+      "failures": [],
+      "dryuiComponents": [
+        "Badge",
+        "Button",
+        "Heading",
+        "Input",
+        "Separator",
+        "Text"
+      ],
+      "visibleWords": 80
+    },
+    "visual": [],
+    "assertionFailures": [],
+    "score": 80,
+    "auditOk": true,
+    "visualOk": true,
+    "ok": false
+  },
+  {
+    "variant": "v19a-panel-budget",
+    "case": "knowledge",
+    "formalOk": false,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-stage123-v19a-panel-budget-knowledge-stage123-pass9-5lP90r",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/stage123-v19a-panel-budget-knowledge-stage123-pass9-1778479331187",
+    "devServer": null,
+    "agentSeconds": 210.3,
+    "source": {
+      "failures": [],
+      "dryuiComponents": [
+        "Badge",
+        "Button",
+        "Heading",
+        "Image",
+        "Input",
+        "Link",
+        "Separator",
+        "Text"
+      ],
+      "visibleWords": 96
+    },
+    "visual": [],
+    "assertionFailures": [],
+    "score": 80,
+    "auditOk": true,
+    "visualOk": true,
+    "ok": false
+  },
+  {
+    "variant": "v19a-panel-budget",
+    "case": "kanban",
+    "formalOk": true,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-stage123-v19a-panel-budget-kanban-stage123-pass9-ohr7LR",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/stage123-v19a-panel-budget-kanban-stage123-pass9-1778479118249",
+    "devServer": {
+      "url": "http://127.0.0.1:50003/",
+      "pid": 81136
+    },
+    "agentSeconds": 194.3,
+    "source": {
+      "failures": [],
+      "dryuiComponents": [
+        "Badge",
+        "Button",
+        "Heading",
+        "Input",
+        "Link",
+        "Separator",
+        "Text"
+      ],
+      "visibleWords": 102
+    },
+    "visual": [
+      {
+        "viewport": "mobile",
+        "screenshot": "/Users/robertbalfre/dryui/reports/skill-experiments/2026-05-11/batch-8/screenshots-pass9/v19a-panel-budget-kanban-mobile.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.11214953271028037,
+        "scrollHeight": 2613
+      },
+      {
+        "viewport": "tablet",
+        "screenshot": "/Users/robertbalfre/dryui/reports/skill-experiments/2026-05-11/batch-8/screenshots-pass9/v19a-panel-budget-kanban-tablet.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.11214953271028037,
+        "scrollHeight": 1262
+      },
+      {
+        "viewport": "desktop",
+        "screenshot": "/Users/robertbalfre/dryui/reports/skill-experiments/2026-05-11/batch-8/screenshots-pass9/v19a-panel-budget-kanban-desktop.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.11214953271028037,
+        "scrollHeight": 1024
+      }
+    ],
+    "assertionFailures": [],
+    "score": 76,
+    "auditOk": true,
+    "visualOk": false,
+    "ok": false
+  }
+]

@@ -1,0 +1,708 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>DryUI Skill Experiment Dashboard Preview</title>
+		<style>
+			:root {
+				color-scheme: light;
+				--bg: #f5f6f8;
+				--surface: #ffffff;
+				--surface-2: #f9fafb;
+				--text: #17181a;
+				--muted: #656b75;
+				--line: #d9dde4;
+				--accent: #1d6fd6;
+				--accent-soft: #e7f0fc;
+				--good: #177245;
+				--warn: #a05a00;
+				--bad: #b3261e;
+				--radius: 8px;
+				--shadow: 0 16px 40px rgba(23, 24, 26, 0.08);
+				font-family:
+					ui-sans-serif,
+					system-ui,
+					-apple-system,
+					BlinkMacSystemFont,
+					'Segoe UI',
+					sans-serif;
+			}
+
+			* {
+				box-sizing: border-box;
+			}
+
+			body {
+				margin: 0;
+				background: var(--bg);
+				color: var(--text);
+			}
+
+			.preview-frame {
+				min-height: 100vh;
+				padding: 16px;
+			}
+
+			.variant-label {
+				display: grid;
+				gap: 16px;
+				margin: 0 auto 18px;
+				max-width: 1240px;
+			}
+
+			.variant-label h1 {
+				margin: 0;
+				font-size: 18px;
+				line-height: 1.2;
+			}
+
+			.variant-label p {
+				margin: 4px 0 0;
+				color: var(--muted);
+				font-size: 13px;
+			}
+
+			.score {
+				border: 1px solid var(--line);
+				background: var(--surface);
+				border-radius: 999px;
+				padding: 8px 12px;
+				font-size: 13px;
+				font-weight: 650;
+			}
+
+			.dashboard {
+				container: dashboard / inline-size;
+				display: grid;
+				gap: 18px;
+				grid-template-columns: minmax(0, 1fr);
+				grid-template-areas:
+					'header'
+					'filters'
+					'metrics'
+					'chart'
+					'detail'
+					'table'
+					'status';
+				max-width: 1240px;
+				margin: 0 auto;
+			}
+
+			.panel,
+			.metric,
+			.controls,
+			.status {
+				background: var(--surface);
+				border: 1px solid var(--line);
+				border-radius: var(--radius);
+				box-shadow: var(--shadow);
+			}
+
+			.header {
+				display: grid;
+				grid-template-columns: minmax(0, 1fr);
+				align-items: start;
+				gap: 16px;
+			}
+
+			.kicker {
+				margin: 0 0 8px;
+				color: var(--muted);
+				font-size: 12px;
+				font-weight: 700;
+				text-transform: uppercase;
+				letter-spacing: 0.08em;
+			}
+
+			h2,
+			h3 {
+				margin: 0;
+				line-height: 1.15;
+			}
+
+			.header h2 {
+				font-size: clamp(26px, 8vw, 34px);
+			}
+
+			.header p {
+				margin: 8px 0 0;
+				color: var(--muted);
+				font-size: 15px;
+			}
+
+			.button-row,
+			.panel-head {
+				display: grid;
+				grid-auto-flow: column;
+				grid-auto-columns: max-content;
+				align-items: center;
+				justify-content: space-between;
+				gap: 10px;
+			}
+
+			.button {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				min-height: 38px;
+				border: 1px solid var(--line);
+				border-radius: 6px;
+				background: var(--surface);
+				color: var(--text);
+				padding: 0 14px;
+				font-size: 13px;
+				font-weight: 650;
+			}
+
+			.button.primary {
+				border-color: var(--accent);
+				background: var(--accent);
+				color: #fff;
+			}
+
+			.badge {
+				display: inline-flex;
+				width: fit-content;
+				align-items: center;
+				border-radius: 999px;
+				padding: 4px 8px;
+				background: var(--accent-soft);
+				color: #174b86;
+				font-size: 12px;
+				font-weight: 650;
+			}
+
+			.badge.good {
+				background: #e7f5ee;
+				color: var(--good);
+			}
+
+			.badge.warn {
+				background: #fff3df;
+				color: var(--warn);
+			}
+
+			.badge.bad {
+				background: #fdecea;
+				color: var(--bad);
+			}
+
+			.controls {
+				display: grid;
+				grid-template-columns: minmax(0, 1fr);
+				gap: 12px;
+				align-items: end;
+				padding: 14px;
+			}
+
+			.field {
+				display: grid;
+				gap: 6px;
+			}
+
+			.field label {
+				color: var(--muted);
+				font-size: 12px;
+				font-weight: 650;
+			}
+
+			.input {
+				min-height: 38px;
+				border: 1px solid var(--line);
+				border-radius: 6px;
+				background: var(--surface-2);
+				padding: 8px 10px;
+				color: var(--text);
+				font-size: 13px;
+			}
+
+			.metrics {
+				display: grid;
+				grid-template-columns: minmax(0, 1fr);
+				gap: 14px;
+			}
+
+			.metric {
+				display: grid;
+				gap: 12px;
+				padding: 16px;
+			}
+
+			.metric span:first-child {
+				color: var(--muted);
+				font-size: 13px;
+			}
+
+			.metric strong {
+				font-size: 27px;
+				line-height: 1;
+				font-variant-numeric: tabular-nums;
+			}
+
+			.sparkline {
+				height: 34px;
+				border-radius: 5px;
+				background:
+					linear-gradient(
+						145deg,
+						transparent 45%,
+						rgba(29, 111, 214, 0.16) 45% 58%,
+						transparent 58%
+					),
+					linear-gradient(90deg, #e9edf3, #f6f8fb);
+			}
+
+			.chart,
+			.table,
+			.detail,
+			.status {
+				padding: 18px;
+			}
+
+			.chart-visual {
+				height: 300px;
+				margin-top: 16px;
+				border: 1px solid var(--line);
+				border-radius: 6px;
+				background:
+					linear-gradient(180deg, rgba(29, 111, 214, 0.18), rgba(29, 111, 214, 0.02)),
+					linear-gradient(
+						90deg,
+						transparent 24%,
+						rgba(23, 24, 26, 0.05) 24% 25%,
+						transparent 25% 49%,
+						rgba(23, 24, 26, 0.05) 49% 50%,
+						transparent 50% 74%,
+						rgba(23, 24, 26, 0.05) 74% 75%,
+						transparent 75%
+					),
+					linear-gradient(
+						180deg,
+						transparent 24%,
+						rgba(23, 24, 26, 0.05) 24% 25%,
+						transparent 25% 49%,
+						rgba(23, 24, 26, 0.05) 49% 50%,
+						transparent 50% 74%,
+						rgba(23, 24, 26, 0.05) 74% 75%,
+						transparent 75%
+					);
+				position: relative;
+				overflow: hidden;
+			}
+
+			.chart-visual::after {
+				content: '';
+				position: absolute;
+				inset: 36px 28px 44px;
+				background: none;
+				border-bottom: 4px solid var(--accent);
+				border-left: 4px solid transparent;
+				transform: skewY(-9deg);
+				filter: drop-shadow(0 10px 12px rgba(29, 111, 214, 0.22));
+			}
+
+			table {
+				width: 100%;
+				min-width: 680px;
+				border-collapse: collapse;
+				margin-top: 14px;
+				font-size: 13px;
+			}
+
+			th,
+			td {
+				border-bottom: 1px solid var(--line);
+				padding: 11px 8px;
+				text-align: left;
+				vertical-align: middle;
+			}
+
+			th {
+				color: var(--muted);
+				font-size: 12px;
+				font-weight: 700;
+			}
+
+			td.number {
+				font-variant-numeric: tabular-nums;
+			}
+
+			.status {
+				display: grid;
+				gap: 12px;
+			}
+
+			.table,
+			.detail {
+				overflow-x: auto;
+			}
+
+			.status-grid {
+				display: grid;
+				grid-template-columns: minmax(0, 1fr);
+				gap: 12px;
+			}
+
+			.state-card {
+				border: 1px dashed var(--line);
+				border-radius: 6px;
+				background: var(--surface-2);
+				padding: 14px;
+			}
+
+			.state-card h4 {
+				margin: 0 0 8px;
+				font-size: 13px;
+			}
+
+			.state-card p {
+				margin: 0;
+				color: var(--muted);
+				font-size: 12px;
+				line-height: 1.4;
+			}
+
+			.variant-c .metric {
+				box-shadow: none;
+			}
+
+			.header {
+				grid-area: header;
+			}
+
+			.controls {
+				grid-area: filters;
+			}
+
+			.metrics {
+				grid-area: metrics;
+			}
+
+			.chart {
+				grid-area: chart;
+			}
+
+			.table {
+				grid-area: table;
+			}
+
+			.detail {
+				grid-area: detail;
+			}
+
+			.status {
+				grid-area: status;
+			}
+
+			@container dashboard (min-width: 44rem) {
+				.controls {
+					grid-template-columns: repeat(2, minmax(0, 1fr));
+				}
+
+				.header {
+					grid-template-columns: minmax(0, 1fr) auto;
+					align-items: end;
+				}
+
+				.metrics,
+				.variant-b .metrics {
+					grid-template-columns: repeat(2, minmax(0, 1fr));
+				}
+
+				.status-grid {
+					grid-template-columns: repeat(3, minmax(0, 1fr));
+				}
+
+				.variant-a .dashboard {
+					grid-template-columns: minmax(0, 1.4fr) minmax(16rem, 0.8fr);
+					grid-template-areas:
+						'header header'
+						'filters filters'
+						'metrics metrics'
+						'chart detail'
+						'table table'
+						'status status';
+				}
+
+				.variant-b .dashboard,
+				.variant-c .dashboard {
+					grid-template-columns: repeat(2, minmax(0, 1fr));
+					grid-template-areas:
+						'header header'
+						'filters filters'
+						'metrics metrics'
+						'chart chart'
+						'table table'
+						'status status';
+				}
+
+				.variant-b .detail,
+				.variant-c .detail {
+					display: none;
+				}
+			}
+
+			@container dashboard (min-width: 68rem) {
+				.controls {
+					grid-template-columns: minmax(0, 1.4fr) repeat(2, minmax(150px, 0.8fr)) auto;
+				}
+
+				.metrics {
+					grid-template-columns: repeat(4, minmax(0, 1fr));
+				}
+
+				.variant-a .dashboard {
+					grid-template-columns: minmax(0, 2fr) minmax(250px, 0.8fr);
+					grid-template-areas:
+						'header header'
+						'filters filters'
+						'metrics metrics'
+						'chart detail'
+						'table table'
+						'status status';
+				}
+
+				.variant-b .dashboard {
+					grid-template-columns: repeat(12, minmax(0, 1fr));
+					grid-template-areas:
+						'header header header header header header header header header header header header'
+						'filters filters filters filters filters filters filters filters filters filters filters filters'
+						'metrics metrics metrics metrics chart chart chart chart chart chart chart chart'
+						'table table table table table table table table table table table table'
+						'status status status status status status status status status status status status';
+				}
+
+				.variant-b .metrics {
+					grid-template-columns: repeat(2, minmax(0, 1fr));
+				}
+
+				.variant-c .dashboard {
+					grid-template-columns: repeat(12, minmax(0, 1fr));
+					grid-template-areas:
+						'header header header header header header header header header header header header'
+						'filters filters filters filters filters filters filters filters filters filters filters filters'
+						'metrics metrics metrics metrics chart chart chart chart chart chart chart chart'
+						'table table table table table table table table table table table table'
+						'status status status status status status status status status status status status';
+				}
+
+				.variant-c .metrics {
+					grid-template-columns: minmax(0, 1fr);
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<main class="preview-frame">
+			<div class="variant-label">
+				<div>
+					<h1 id="variant-title">Variant Preview</h1>
+					<p id="variant-subtitle">Static preview generated from the worker's proposed layout.</p>
+				</div>
+				<div class="score" id="variant-score">Score</div>
+			</div>
+			<section class="dashboard" aria-label="Analytics Dashboard preview">
+				<header class="header">
+					<div>
+						<p class="kicker" id="kicker">Analytics</p>
+						<h2>Analytics Dashboard</h2>
+						<p id="header-copy">Monitor performance across active channels and campaigns.</p>
+					</div>
+					<div class="button-row">
+						<span class="button">Export</span>
+						<span class="button primary">Refresh</span>
+					</div>
+				</header>
+
+				<section class="controls" aria-label="Dashboard filters">
+					<div class="field">
+						<label>Search</label>
+						<div class="input">Lifecycle, paid, partner</div>
+					</div>
+					<div class="field">
+						<label>Date range</label>
+						<div class="input">Last 30 days</div>
+					</div>
+					<div class="field">
+						<label>Segment</label>
+						<div class="input">All segments</div>
+					</div>
+					<span class="button">Apply</span>
+				</section>
+
+				<section class="metrics" aria-label="Summary metrics">
+					<article class="metric">
+						<span>Revenue</span>
+						<strong>$128.4k</strong>
+						<span class="badge good">+12.8%</span>
+						<div class="sparkline"></div>
+					</article>
+					<article class="metric">
+						<span>Conversion rate</span>
+						<strong>7.4%</strong>
+						<span class="badge good">+1.1%</span>
+						<div class="sparkline"></div>
+					</article>
+					<article class="metric">
+						<span>Active accounts</span>
+						<strong>2,418</strong>
+						<span class="badge warn">-2.0%</span>
+						<div class="sparkline"></div>
+					</article>
+					<article class="metric">
+						<span>Churn risk</span>
+						<strong>84</strong>
+						<span class="badge bad">+9 flagged</span>
+						<div class="sparkline"></div>
+					</article>
+				</section>
+
+				<section class="panel chart" aria-label="Performance trend">
+					<div class="panel-head">
+						<h3 id="chart-title">Performance trend</h3>
+						<span class="badge">Daily</span>
+					</div>
+					<div class="chart-visual"></div>
+				</section>
+
+				<aside class="panel detail" aria-label="Insights">
+					<div class="panel-head">
+						<h3>Insights</h3>
+						<span class="badge warn">3 alerts</span>
+					</div>
+					<table>
+						<tbody>
+							<tr>
+								<td>Paid search CPL rose after budget shift</td>
+							</tr>
+							<tr>
+								<td>Enterprise webinar conversion is strongest</td>
+							</tr>
+							<tr>
+								<td>Churn risk concentrated in expansion segment</td>
+							</tr>
+						</tbody>
+					</table>
+				</aside>
+
+				<section class="panel table" aria-label="Campaign performance">
+					<div class="panel-head">
+						<h3 id="table-title">Campaign performance</h3>
+						<span class="badge">10 rows</span>
+					</div>
+					<table>
+						<thead>
+							<tr>
+								<th>Source</th>
+								<th>Segment</th>
+								<th>Visitors</th>
+								<th>Conversion</th>
+								<th>Revenue</th>
+								<th>Status</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>Lifecycle email</td>
+								<td>Expansion</td>
+								<td class="number">18,420</td>
+								<td class="number">8.9%</td>
+								<td class="number">$44.2k</td>
+								<td><span class="badge good">Healthy</span></td>
+							</tr>
+							<tr>
+								<td>Paid search</td>
+								<td>Acquisition</td>
+								<td class="number">24,180</td>
+								<td class="number">5.6%</td>
+								<td class="number">$38.7k</td>
+								<td><span class="badge warn">Watch</span></td>
+							</tr>
+							<tr>
+								<td>Partner webinar</td>
+								<td>Enterprise</td>
+								<td class="number">6,120</td>
+								<td class="number">12.4%</td>
+								<td class="number">$31.5k</td>
+								<td><span class="badge good">Healthy</span></td>
+							</tr>
+							<tr>
+								<td>Content syndication</td>
+								<td>Mid-market</td>
+								<td class="number">9,870</td>
+								<td class="number">4.2%</td>
+								<td class="number">$22.1k</td>
+								<td><span class="badge bad">Risk</span></td>
+							</tr>
+						</tbody>
+					</table>
+				</section>
+
+				<section class="status" aria-label="State coverage">
+					<div class="panel-head">
+						<h3>State coverage</h3>
+						<span class="badge">Loading / empty / error</span>
+					</div>
+					<div class="status-grid">
+						<div class="state-card">
+							<h4>Loading</h4>
+							<p>
+								Skeletons reserve space for metrics, chart, and table while controls are disabled.
+							</p>
+						</div>
+						<div class="state-card">
+							<h4>Empty</h4>
+							<p>Explains that no analytics match the filters and offers reset guidance.</p>
+						</div>
+						<div class="state-card">
+							<h4>Error</h4>
+							<p>Shows a retry path without hiding the dashboard task context.</p>
+						</div>
+					</div>
+				</section>
+			</section>
+		</main>
+		<script>
+			const variants = {
+				a: {
+					body: 'variant-a',
+					title: 'Variant A: Branching Task List',
+					subtitle: 'Followed Dashboard, then Full page. Added an extra insights/detail rail.',
+					score: '24 / 30',
+					kicker: 'Monitor + compare',
+					copy: 'Monitor performance across active channels and campaigns.',
+					chart: 'Performance trend'
+				},
+				b: {
+					body: 'variant-b',
+					title: 'Variant B: Gated Workflow',
+					subtitle: 'Target brief and gates produced the clearest dashboard hierarchy.',
+					score: '28 / 30',
+					kicker: 'Monitor',
+					copy: 'Product analyst view for filters, summary metrics, primary trend, and channel table.',
+					chart: 'Revenue trend'
+				},
+				c: {
+					body: 'variant-c',
+					title: 'Variant C: Decision Table',
+					subtitle: 'Compact recipe produced a concrete dashboard, but allowed more styling drift.',
+					score: '22 / 30',
+					kicker: 'Triage',
+					copy: 'Filter time range, segment, and channel, then compare KPI movement and row performance.',
+					chart: 'Revenue trend'
+				}
+			};
+
+			const key = new URLSearchParams(location.search).get('variant') || 'a';
+			const variant = variants[key] || variants.a;
+			document.body.classList.add(variant.body);
+			document.getElementById('variant-title').textContent = variant.title;
+			document.getElementById('variant-subtitle').textContent = variant.subtitle;
+			document.getElementById('variant-score').textContent = variant.score;
+			document.getElementById('kicker').textContent = variant.kicker;
+			document.getElementById('header-copy').textContent = variant.copy;
+			document.getElementById('chart-title').textContent = variant.chart;
+		</script>
+	</body>
+</html>

@@ -1,0 +1,82 @@
+[
+  {
+    "caseName": "analytics",
+    "variant": "v7-fixed-page",
+    "ok": true,
+    "formalOk": true,
+    "auditOk": true,
+    "failures": [],
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-fixed-analytics-layout-tighten-v7-fixed-page-uUKeNA",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/fixed-analytics-layout-tighten-v7-fixed-page-1778465486179",
+    "agentSeconds": 232.2,
+    "shots": {
+      "mobile": "v7-fixed-page-analytics-mobile.png",
+      "tablet": "v7-fixed-page-analytics-tablet.png",
+      "desktop": "v7-fixed-page-analytics-desktop.png"
+    }
+  },
+  {
+    "caseName": "kanban",
+    "variant": "v7-fixed-page",
+    "ok": true,
+    "formalOk": true,
+    "auditOk": true,
+    "failures": [],
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-fixed-kanban-layout-tighten-v7-fixed-page-BuLDHM",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/fixed-kanban-layout-tighten-v7-fixed-page-1778465486181",
+    "agentSeconds": 333.2,
+    "shots": {
+      "mobile": "v7-fixed-page-kanban-mobile.png",
+      "tablet": "v7-fixed-page-kanban-tablet.png",
+      "desktop": "v7-fixed-page-kanban-desktop.png"
+    }
+  },
+  {
+    "caseName": "crm",
+    "variant": "v7-fixed-page",
+    "ok": true,
+    "formalOk": true,
+    "auditOk": true,
+    "failures": [],
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-fixed-crm-layout-tighten-v7-fixed-page-tfVwzG",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/fixed-crm-layout-tighten-v7-fixed-page-1778465486181",
+    "agentSeconds": 205.9,
+    "shots": {
+      "mobile": "v7-fixed-page-crm-mobile.png",
+      "tablet": "v7-fixed-page-crm-tablet.png",
+      "desktop": "v7-fixed-page-crm-desktop.png"
+    }
+  },
+  {
+    "caseName": "settings",
+    "variant": "v7-fixed-page",
+    "ok": true,
+    "formalOk": true,
+    "auditOk": true,
+    "failures": [],
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-fixed-settings-layout-tighten-v7-fixed-page-yFI6an",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/fixed-settings-layout-tighten-v7-fixed-page-1778465486181",
+    "agentSeconds": null,
+    "shots": {
+      "mobile": "v7-fixed-page-settings-mobile.png",
+      "tablet": "v7-fixed-page-settings-tablet.png",
+      "desktop": "v7-fixed-page-settings-desktop.png"
+    }
+  },
+  {
+    "caseName": "knowledge",
+    "variant": "v7-fixed-page",
+    "ok": true,
+    "formalOk": true,
+    "auditOk": true,
+    "failures": [],
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-fixed-knowledge-layout-tighten-v7-fixed-page-b4TUA8",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/fixed-knowledge-layout-tighten-v7-fixed-page-1778465486181",
+    "agentSeconds": 319.8,
+    "shots": {
+      "mobile": "v7-fixed-page-knowledge-mobile.png",
+      "tablet": "v7-fixed-page-knowledge-tablet.png",
+      "desktop": "v7-fixed-page-knowledge-desktop.png"
+    }
+  }
+]

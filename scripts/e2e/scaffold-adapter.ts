@@ -66,6 +66,7 @@ export const REQUIRED_DRYUI_PACKAGES: readonly DryuiConsumerPackage[] = [
 const PACKAGE_JSON = 'package.json';
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const DRYUI_SKILLS_SOURCE = 'skills';
+const DRYUI_BUILD_SKILL_OVERRIDE_ENV = 'DRYUI_E2E_DRYUI_BUILD_SKILL_OVERRIDE';
 const AGENT_SKILL_TARGETS = [
 	'skills',
 	'.agents/skills',
@@ -165,6 +166,22 @@ function copyDryuiAgentSkillBundle(projectDir: string, files: string[]): void {
 	for (const target of AGENT_SKILL_TARGETS) {
 		copyProjectDirectory(projectDir, DRYUI_SKILLS_SOURCE, target, files);
 	}
+}
+
+function applyDryuiBuildSkillOverride(projectDir: string, logLines: string[]): void {
+	const override = process.env[DRYUI_BUILD_SKILL_OVERRIDE_ENV];
+	if (!override) return;
+
+	const overridePath = resolve(override);
+	if (!existsSync(overridePath)) {
+		throw new Error(`${DRYUI_BUILD_SKILL_OVERRIDE_ENV} does not exist: ${overridePath}`);
+	}
+
+	const skill = readFileSync(overridePath, 'utf8');
+	for (const target of AGENT_SKILL_TARGETS) {
+		writeFileSync(resolve(projectDir, target, 'dryui-build/SKILL.md'), skill);
+	}
+	logLines.push(`dryui-build override: ${overridePath}`);
 }
 
 function installDependencies(projectDir: string): string {
@@ -282,15 +299,13 @@ const APP_HTML = `<!doctype html>
 </html>
 `;
 
-const APP_CSS = `:root {
-	color-scheme: light dark;
-}
-
-html {
+const APP_CSS = `html {
 	min-block-size: 100%;
 }
 
 body {
+	background: var(--dry-color-bg-base);
+	color: var(--dry-color-text);
 	min-block-size: 100%;
 	margin: 0;
 	container-type: inline-size;
@@ -372,6 +387,7 @@ export function scaffoldDryuiConsumerProject(
 	writeProjectFile(projectDir, 'AGENTS.md', AGENTS_MD, filesWritten);
 	writeProjectFile(projectDir, 'CLAUDE.md', CLAUDE_MD, filesWritten);
 	copyDryuiAgentSkillBundle(projectDir, filesWritten);
+	applyDryuiBuildSkillOverride(projectDir, logLines);
 	writeProjectFile(projectDir, 'svelte.config.js', SVELTE_CONFIG, filesWritten);
 	writeProjectFile(projectDir, 'vite.config.ts', VITE_CONFIG, filesWritten);
 	writeProjectFile(projectDir, 'tsconfig.json', TSCONFIG, filesWritten);

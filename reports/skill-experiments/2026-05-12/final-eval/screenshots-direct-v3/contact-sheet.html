@@ -1,0 +1,372 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>Direct Candidate Holdout Eval v3</title>
+		<style>
+			body {
+				margin: 0;
+				padding: 24px;
+				font-family: Inter, system-ui, sans-serif;
+				background: #f3f4f6;
+				color: #111827;
+			}
+			h1 {
+				margin: 0 0 6px;
+				font-size: 24px;
+			}
+			.note {
+				margin: 0 0 18px;
+				color: #4b5563;
+				font-size: 13px;
+			}
+			.run {
+				margin: 0 0 22px;
+				padding: 16px;
+				background: #fff;
+				border: 1px solid #d1d5db;
+				border-radius: 8px;
+			}
+			.title {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 10px;
+				align-items: baseline;
+				margin: 0 0 10px;
+				font-weight: 700;
+			}
+			.score {
+				padding: 3px 8px;
+				border-radius: 999px;
+				background: #111827;
+				color: #fff;
+				font-size: 12px;
+			}
+			.score.good {
+				background: #047857;
+			}
+			.score.warn {
+				background: #b45309;
+			}
+			.failures {
+				margin: -2px 0 12px;
+				color: #991b1b;
+				font-size: 12px;
+			}
+			.grid {
+				display: grid;
+				grid-template-columns: 390px 410px 720px;
+				gap: 12px;
+				align-items: start;
+			}
+			.shot {
+				margin: 0;
+				background: #e5e7eb;
+				border: 1px solid #cbd5e1;
+				overflow: visible;
+			}
+			.shot h2 {
+				margin: 0;
+				padding: 8px 10px;
+				background: #111827;
+				color: #fff;
+				font-size: 12px;
+			}
+			.shot img {
+				display: block;
+				width: 100%;
+				height: auto;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>Direct Candidate Holdout Eval v3</h1>
+		<p class="note">
+			Top historical candidates × five holdout references. Screenshots show the actual mobile,
+			tablet, and desktop viewport; scroll height is scored separately.
+		</p>
+		<section class="run">
+			<p class="title">
+				v22a-mobile-density-safe / finance-planning <span class="score good">100/100</span>
+			</p>
+
+			<div class="grid">
+				<figure class="shot">
+					<h2>mobile 390px</h2>
+					<img
+						src="file:///Users/robertbalfre/dryui/reports/skill-experiments/2026-05-12/final-eval/screenshots-direct-v3/v22a-mobile-density-safe-finance-planning-mobile.png"
+						alt="v22a-mobile-density-safe finance-planning mobile"
+					/>
+				</figure>
+				<figure class="shot">
+					<h2>tablet 820px</h2>
+					<img
+						src="file:///Users/robertbalfre/dryui/reports/skill-experiments/2026-05-12/final-eval/screenshots-direct-v3/v22a-mobile-density-safe-finance-planning-tablet.png"
+						alt="v22a-mobile-density-safe finance-planning tablet"
+					/>
+				</figure>
+				<figure class="shot">
+					<h2>desktop 1440px</h2>
+					<img
+						src="file:///Users/robertbalfre/dryui/reports/skill-experiments/2026-05-12/final-eval/screenshots-direct-v3/v22a-mobile-density-safe-finance-planning-desktop.png"
+						alt="v22a-mobile-density-safe finance-planning desktop"
+					/>
+				</figure>
+			</div>
+		</section>
+		<section class="run">
+			<p class="title">
+				v22a-mobile-density-safe / course-portal <span class="score good">100/100</span>
+			</p>
+
+			<div class="grid">
+				<figure class="shot">
+					<h2>mobile 390px</h2>
+					<img
+						src="file:///Users/robertbalfre/dryui/reports/skill-experiments/2026-05-12/final-eval/screenshots-direct-v3/v22a-mobile-density-safe-course-portal-mobile.png"
+						alt="v22a-mobile-density-safe course-portal mobile"
+					/>
+				</figure>
+				<figure class="shot">
+					<h2>tablet 820px</h2>
+					<img
+						src="file:///Users/robertbalfre/dryui/reports/skill-experiments/2026-05-12/final-eval/screenshots-direct-v3/v22a-mobile-density-safe-course-portal-tablet.png"
+						alt="v22a-mobile-density-safe course-portal tablet"
+					/>
+				</figure>
+				<figure class="shot">
+					<h2>desktop 1440px</h2>
+					<img
+						src="file:///Users/robertbalfre/dryui/reports/skill-experiments/2026-05-12/final-eval/screenshots-direct-v3/v22a-mobile-density-safe-course-portal-desktop.png"
+						alt="v22a-mobile-density-safe course-portal desktop"
+					/>
+				</figure>
+			</div>
+		</section>
+		<section class="run">
+			<p class="title">
+				v24a-v22-plus-preview-guard / finance-planning <span class="score good">100/100</span>
+			</p>
+
+			<div class="grid">
+				<figure class="shot">
+					<h2>mobile 390px</h2>
+					<img
+						src="file:///Users/robertbalfre/dryui/reports/skill-experiments/2026-05-12/final-eval/screenshots-direct-v3/v24a-v22-plus-preview-guard-finance-planning-mobile.png"
+						alt="v24a-v22-plus-preview-guard finance-planning mobile"
+					/>
+				</figure>
+				<figure class="shot">
+					<h2>tablet 820px</h2>
+					<img
+						src="file:///Users/robertbalfre/dryui/reports/skill-experiments/2026-05-12/final-eval/screenshots-direct-v3/v24a-v22-plus-preview-guard-finance-planning-tablet.png"
+						alt="v24a-v22-plus-preview-guard finance-planning tablet"
+					/>
+				</figure>
+				<figure class="shot">
+					<h2>desktop 1440px</h2>
+					<img
+						src="file:///Users/robertbalfre/dryui/reports/skill-experiments/2026-05-12/final-eval/screenshots-direct-v3/v24a-v22-plus-preview-guard-finance-planning-desktop.png"
+						alt="v24a-v22-plus-preview-guard finance-planning desktop"
+					/>
+				</figure>
+			</div>
+		</section>
+		<section class="run">
+			<p class="title">
+				v24a-v22-plus-preview-guard / course-portal <span class="score good">100/100</span>
+			</p>
+
+			<div class="grid">
+				<figure class="shot">
+					<h2>mobile 390px</h2>
+					<img
+						src="file:///Users/robertbalfre/dryui/reports/skill-experiments/2026-05-12/final-eval/screenshots-direct-v3/v24a-v22-plus-preview-guard-course-portal-mobile.png"
+						alt="v24a-v22-plus-preview-guard course-portal mobile"
+					/>
+				</figure>
+				<figure class="shot">
+					<h2>tablet 820px</h2>
+					<img
+						src="file:///Users/robertbalfre/dryui/reports/skill-experiments/2026-05-12/final-eval/screenshots-direct-v3/v24a-v22-plus-preview-guard-course-portal-tablet.png"
+						alt="v24a-v22-plus-preview-guard course-portal tablet"
+					/>
+				</figure>
+				<figure class="shot">
+					<h2>desktop 1440px</h2>
+					<img
+						src="file:///Users/robertbalfre/dryui/reports/skill-experiments/2026-05-12/final-eval/screenshots-direct-v3/v24a-v22-plus-preview-guard-course-portal-desktop.png"
+						alt="v24a-v22-plus-preview-guard course-portal desktop"
+					/>
+				</figure>
+			</div>
+		</section>
+		<section class="run">
+			<p class="title">
+				v22a-mobile-density-safe / support-inbox <span class="score good">93/100</span>
+			</p>
+			<p class="failures">size layout outside defensive wrapper group in app.css</p>
+			<div class="grid">
+				<figure class="shot">
+					<h2>mobile 390px</h2>
+					<img
+						src="file:///Users/robertbalfre/dryui/reports/skill-experiments/2026-05-12/final-eval/screenshots-direct-v3/v22a-mobile-density-safe-support-inbox-mobile.png"
+						alt="v22a-mobile-density-safe support-inbox mobile"
+					/>
+				</figure>
+				<figure class="shot">
+					<h2>tablet 820px</h2>
+					<img
+						src="file:///Users/robertbalfre/dryui/reports/skill-experiments/2026-05-12/final-eval/screenshots-direct-v3/v22a-mobile-density-safe-support-inbox-tablet.png"
+						alt="v22a-mobile-density-safe support-inbox tablet"
+					/>
+				</figure>
+				<figure class="shot">
+					<h2>desktop 1440px</h2>
+					<img
+						src="file:///Users/robertbalfre/dryui/reports/skill-experiments/2026-05-12/final-eval/screenshots-direct-v3/v22a-mobile-density-safe-support-inbox-desktop.png"
+						alt="v22a-mobile-density-safe support-inbox desktop"
+					/>
+				</figure>
+			</div>
+		</section>
+		<section class="run">
+			<p class="title">
+				v24a-v22-plus-preview-guard / support-inbox <span class="score good">93/100</span>
+			</p>
+			<p class="failures">size layout outside defensive wrapper group in app.css</p>
+			<div class="grid">
+				<figure class="shot">
+					<h2>mobile 390px</h2>
+					<img
+						src="file:///Users/robertbalfre/dryui/reports/skill-experiments/2026-05-12/final-eval/screenshots-direct-v3/v24a-v22-plus-preview-guard-support-inbox-mobile.png"
+						alt="v24a-v22-plus-preview-guard support-inbox mobile"
+					/>
+				</figure>
+				<figure class="shot">
+					<h2>tablet 820px</h2>
+					<img
+						src="file:///Users/robertbalfre/dryui/reports/skill-experiments/2026-05-12/final-eval/screenshots-direct-v3/v24a-v22-plus-preview-guard-support-inbox-tablet.png"
+						alt="v24a-v22-plus-preview-guard support-inbox tablet"
+					/>
+				</figure>
+				<figure class="shot">
+					<h2>desktop 1440px</h2>
+					<img
+						src="file:///Users/robertbalfre/dryui/reports/skill-experiments/2026-05-12/final-eval/screenshots-direct-v3/v24a-v22-plus-preview-guard-support-inbox-desktop.png"
+						alt="v24a-v22-plus-preview-guard support-inbox desktop"
+					/>
+				</figure>
+			</div>
+		</section>
+		<section class="run">
+			<p class="title">
+				v22a-mobile-density-safe / inventory-admin <span class="score good">86/100</span>
+			</p>
+			<p class="failures">
+				gap layout in app.css<br />size layout outside defensive wrapper group in app.css
+			</p>
+			<div class="grid">
+				<figure class="shot">
+					<h2>mobile 390px</h2>
+					<img
+						src="file:///Users/robertbalfre/dryui/reports/skill-experiments/2026-05-12/final-eval/screenshots-direct-v3/v22a-mobile-density-safe-inventory-admin-mobile.png"
+						alt="v22a-mobile-density-safe inventory-admin mobile"
+					/>
+				</figure>
+				<figure class="shot">
+					<h2>tablet 820px</h2>
+					<img
+						src="file:///Users/robertbalfre/dryui/reports/skill-experiments/2026-05-12/final-eval/screenshots-direct-v3/v22a-mobile-density-safe-inventory-admin-tablet.png"
+						alt="v22a-mobile-density-safe inventory-admin tablet"
+					/>
+				</figure>
+				<figure class="shot">
+					<h2>desktop 1440px</h2>
+					<img
+						src="file:///Users/robertbalfre/dryui/reports/skill-experiments/2026-05-12/final-eval/screenshots-direct-v3/v22a-mobile-density-safe-inventory-admin-desktop.png"
+						alt="v22a-mobile-density-safe inventory-admin desktop"
+					/>
+				</figure>
+			</div>
+		</section>
+		<section class="run">
+			<p class="title">
+				v24a-v22-plus-preview-guard / calendar-ops <span class="score warn">79/100</span>
+			</p>
+			<p class="failures">
+				gap layout in app.css<br />size layout outside defensive wrapper group in app.css<br />element
+				selector in app.css
+			</p>
+			<div class="grid">
+				<figure class="shot">
+					<h2>mobile 390px</h2>
+					<img
+						src="file:///Users/robertbalfre/dryui/reports/skill-experiments/2026-05-12/final-eval/screenshots-direct-v3/v24a-v22-plus-preview-guard-calendar-ops-mobile.png"
+						alt="v24a-v22-plus-preview-guard calendar-ops mobile"
+					/>
+				</figure>
+				<figure class="shot">
+					<h2>tablet 820px</h2>
+					<img
+						src="file:///Users/robertbalfre/dryui/reports/skill-experiments/2026-05-12/final-eval/screenshots-direct-v3/v24a-v22-plus-preview-guard-calendar-ops-tablet.png"
+						alt="v24a-v22-plus-preview-guard calendar-ops tablet"
+					/>
+				</figure>
+				<figure class="shot">
+					<h2>desktop 1440px</h2>
+					<img
+						src="file:///Users/robertbalfre/dryui/reports/skill-experiments/2026-05-12/final-eval/screenshots-direct-v3/v24a-v22-plus-preview-guard-calendar-ops-desktop.png"
+						alt="v24a-v22-plus-preview-guard calendar-ops desktop"
+					/>
+				</figure>
+			</div>
+		</section>
+		<section class="run">
+			<p class="title">
+				v24a-v22-plus-preview-guard / inventory-admin <span class="score warn">76/100</span>
+			</p>
+
+			<div class="grid">
+				<figure class="shot">
+					<h2>mobile 390px</h2>
+					<img
+						src="file:///Users/robertbalfre/dryui/reports/skill-experiments/2026-05-12/final-eval/screenshots-direct-v3/v24a-v22-plus-preview-guard-inventory-admin-mobile.png"
+						alt="v24a-v22-plus-preview-guard inventory-admin mobile"
+					/>
+				</figure>
+				<figure class="shot">
+					<h2>tablet 820px</h2>
+					<img
+						src="file:///Users/robertbalfre/dryui/reports/skill-experiments/2026-05-12/final-eval/screenshots-direct-v3/v24a-v22-plus-preview-guard-inventory-admin-tablet.png"
+						alt="v24a-v22-plus-preview-guard inventory-admin tablet"
+					/>
+				</figure>
+				<figure class="shot">
+					<h2>desktop 1440px</h2>
+					<img
+						src="file:///Users/robertbalfre/dryui/reports/skill-experiments/2026-05-12/final-eval/screenshots-direct-v3/v24a-v22-plus-preview-guard-inventory-admin-desktop.png"
+						alt="v24a-v22-plus-preview-guard inventory-admin desktop"
+					/>
+				</figure>
+			</div>
+		</section>
+		<section class="run">
+			<p class="title">v22a-mobile-density-safe / calendar-ops <span class="score">0/100</span></p>
+			<p class="failures">
+				file-contains: src/layout.css missing "container: page / inline-size"<br />file-matches:
+				src/routes/+page.svelte failed /data-layout-area="page"/i<br />file-matches:
+				src/routes/+page.svelte failed /data-layout-area="primary"/i<br />file-matches:
+				src/routes/+page.svelte failed /data-layout-area="(topbar|navigation)"/i<br />route
+				&lt;style&gt; block<br />:global selector<br />display in route style<br />@container in
+				route style<br />size layout outside defensive wrapper group in app.css<br />element
+				selector in app.css<br />missing page inline-size container
+			</p>
+			<div class="grid">
+				<figure class="shot"><h2>mobile 390px</h2></figure>
+				<figure class="shot"><h2>tablet 820px</h2></figure>
+				<figure class="shot"><h2>desktop 1440px</h2></figure>
+			</div>
+		</section>
+	</body>
+</html>

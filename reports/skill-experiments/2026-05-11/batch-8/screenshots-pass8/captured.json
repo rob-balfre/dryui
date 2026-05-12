@@ -1,0 +1,313 @@
+[
+  {
+    "variant": "v18a-no-table-runtime",
+    "case": "analytics",
+    "formalOk": true,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-stage123-v18a-no-table-runtime-analytics-stage123-pass8-R7bhfL",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/stage123-v18a-no-table-runtime-analytics-stage123-pass8-1778478088223",
+    "devServer": {
+      "url": "http://127.0.0.1:65145/",
+      "pid": 47358
+    },
+    "agentSeconds": 183.1,
+    "source": {
+      "failures": [],
+      "dryuiComponents": [
+        "Badge",
+        "Button",
+        "Heading",
+        "Input",
+        "Separator",
+        "Text"
+      ],
+      "visibleWords": 71
+    },
+    "visual": [
+      {
+        "viewport": "mobile",
+        "screenshot": "v18a-no-table-runtime-analytics-mobile.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.05263157894736842,
+        "scrollHeight": 2433
+      },
+      {
+        "viewport": "tablet",
+        "screenshot": "v18a-no-table-runtime-analytics-tablet.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.05263157894736842,
+        "scrollHeight": 1156
+      },
+      {
+        "viewport": "desktop",
+        "screenshot": "v18a-no-table-runtime-analytics-desktop.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.05263157894736842,
+        "scrollHeight": 1000
+      }
+    ],
+    "assertionFailures": [],
+    "score": 100,
+    "auditOk": true,
+    "visualOk": true,
+    "ok": true
+  },
+  {
+    "variant": "v18a-no-table-runtime",
+    "case": "kanban",
+    "formalOk": true,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-stage123-v18a-no-table-runtime-kanban-stage123-pass8-hyD5jY",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/stage123-v18a-no-table-runtime-kanban-stage123-pass8-1778478295716",
+    "devServer": {
+      "url": "http://127.0.0.1:65530/",
+      "pid": 56454
+    },
+    "agentSeconds": 155,
+    "source": {
+      "failures": [],
+      "dryuiComponents": [
+        "Badge",
+        "Button",
+        "Heading",
+        "Image",
+        "Input",
+        "Link",
+        "Separator",
+        "Text"
+      ],
+      "visibleWords": 78
+    },
+    "visual": [
+      {
+        "viewport": "mobile",
+        "screenshot": "v18a-no-table-runtime-kanban-mobile.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.020833333333333332,
+        "scrollHeight": 2354
+      },
+      {
+        "viewport": "tablet",
+        "screenshot": "v18a-no-table-runtime-kanban-tablet.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.020833333333333332,
+        "scrollHeight": 1255
+      },
+      {
+        "viewport": "desktop",
+        "screenshot": "v18a-no-table-runtime-kanban-desktop.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.020833333333333332,
+        "scrollHeight": 1000
+      }
+    ],
+    "assertionFailures": [],
+    "score": 100,
+    "auditOk": true,
+    "visualOk": true,
+    "ok": true
+  },
+  {
+    "variant": "v18a-no-table-runtime",
+    "case": "settings",
+    "formalOk": true,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-stage123-v18a-no-table-runtime-settings-stage123-pass8-tkFUqD",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/stage123-v18a-no-table-runtime-settings-stage123-pass8-1778478088225",
+    "devServer": {
+      "url": "http://127.0.0.1:65147/",
+      "pid": 47748
+    },
+    "agentSeconds": 186.7,
+    "source": {
+      "failures": [],
+      "dryuiComponents": [
+        "Badge",
+        "Button",
+        "Heading",
+        "Image",
+        "Input",
+        "Link",
+        "Separator",
+        "Text"
+      ],
+      "visibleWords": 112
+    },
+    "visual": [
+      {
+        "viewport": "mobile",
+        "screenshot": "v18a-no-table-runtime-settings-mobile.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.027522935779816515,
+        "scrollHeight": 2963
+      },
+      {
+        "viewport": "tablet",
+        "screenshot": "v18a-no-table-runtime-settings-tablet.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.027522935779816515,
+        "scrollHeight": 1342
+      },
+      {
+        "viewport": "desktop",
+        "screenshot": "v18a-no-table-runtime-settings-desktop.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.027522935779816515,
+        "scrollHeight": 1102
+      }
+    ],
+    "assertionFailures": [],
+    "score": 95,
+    "auditOk": true,
+    "visualOk": false,
+    "ok": false
+  },
+  {
+    "variant": "v18a-no-table-runtime",
+    "case": "crm",
+    "formalOk": true,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-stage123-v18a-no-table-runtime-crm-stage123-pass8-UVz3tn",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/stage123-v18a-no-table-runtime-crm-stage123-pass8-1778478295714",
+    "devServer": {
+      "url": "http://127.0.0.1:65528/",
+      "pid": 55658
+    },
+    "agentSeconds": 150.4,
+    "source": {
+      "failures": [],
+      "dryuiComponents": [
+        "Badge",
+        "Button",
+        "Heading",
+        "Input",
+        "Separator",
+        "Text"
+      ],
+      "visibleWords": 100
+    },
+    "visual": [
+      {
+        "viewport": "mobile",
+        "screenshot": "v18a-no-table-runtime-crm-mobile.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.043478260869565216,
+        "scrollHeight": 3075
+      },
+      {
+        "viewport": "tablet",
+        "screenshot": "v18a-no-table-runtime-crm-tablet.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.043478260869565216,
+        "scrollHeight": 1505
+      },
+      {
+        "viewport": "desktop",
+        "screenshot": "v18a-no-table-runtime-crm-desktop.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.043478260869565216,
+        "scrollHeight": 1155
+      }
+    ],
+    "assertionFailures": [],
+    "score": 95,
+    "auditOk": true,
+    "visualOk": false,
+    "ok": false
+  },
+  {
+    "variant": "v18a-no-table-runtime",
+    "case": "knowledge",
+    "formalOk": true,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-stage123-v18a-no-table-runtime-knowledge-stage123-pass8-IWdkZc",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/stage123-v18a-no-table-runtime-knowledge-stage123-pass8-1778478472091",
+    "devServer": {
+      "url": "http://127.0.0.1:49364/",
+      "pid": 64124
+    },
+    "agentSeconds": 197.2,
+    "source": {
+      "failures": [],
+      "dryuiComponents": [
+        "Badge",
+        "Button",
+        "Heading",
+        "Image",
+        "Input",
+        "Link",
+        "Separator",
+        "Text"
+      ],
+      "visibleWords": 129
+    },
+    "visual": [
+      {
+        "viewport": "mobile",
+        "screenshot": "v18a-no-table-runtime-knowledge-mobile.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.19090909090909092,
+        "scrollHeight": 3021
+      },
+      {
+        "viewport": "tablet",
+        "screenshot": "v18a-no-table-runtime-knowledge-tablet.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.19090909090909092,
+        "scrollHeight": 1392
+      },
+      {
+        "viewport": "desktop",
+        "screenshot": "v18a-no-table-runtime-knowledge-desktop.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.19090909090909092,
+        "scrollHeight": 1006
+      }
+    ],
+    "assertionFailures": [],
+    "score": 71,
+    "auditOk": true,
+    "visualOk": false,
+    "ok": false
+  }
+]

@@ -9,6 +9,7 @@ export type WidgetDraftMode = 'annotate' | 'components';
 export interface AddedSnapshot {
 	id: string;
 	kind: string;
+	label?: string;
 	snap: LayoutSnapshot;
 }
 
@@ -162,6 +163,7 @@ function sanitizeAddedSnapshot(value: unknown): AddedSnapshot | null {
 	return {
 		id: value.id,
 		kind: value.kind,
+		...(typeof value.label === 'string' && value.label.trim() ? { label: value.label } : {}),
 		snap
 	};
 }

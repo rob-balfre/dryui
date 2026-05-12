@@ -1,0 +1,96 @@
+[
+  {
+    "variant": "v21a-light-nav-size-safe",
+    "case": "calendar-ops",
+    "formalOk": false,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-direct-v21a-light-nav-size-safe-calendar-ops-UdicrV",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/direct-v21a-light-nav-size-safe-calendar-ops-1778535878249",
+    "devServer": null,
+    "agentSeconds": 300.3,
+    "source": {
+      "failures": [
+        "route <style> block",
+        "size layout outside defensive wrapper group in app.css",
+        "element selector in app.css",
+        "missing page inline-size container"
+      ],
+      "dryuiComponents": [
+        "Button",
+        "Heading",
+        "Text"
+      ],
+      "visibleWords": 48
+    },
+    "visual": [],
+    "assertionFailures": [
+      "file-contains: src/layout.css missing \"container: page / inline-size\"",
+      "file-matches: src/routes/+page.svelte failed /data-layout=\"[a-z0-9-]+-shell\"/i",
+      "file-matches: src/routes/+page.svelte failed /data-layout-area=\"page\"/i",
+      "file-matches: src/routes/+page.svelte failed /data-layout-area=\"primary\"/i",
+      "file-matches: src/routes/+page.svelte failed /data-layout-area=\"(topbar|navigation)\"/i"
+    ],
+    "score": 12,
+    "auditOk": false,
+    "visualOk": true,
+    "ok": false
+  },
+  {
+    "variant": "v21a-light-nav-size-safe",
+    "case": "inventory-admin",
+    "formalOk": true,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-direct-v21a-light-nav-size-safe-inventory-admin-2EoqcP",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/direct-v21a-light-nav-size-safe-inventory-admin-1778535879649",
+    "devServer": {
+      "url": "http://127.0.0.1:61997/",
+      "pid": 69693
+    },
+    "agentSeconds": 132.8,
+    "source": {
+      "failures": [],
+      "dryuiComponents": [
+        "Badge",
+        "Button",
+        "Heading",
+        "Text"
+      ],
+      "visibleWords": 43
+    },
+    "visual": [
+      {
+        "viewport": "mobile",
+        "screenshot": "/Users/robertbalfre/dryui/reports/skill-experiments/2026-05-12/final-eval/screenshots-direct/v21a-light-nav-size-safe-inventory-admin-mobile.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.07692307692307693,
+        "scrollHeight": 1728
+      },
+      {
+        "viewport": "tablet",
+        "screenshot": "/Users/robertbalfre/dryui/reports/skill-experiments/2026-05-12/final-eval/screenshots-direct/v21a-light-nav-size-safe-inventory-admin-tablet.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.07692307692307693,
+        "scrollHeight": 1000
+      },
+      {
+        "viewport": "desktop",
+        "screenshot": "/Users/robertbalfre/dryui/reports/skill-experiments/2026-05-12/final-eval/screenshots-direct/v21a-light-nav-size-safe-inventory-admin-desktop.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.07692307692307693,
+        "scrollHeight": 1000
+      }
+    ],
+    "assertionFailures": [],
+    "score": 100,
+    "auditOk": true,
+    "visualOk": true,
+    "ok": true
+  }
+]

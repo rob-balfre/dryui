@@ -1,0 +1,128 @@
+[
+  {
+    "variant": "v20a-css-gate",
+    "case": "analytics",
+    "formalOk": true,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-stage123-v20a-css-gate-analytics-stage123-pass10-RKMzjn",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/stage123-v20a-css-gate-analytics-stage123-pass10-1778479773117",
+    "devServer": {
+      "url": "http://127.0.0.1:51466/",
+      "pid": 92893
+    },
+    "agentSeconds": 144.3,
+    "source": {
+      "failures": [
+        "size layout outside defensive wrapper group in app.css"
+      ],
+      "dryuiComponents": [
+        "Badge",
+        "Button",
+        "Heading",
+        "Input",
+        "Separator",
+        "Text"
+      ],
+      "visibleWords": 77
+    },
+    "visual": [
+      {
+        "viewport": "mobile",
+        "screenshot": "/Users/robertbalfre/dryui/reports/skill-experiments/2026-05-11/batch-8/screenshots-pass10/v20a-css-gate-analytics-mobile.png",
+        "horizontalOverflow": 1,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.13636363636363635,
+        "scrollHeight": 2706
+      },
+      {
+        "viewport": "tablet",
+        "screenshot": "/Users/robertbalfre/dryui/reports/skill-experiments/2026-05-11/batch-8/screenshots-pass10/v20a-css-gate-analytics-tablet.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.13636363636363635,
+        "scrollHeight": 1329
+      },
+      {
+        "viewport": "desktop",
+        "screenshot": "/Users/robertbalfre/dryui/reports/skill-experiments/2026-05-11/batch-8/screenshots-pass10/v20a-css-gate-analytics-desktop.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.13636363636363635,
+        "scrollHeight": 1000
+      }
+    ],
+    "assertionFailures": [],
+    "score": 69,
+    "auditOk": false,
+    "visualOk": false,
+    "ok": false
+  },
+  {
+    "variant": "v20a-css-gate",
+    "case": "settings",
+    "formalOk": true,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-stage123-v20a-css-gate-settings-stage123-pass10-7rNOr0",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/stage123-v20a-css-gate-settings-stage123-pass10-1778479773119",
+    "devServer": {
+      "url": "http://127.0.0.1:51468/",
+      "pid": 96260
+    },
+    "agentSeconds": 185.1,
+    "source": {
+      "failures": [],
+      "dryuiComponents": [
+        "Badge",
+        "Button",
+        "Heading",
+        "Image",
+        "Input",
+        "Link",
+        "Separator",
+        "Text"
+      ],
+      "visibleWords": 74
+    },
+    "visual": [
+      {
+        "viewport": "mobile",
+        "screenshot": "/Users/robertbalfre/dryui/reports/skill-experiments/2026-05-11/batch-8/screenshots-pass10/v20a-css-gate-settings-mobile.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.0625,
+        "scrollHeight": 2295
+      },
+      {
+        "viewport": "tablet",
+        "screenshot": "/Users/robertbalfre/dryui/reports/skill-experiments/2026-05-11/batch-8/screenshots-pass10/v20a-css-gate-settings-tablet.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.0625,
+        "scrollHeight": 1129
+      },
+      {
+        "viewport": "desktop",
+        "screenshot": "/Users/robertbalfre/dryui/reports/skill-experiments/2026-05-11/batch-8/screenshots-pass10/v20a-css-gate-settings-desktop.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.0625,
+        "scrollHeight": 1000
+      }
+    ],
+    "assertionFailures": [],
+    "score": 100,
+    "auditOk": true,
+    "visualOk": true,
+    "ok": true
+  }
+]

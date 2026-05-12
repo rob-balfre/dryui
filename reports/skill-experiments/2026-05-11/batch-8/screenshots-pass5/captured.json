@@ -1,0 +1,313 @@
+[
+  {
+    "variant": "v15a-fixture-first",
+    "case": "crm",
+    "formalOk": true,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-stage123-v15a-fixture-first-crm-stage123-pass5-BTRodX",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/stage123-v15a-fixture-first-crm-stage123-pass5-1778475585827",
+    "devServer": {
+      "url": "http://127.0.0.1:63289/",
+      "pid": 91304
+    },
+    "agentSeconds": 221.7,
+    "source": {
+      "failures": [],
+      "dryuiComponents": [
+        "Badge",
+        "Button",
+        "Heading",
+        "Input",
+        "Link",
+        "Separator",
+        "Text"
+      ],
+      "visibleWords": 127
+    },
+    "visual": [
+      {
+        "viewport": "mobile",
+        "screenshot": "v15a-fixture-first-crm-mobile.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.029940119760479042,
+        "scrollHeight": 4129
+      },
+      {
+        "viewport": "tablet",
+        "screenshot": "v15a-fixture-first-crm-tablet.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.029940119760479042,
+        "scrollHeight": 2862
+      },
+      {
+        "viewport": "desktop",
+        "screenshot": "v15a-fixture-first-crm-desktop.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.029940119760479042,
+        "scrollHeight": 1421
+      }
+    ],
+    "assertionFailures": [],
+    "score": 95,
+    "auditOk": true,
+    "visualOk": false,
+    "ok": false
+  },
+  {
+    "variant": "v15a-fixture-first",
+    "case": "kanban",
+    "formalOk": true,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-stage123-v15a-fixture-first-kanban-stage123-pass5-WZMOMC",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/stage123-v15a-fixture-first-kanban-stage123-pass5-1778475585828",
+    "devServer": {
+      "url": "http://127.0.0.1:63291/",
+      "pid": 87279
+    },
+    "agentSeconds": 143.3,
+    "source": {
+      "failures": [],
+      "dryuiComponents": [
+        "Badge",
+        "Button",
+        "Heading",
+        "Input",
+        "Separator",
+        "Text"
+      ],
+      "visibleWords": 122
+    },
+    "visual": [
+      {
+        "viewport": "mobile",
+        "screenshot": "v15a-fixture-first-kanban-mobile.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.06735751295336788,
+        "scrollHeight": 5446
+      },
+      {
+        "viewport": "tablet",
+        "screenshot": "v15a-fixture-first-kanban-tablet.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.06735751295336788,
+        "scrollHeight": 3127
+      },
+      {
+        "viewport": "desktop",
+        "screenshot": "v15a-fixture-first-kanban-desktop.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.06735751295336788,
+        "scrollHeight": 2212
+      }
+    ],
+    "assertionFailures": [],
+    "score": 95,
+    "auditOk": true,
+    "visualOk": false,
+    "ok": false
+  },
+  {
+    "variant": "v15a-fixture-first",
+    "case": "knowledge",
+    "formalOk": true,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-stage123-v15a-fixture-first-knowledge-stage123-pass5-yO4stU",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/stage123-v15a-fixture-first-knowledge-stage123-pass5-1778475825702",
+    "devServer": {
+      "url": "http://127.0.0.1:63441/",
+      "pid": 96779
+    },
+    "agentSeconds": 181.3,
+    "source": {
+      "failures": [],
+      "dryuiComponents": [
+        "Badge",
+        "Button",
+        "Heading",
+        "Image",
+        "Input",
+        "Separator",
+        "Text"
+      ],
+      "visibleWords": 175
+    },
+    "visual": [
+      {
+        "viewport": "mobile",
+        "screenshot": "v15a-fixture-first-knowledge-mobile.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0,
+        "scrollHeight": 4353
+      },
+      {
+        "viewport": "tablet",
+        "screenshot": "v15a-fixture-first-knowledge-tablet.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0,
+        "scrollHeight": 2406
+      },
+      {
+        "viewport": "desktop",
+        "screenshot": "v15a-fixture-first-knowledge-desktop.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0,
+        "scrollHeight": 1547
+      }
+    ],
+    "assertionFailures": [],
+    "score": 95,
+    "auditOk": true,
+    "visualOk": false,
+    "ok": false
+  },
+  {
+    "variant": "v15a-fixture-first",
+    "case": "settings",
+    "formalOk": true,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-stage123-v15a-fixture-first-settings-stage123-pass5-UGCIZ6",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/stage123-v15a-fixture-first-settings-stage123-pass5-1778475326450",
+    "devServer": {
+      "url": "http://127.0.0.1:62916/",
+      "pid": 81809
+    },
+    "agentSeconds": 234.1,
+    "source": {
+      "failures": [],
+      "dryuiComponents": [
+        "Badge",
+        "Button",
+        "Heading",
+        "Image",
+        "Input",
+        "Link",
+        "Separator",
+        "Text"
+      ],
+      "visibleWords": 151
+    },
+    "visual": [
+      {
+        "viewport": "mobile",
+        "screenshot": "v15a-fixture-first-settings-mobile.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.09482758620689655,
+        "scrollHeight": 3819
+      },
+      {
+        "viewport": "tablet",
+        "screenshot": "v15a-fixture-first-settings-tablet.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": false,
+        "lowContrastRatio": 0.09482758620689655,
+        "scrollHeight": 2420
+      },
+      {
+        "viewport": "desktop",
+        "screenshot": "v15a-fixture-first-settings-desktop.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.09482758620689655,
+        "scrollHeight": 1466
+      }
+    ],
+    "assertionFailures": [],
+    "score": 71,
+    "auditOk": true,
+    "visualOk": false,
+    "ok": false
+  },
+  {
+    "variant": "v15a-fixture-first",
+    "case": "analytics",
+    "formalOk": true,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-stage123-v15a-fixture-first-analytics-stage123-pass5-WP1IFx",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/stage123-v15a-fixture-first-analytics-stage123-pass5-1778475326448",
+    "devServer": {
+      "url": "http://127.0.0.1:62914/",
+      "pid": 78351
+    },
+    "agentSeconds": 164.6,
+    "source": {
+      "failures": [],
+      "dryuiComponents": [
+        "Badge",
+        "Button",
+        "Heading",
+        "Image",
+        "Input",
+        "Link",
+        "Separator",
+        "Text"
+      ],
+      "visibleWords": 66
+    },
+    "visual": [
+      {
+        "viewport": "mobile",
+        "screenshot": "v15a-fixture-first-analytics-mobile.png",
+        "horizontalOverflow": 276,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.08333333333333333,
+        "scrollHeight": 3264
+      },
+      {
+        "viewport": "tablet",
+        "screenshot": "v15a-fixture-first-analytics-tablet.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.08333333333333333,
+        "scrollHeight": 2069
+      },
+      {
+        "viewport": "desktop",
+        "screenshot": "v15a-fixture-first-analytics-desktop.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.08333333333333333,
+        "scrollHeight": 1240
+      }
+    ],
+    "assertionFailures": [],
+    "score": 61,
+    "auditOk": true,
+    "visualOk": false,
+    "ok": false
+  }
+]

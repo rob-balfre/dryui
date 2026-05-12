@@ -1,0 +1,76 @@
+[
+  {
+    "variant": "v6-hybrid",
+    "case": "analytics",
+    "ok": false,
+    "formalOk": true,
+    "auditOk": false,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-hybrid-analytics-layout-tighten-v6-hybrid-HoBy4v",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/hybrid-analytics-layout-tighten-v6-hybrid-1778465034717",
+    "agentSeconds": 208.7,
+    "assertionFailures": [],
+    "auditFailures": [
+      "grid/flex in route style",
+      "missing exact 48rem container query",
+      "missing exact 72rem container query"
+    ]
+  },
+  {
+    "variant": "v6-hybrid",
+    "case": "kanban",
+    "ok": false,
+    "formalOk": true,
+    "auditOk": false,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-hybrid-kanban-layout-tighten-v6-hybrid-NvVD9y",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/hybrid-kanban-layout-tighten-v6-hybrid-1778465034718",
+    "agentSeconds": 224.7,
+    "assertionFailures": [],
+    "auditFailures": [
+      "grid/flex in route style"
+    ]
+  },
+  {
+    "variant": "v6-hybrid",
+    "case": "crm",
+    "ok": false,
+    "formalOk": true,
+    "auditOk": false,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-hybrid-crm-layout-tighten-v6-hybrid-SUlzrc",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/hybrid-crm-layout-tighten-v6-hybrid-1778465034719",
+    "agentSeconds": 264.9,
+    "assertionFailures": [],
+    "auditFailures": [
+      "grid/flex in route style"
+    ]
+  },
+  {
+    "variant": "v6-hybrid",
+    "case": "settings",
+    "ok": false,
+    "formalOk": true,
+    "auditOk": false,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-hybrid-settings-layout-tighten-v6-hybrid-94dDQv",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/hybrid-settings-layout-tighten-v6-hybrid-1778465034719",
+    "agentSeconds": 276.9,
+    "assertionFailures": [],
+    "auditFailures": [
+      "grid/flex in route style"
+    ]
+  },
+  {
+    "variant": "v6-hybrid",
+    "case": "knowledge",
+    "ok": false,
+    "formalOk": true,
+    "auditOk": false,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-hybrid-knowledge-layout-tighten-v6-hybrid-kWcYdy",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/hybrid-knowledge-layout-tighten-v6-hybrid-1778465034719",
+    "agentSeconds": 326.8,
+    "assertionFailures": [],
+    "auditFailures": [
+      "grid/flex in route style",
+      "missing exact 48rem container query",
+      "missing exact 72rem container query"
+    ]
+  }
+]

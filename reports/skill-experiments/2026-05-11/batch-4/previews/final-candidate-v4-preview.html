@@ -1,0 +1,639 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Batch 4 Final Candidate V4 Dashboard Preview</title>
+		<style>
+			:root {
+				color-scheme: light;
+				--dry-space-2: 8px;
+				--dry-space-3: 12px;
+				--dry-space-4: 16px;
+				--dry-space-6: 24px;
+				--bg: #f4f6f9;
+				--surface: #ffffff;
+				--surface-soft: #f8fafc;
+				--text: #17191d;
+				--muted: #636d7a;
+				--line: #d9dee7;
+				--accent: #245fbb;
+				--accent-soft: #e8f1ff;
+				--good: #23714b;
+				--warn: #946000;
+				--shadow: 0 14px 34px rgba(22, 27, 34, 0.07);
+				font-family:
+					ui-sans-serif,
+					system-ui,
+					-apple-system,
+					BlinkMacSystemFont,
+					'Segoe UI',
+					sans-serif;
+			}
+
+			* {
+				box-sizing: border-box;
+			}
+
+			body {
+				margin: 0;
+				background: var(--bg);
+				color: var(--text);
+			}
+
+			.preview {
+				padding: 16px;
+			}
+
+			.preview-label {
+				display: grid;
+				gap: 6px;
+				max-width: 1220px;
+				margin: 0 auto 18px;
+			}
+
+			.preview-label h1 {
+				margin: 0;
+				font-size: 18px;
+				line-height: 1.2;
+			}
+
+			.preview-label p {
+				margin: 0;
+				color: var(--muted);
+				font-size: 13px;
+				line-height: 1.45;
+			}
+
+			/* Structural layout copied from the final-candidate-v4 output. */
+			[data-layout='analytics-dashboard-shell'] {
+				container: analytics-dashboard / inline-size;
+				max-width: 1220px;
+				margin: 0 auto;
+			}
+
+			[data-layout='analytics-dashboard-shell'] [data-layout-area='page'] {
+				display: grid;
+				gap: var(--dry-space-4);
+				padding: var(--dry-space-4);
+				grid-template-areas:
+					'header'
+					'filters'
+					'status'
+					'metrics'
+					'primary'
+					'secondary'
+					'table';
+			}
+
+			[data-layout='analytics-dashboard-shell'] [data-layout-area='header'] {
+				display: grid;
+				gap: var(--dry-space-3);
+				grid-area: header;
+			}
+
+			[data-layout='analytics-dashboard-shell'] [data-layout-area='filters'] {
+				display: grid;
+				gap: var(--dry-space-3);
+				grid-area: filters;
+			}
+
+			[data-layout='analytics-dashboard-shell'] [data-layout-area='status'] {
+				display: grid;
+				gap: var(--dry-space-2);
+				grid-area: status;
+			}
+
+			[data-layout='analytics-dashboard-shell'] [data-layout-area='metrics'] {
+				display: grid;
+				gap: var(--dry-space-3);
+				grid-area: metrics;
+			}
+
+			[data-layout='analytics-dashboard-shell'] [data-layout-area='primary'] {
+				display: grid;
+				gap: var(--dry-space-4);
+				grid-area: primary;
+				align-content: start;
+			}
+
+			[data-layout='analytics-dashboard-shell'] [data-layout-area='secondary'] {
+				display: grid;
+				gap: var(--dry-space-4);
+				grid-area: secondary;
+				align-content: start;
+			}
+
+			[data-layout='analytics-dashboard-shell'] [data-layout-area='table'] {
+				display: grid;
+				gap: var(--dry-space-4);
+				grid-area: table;
+			}
+
+			[data-layout='analytics-dashboard-shell'] [data-layout='analytics-dashboard-header-actions'],
+			[data-layout='analytics-dashboard-shell'] [data-layout='analytics-dashboard-filter-actions'],
+			[data-layout='analytics-dashboard-shell'] [data-layout='analytics-dashboard-section-heading'],
+			[data-layout='analytics-dashboard-shell']
+				[data-layout='analytics-dashboard-insight-actions'] {
+				display: flex;
+				gap: var(--dry-space-2);
+				align-items: center;
+			}
+
+			[data-layout='analytics-dashboard-shell'] [data-layout='analytics-dashboard-metric'],
+			[data-layout='analytics-dashboard-shell'] [data-layout='analytics-dashboard-filter-field'],
+			[data-layout='analytics-dashboard-shell'] [data-layout='analytics-dashboard-chart-frame'],
+			[data-layout='analytics-dashboard-shell'] [data-layout='analytics-dashboard-table-loading'] {
+				display: grid;
+				gap: var(--dry-space-2);
+				padding: var(--dry-space-3);
+			}
+
+			[data-layout='analytics-dashboard-shell'] [data-layout='analytics-dashboard-insight-list'] {
+				display: grid;
+				gap: var(--dry-space-2);
+				padding: var(--dry-space-3);
+			}
+
+			@container analytics-dashboard (min-width: 48rem) {
+				[data-layout='analytics-dashboard-shell'] [data-layout-area='page'] {
+					padding: var(--dry-space-6);
+					grid-template-areas:
+						'header header'
+						'filters filters'
+						'status status'
+						'metrics metrics'
+						'primary primary'
+						'secondary secondary'
+						'table table';
+					grid-template-columns: repeat(2, minmax(0, 1fr));
+				}
+
+				[data-layout='analytics-dashboard-shell'] [data-layout-area='header'],
+				[data-layout='analytics-dashboard-shell'] [data-layout-area='filters'],
+				[data-layout='analytics-dashboard-shell'] [data-layout-area='metrics'] {
+					grid-template-columns: repeat(2, minmax(0, 1fr));
+					align-items: end;
+				}
+			}
+
+			@container analytics-dashboard (min-width: 72rem) {
+				[data-layout='analytics-dashboard-shell'] [data-layout-area='page'] {
+					grid-template-areas:
+						'header header header'
+						'filters filters filters'
+						'status status status'
+						'metrics metrics secondary'
+						'primary primary secondary'
+						'table table table';
+					grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(18rem, 24rem);
+					align-items: start;
+				}
+
+				[data-layout='analytics-dashboard-shell'] [data-layout-area='metrics'] {
+					grid-template-columns: repeat(4, minmax(0, 1fr));
+				}
+
+				[data-layout='analytics-dashboard-shell'] [data-layout-area='filters'] {
+					grid-template-columns: minmax(14rem, 1fr) minmax(12rem, 16rem) minmax(12rem, 16rem) auto;
+				}
+			}
+
+			/* Preview-only visual styling. */
+			[data-layout='analytics-dashboard-shell'] {
+				color: var(--text);
+			}
+
+			.card,
+			.metric,
+			.filter,
+			.status {
+				background: var(--surface);
+				border: 1px solid var(--line);
+				border-radius: 8px;
+				box-shadow: var(--shadow);
+			}
+
+			.card,
+			.metric,
+			.status {
+				padding: 16px;
+			}
+
+			.heading,
+			.actions,
+			.panel-heading,
+			.table-scroll {
+				min-width: 0;
+			}
+
+			.actions,
+			.panel-heading {
+				justify-content: space-between;
+				flex-wrap: wrap;
+			}
+
+			.eyebrow {
+				margin: 0 0 7px;
+				color: var(--muted);
+				font-size: 12px;
+				font-weight: 700;
+				letter-spacing: 0.08em;
+				text-transform: uppercase;
+			}
+
+			h2,
+			h3 {
+				margin: 0;
+				line-height: 1.16;
+			}
+
+			h2 {
+				font-size: 28px;
+			}
+
+			h3 {
+				font-size: 16px;
+			}
+
+			p {
+				margin: 0;
+				color: var(--muted);
+				font-size: 13px;
+				line-height: 1.45;
+			}
+
+			.summary {
+				margin-top: 8px;
+				max-width: 66ch;
+				font-size: 15px;
+			}
+
+			label {
+				color: var(--muted);
+				font-size: 12px;
+				font-weight: 650;
+			}
+
+			.input {
+				min-height: 36px;
+				border: 1px solid var(--line);
+				border-radius: 6px;
+				background: var(--surface-soft);
+				padding: 8px 10px;
+				overflow: hidden;
+				color: var(--text);
+				font-size: 13px;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+
+			.button {
+				display: inline-flex;
+				min-height: 36px;
+				align-items: center;
+				justify-content: center;
+				border: 1px solid var(--line);
+				border-radius: 6px;
+				background: var(--surface);
+				color: var(--text);
+				padding: 0 12px;
+				font-size: 13px;
+				font-weight: 650;
+				white-space: nowrap;
+			}
+
+			.button.primary {
+				border-color: var(--accent);
+				background: var(--accent);
+				color: #fff;
+			}
+
+			.metric {
+				align-content: start;
+			}
+
+			.metric span {
+				color: var(--muted);
+				font-size: 12px;
+				font-weight: 650;
+			}
+
+			.metric strong {
+				color: var(--text);
+				font-size: 24px;
+				line-height: 1.1;
+			}
+
+			.metric small {
+				color: var(--good);
+				font-size: 12px;
+				font-weight: 650;
+			}
+
+			.chart-shell {
+				display: grid;
+				align-content: end;
+				gap: 14px;
+				min-height: 290px;
+				border: 1px solid var(--line);
+				border-radius: 8px;
+				background:
+					linear-gradient(to top, rgba(36, 95, 187, 0.09), rgba(36, 95, 187, 0)),
+					var(--surface-soft);
+				padding: 14px;
+			}
+
+			.chart-bars {
+				display: grid;
+				min-height: 190px;
+				align-items: end;
+				grid-template-columns: repeat(12, minmax(10px, 1fr));
+				gap: 8px;
+			}
+
+			.bar {
+				min-height: 24px;
+				border-radius: 5px 5px 2px 2px;
+				background: var(--accent);
+			}
+
+			.bar:nth-child(3n) {
+				background: #4f8a49;
+			}
+
+			.bar:nth-child(4n) {
+				background: #9a6a22;
+			}
+
+			.badge {
+				display: inline-flex;
+				width: fit-content;
+				border-radius: 999px;
+				background: var(--accent-soft);
+				color: #194b85;
+				padding: 4px 8px;
+				font-size: 12px;
+				font-weight: 650;
+			}
+
+			.badge.good {
+				background: #e7f5ee;
+				color: var(--good);
+			}
+
+			.badge.warn {
+				background: #fff2d9;
+				color: var(--warn);
+			}
+
+			.insights {
+				margin: 0;
+				list-style: none;
+			}
+
+			.insights li {
+				border: 1px solid var(--line);
+				border-radius: 7px;
+				background: var(--surface-soft);
+				padding: 10px;
+				font-size: 13px;
+				line-height: 1.35;
+			}
+
+			.table-scroll {
+				overflow-x: auto;
+			}
+
+			table {
+				width: 100%;
+				min-width: 620px;
+				border-collapse: collapse;
+			}
+
+			th,
+			td {
+				border-bottom: 1px solid var(--line);
+				padding: 9px 8px;
+				text-align: left;
+				font-size: 13px;
+				white-space: nowrap;
+			}
+
+			th {
+				color: var(--muted);
+				font-size: 12px;
+				font-weight: 700;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="preview">
+			<div class="preview-label">
+				<h1>Batch 4 - Final Candidate V4</h1>
+				<p>
+					Static visual harness for the combined test skill output. It uses the v4
+					shell/container/grid rules and preview-only visual styling.
+				</p>
+			</div>
+
+			<main data-layout="analytics-dashboard-shell" aria-labelledby="analytics-dashboard-title">
+				<section data-layout-area="page">
+					<header data-layout-area="header">
+						<div class="heading" data-layout="analytics-dashboard-heading">
+							<p class="eyebrow" data-layout="analytics-dashboard-kicker">Performance</p>
+							<h2 id="analytics-dashboard-title" data-layout="analytics-dashboard-title">
+								Analytics Dashboard
+							</h2>
+							<p class="summary" data-layout="analytics-dashboard-summary">
+								Monitor acquisition quality, conversion movement, and campaign risk.
+							</p>
+						</div>
+						<div class="actions" data-layout="analytics-dashboard-header-actions">
+							<span class="button">Export</span>
+							<span class="button primary">Refresh</span>
+						</div>
+					</header>
+
+					<form data-layout-area="filters" aria-label="Analytics filters">
+						<div class="filter" data-layout="analytics-dashboard-filter-field">
+							<label>Search</label>
+							<div class="input">Launch campaign</div>
+						</div>
+						<div class="filter" data-layout="analytics-dashboard-filter-field">
+							<label>Segment</label>
+							<div class="input">All traffic</div>
+						</div>
+						<div class="filter" data-layout="analytics-dashboard-filter-field">
+							<label>Range</label>
+							<div class="input">Last 7 days</div>
+						</div>
+						<div data-layout="analytics-dashboard-filter-actions">
+							<span class="button primary">Apply</span>
+							<span class="button">Reset</span>
+						</div>
+					</form>
+
+					<section data-layout-area="status" aria-live="polite">
+						<div class="status">
+							<p><strong>Live analytics.</strong> Current through the last refresh window.</p>
+						</div>
+					</section>
+
+					<section data-layout-area="metrics" aria-label="Summary metrics">
+						<article class="metric" data-layout="analytics-dashboard-metric">
+							<span>Visitors</span>
+							<strong>128.4k</strong>
+							<small>+12.8%</small>
+						</article>
+						<article class="metric" data-layout="analytics-dashboard-metric">
+							<span>Conversion</span>
+							<strong>6.8%</strong>
+							<small>+0.9%</small>
+						</article>
+						<article class="metric" data-layout="analytics-dashboard-metric">
+							<span>CAC</span>
+							<strong>$42</strong>
+							<small>-4.1%</small>
+						</article>
+						<article class="metric" data-layout="analytics-dashboard-metric">
+							<span>At risk</span>
+							<strong>7</strong>
+							<small class="warn">+2</small>
+						</article>
+					</section>
+
+					<section class="card" data-layout-area="primary" aria-labelledby="analytics-chart-title">
+						<div class="panel-heading" data-layout="analytics-dashboard-section-heading">
+							<div>
+								<h3 id="analytics-chart-title" data-layout="analytics-dashboard-section-title">
+									Conversion trend
+								</h3>
+								<p data-layout="analytics-dashboard-state-copy">
+									Daily conversion index for the selected range.
+								</p>
+							</div>
+							<span class="badge good">Above plan</span>
+						</div>
+						<div
+							class="chart-shell"
+							data-layout="analytics-dashboard-chart-frame"
+							role="img"
+							aria-label="Conversion trend chart"
+						>
+							<div class="chart-bars">
+								<div class="bar" style="height: 42%"></div>
+								<div class="bar" style="height: 58%"></div>
+								<div class="bar" style="height: 51%"></div>
+								<div class="bar" style="height: 68%"></div>
+								<div class="bar" style="height: 74%"></div>
+								<div class="bar" style="height: 61%"></div>
+								<div class="bar" style="height: 79%"></div>
+								<div class="bar" style="height: 72%"></div>
+								<div class="bar" style="height: 84%"></div>
+								<div class="bar" style="height: 66%"></div>
+								<div class="bar" style="height: 88%"></div>
+								<div class="bar" style="height: 91%"></div>
+							</div>
+							<p>Trend improved after campaign throttling was removed.</p>
+						</div>
+					</section>
+
+					<aside
+						class="card"
+						data-layout-area="secondary"
+						aria-labelledby="analytics-insights-title"
+					>
+						<div class="panel-heading" data-layout="analytics-dashboard-section-heading">
+							<div>
+								<h3 id="analytics-insights-title" data-layout="analytics-dashboard-section-title">
+									Insights
+								</h3>
+								<p data-layout="analytics-dashboard-state-copy">
+									Secondary context supports the primary chart.
+								</p>
+							</div>
+						</div>
+						<ul class="insights" data-layout="analytics-dashboard-insight-list">
+							<li data-layout="analytics-dashboard-insight">
+								Paid social is driving 34% more qualified sessions.
+							</li>
+							<li data-layout="analytics-dashboard-insight">
+								Search intent conversion dipped below the weekly target.
+							</li>
+							<li data-layout="analytics-dashboard-insight">
+								Seven campaigns need budget or creative review.
+							</li>
+						</ul>
+						<div data-layout="analytics-dashboard-insight-actions">
+							<span class="button primary">Open recommendations</span>
+							<span class="button">Assign review</span>
+						</div>
+					</aside>
+
+					<section class="card" data-layout-area="table" aria-labelledby="analytics-table-title">
+						<div class="panel-heading" data-layout="analytics-dashboard-section-heading">
+							<div>
+								<h3 id="analytics-table-title" data-layout="analytics-dashboard-section-title">
+									Campaign performance
+								</h3>
+								<p data-layout="analytics-dashboard-state-copy">
+									Dense table stays full-width for scanability.
+								</p>
+							</div>
+							<span class="badge">Dense</span>
+						</div>
+						<div class="table-scroll" data-layout="analytics-dashboard-table-loading">
+							<table>
+								<thead>
+									<tr>
+										<th>Campaign</th>
+										<th>Source</th>
+										<th>Sessions</th>
+										<th>Conversion</th>
+										<th>Revenue</th>
+										<th>Status</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>Launch retargeting</td>
+										<td>Paid social</td>
+										<td>38,420</td>
+										<td>7.4%</td>
+										<td>$84,200</td>
+										<td><span class="badge good">Healthy</span></td>
+									</tr>
+									<tr>
+										<td>Search intent</td>
+										<td>Search</td>
+										<td>24,180</td>
+										<td>5.9%</td>
+										<td>$52,900</td>
+										<td><span class="badge warn">Watch</span></td>
+									</tr>
+									<tr>
+										<td>Lifecycle email</td>
+										<td>Email</td>
+										<td>18,910</td>
+										<td>8.1%</td>
+										<td>$44,300</td>
+										<td><span class="badge good">Healthy</span></td>
+									</tr>
+									<tr>
+										<td>Partner referral</td>
+										<td>Referral</td>
+										<td>12,604</td>
+										<td>4.8%</td>
+										<td>$21,700</td>
+										<td><span class="badge">Review</span></td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</section>
+				</section>
+			</main>
+		</div>
+	</body>
+</html>

@@ -99,6 +99,7 @@
 	const inspectingLabel = 'Inspecting components';
 	const toolbarId = $props.id();
 	const pickerSearchId = `${toolbarId}-component-picker-search`;
+	const CONTAINED_TOOLBAR_POINTER_EVENTS = ['pointerdown', 'mousedown'] as const;
 
 	let pickerOpen = $state(false);
 	let pickerName = $state('');
@@ -266,9 +267,22 @@
 	const captureToolbar: Attachment<HTMLDivElement> = (node) => {
 		toolbarEl = node;
 		const cleanupRepair = scheduleToolbarLayoutRepair(node);
+		const stopAtToolbarBoundary = (event: Event) => {
+			const target = event.target;
+			if (target instanceof Element && target.closest('.drag-handle')) return;
+			event.stopPropagation();
+		};
+
+		for (const eventName of CONTAINED_TOOLBAR_POINTER_EVENTS) {
+			node.addEventListener(eventName, stopAtToolbarBoundary);
+		}
+
 		return () => {
 			cleanupRepair();
 			if (toolbarEl === node) toolbarEl = null;
+			for (const eventName of CONTAINED_TOOLBAR_POINTER_EVENTS) {
+				node.removeEventListener(eventName, stopAtToolbarBoundary);
+			}
 		};
 	};
 

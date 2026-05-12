@@ -148,6 +148,7 @@ describe('captureSubmission', () => {
 				{
 					id: 'add-1',
 					kind: 'Button',
+					label: 'Save changes',
 					element: fakeLayoutElement({ rect: { left: 5, top: 5, width: 50, height: 20 } })
 				}
 			],
@@ -270,7 +271,7 @@ describe('captureSubmission', () => {
 			{
 				id: 'add-1',
 				kind: 'Button',
-				label: 'Button',
+				label: 'Save changes',
 				rect: { x: 5, y: 5, width: 50, height: 20 }
 			}
 		]);
@@ -419,6 +420,7 @@ describe('stored widget draft capture', () => {
 					{
 						id: 'component',
 						kind: 'Button',
+						label: 'Persisted button',
 						snap: { left: '1px', top: '2px', width: '', height: '', transform: '' }
 					},
 					{ id: 'broken' }
@@ -444,6 +446,7 @@ describe('stored widget draft capture', () => {
 				{
 					id: 'component',
 					kind: 'Button',
+					label: 'Persisted button',
 					snap: {
 						left: '1px',
 						top: '2px',
@@ -534,6 +537,20 @@ describe('feedback submission client helpers', () => {
 				sessionStorage
 			})
 		).toBe('http://127.0.0.1:4748');
+	});
+
+	test('stored handoff wins over a configured default for feedback-launched tabs', () => {
+		const localStorage = new MemoryStorage();
+		const sessionStorage = new MemoryStorage();
+		localStorage.setItem('dryui-feedback-server-url', 'http://127.0.0.1:5888');
+
+		expect(
+			resolveFeedbackServerUrl('http://127.0.0.1:4748', {
+				href: 'https://example.test/page?dryui-feedback=1',
+				localStorage,
+				sessionStorage
+			})
+		).toBe('http://127.0.0.1:5888');
 	});
 
 	test('stored handoff is used when no server is configured', () => {

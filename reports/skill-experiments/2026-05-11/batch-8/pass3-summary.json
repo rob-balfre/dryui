@@ -1,0 +1,129 @@
+[
+  {
+    "variant": "v13a-lint-tight",
+    "case": "analytics",
+    "formalOk": false,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-stage123-v13a-lint-tight-analytics-stage123-pass3-9bHOPd",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/stage123-v13a-lint-tight-analytics-stage123-pass3-1778473932465",
+    "devServer": null,
+    "agentSeconds": 240.3,
+    "source": {
+      "failures": [
+        "@media layout breakpoint",
+        "width in layout.css"
+      ],
+      "dryuiComponents": [
+        "Badge",
+        "Button",
+        "Heading",
+        "Input",
+        "Separator",
+        "Table",
+        "Tabs"
+      ],
+      "visibleWords": 79
+    },
+    "visual": [],
+    "assertionFailures": [],
+    "score": 66,
+    "auditOk": false,
+    "visualOk": true,
+    "ok": false
+  },
+  {
+    "variant": "v13a-lint-tight",
+    "case": "settings",
+    "formalOk": false,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-stage123-v13a-lint-tight-settings-stage123-pass3-f7Gv5h",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/stage123-v13a-lint-tight-settings-stage123-pass3-1778473932466",
+    "devServer": null,
+    "agentSeconds": 240.5,
+    "source": {
+      "failures": [
+        "@media layout breakpoint",
+        "flex layout in app.css",
+        "width in layout.css"
+      ],
+      "dryuiComponents": [
+        "Badge",
+        "Avatar",
+        "Button",
+        "Heading",
+        "Input",
+        "Label",
+        "Separator",
+        "Table",
+        "Tabs",
+        "Text"
+      ],
+      "visibleWords": 119
+    },
+    "visual": [],
+    "assertionFailures": [],
+    "score": 59,
+    "auditOk": false,
+    "visualOk": true,
+    "ok": false
+  },
+  {
+    "variant": "v13a-lint-tight",
+    "case": "crm",
+    "formalOk": false,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-stage123-v13a-lint-tight-crm-stage123-pass3-PMfGYv",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/stage123-v13a-lint-tight-crm-stage123-pass3-1778474174299",
+    "devServer": null,
+    "agentSeconds": 240.4,
+    "source": {
+      "failures": [
+        "@media layout breakpoint",
+        "flex layout in app.css",
+        "width in layout.css"
+      ],
+      "dryuiComponents": [
+        "Badge",
+        "Button",
+        "Input",
+        "Separator",
+        "Table",
+        "Tabs"
+      ],
+      "visibleWords": 149
+    },
+    "visual": [],
+    "assertionFailures": [],
+    "score": 59,
+    "auditOk": false,
+    "visualOk": true,
+    "ok": false
+  },
+  {
+    "variant": "v13a-lint-tight",
+    "case": "kanban",
+    "formalOk": false,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-stage123-v13a-lint-tight-kanban-stage123-pass3-v4wUgz",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/stage123-v13a-lint-tight-kanban-stage123-pass3-1778474174299",
+    "devServer": null,
+    "agentSeconds": 240.2,
+    "source": {
+      "failures": [
+        "width in layout.css"
+      ],
+      "dryuiComponents": [
+        "Avatar",
+        "Badge",
+        "Button",
+        "Input",
+        "Separator",
+        "Table",
+        "Tabs"
+      ],
+      "visibleWords": 134
+    },
+    "visual": [],
+    "assertionFailures": [],
+    "score": 73,
+    "auditOk": false,
+    "visualOk": true,
+    "ok": false
+  }
+]

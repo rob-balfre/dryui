@@ -1,0 +1,5 @@
+Done. I wrote the report to:
+
+[final-candidate-v3.md](/Users/robertbalfre/dryui/reports/skill-experiments/2026-05-11/batch-4/outputs/final-candidate-v3.md)
+
+I only created that output report. It includes all seven requested sections and records the component API verification plus snippet integrity gate review.

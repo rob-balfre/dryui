@@ -147,6 +147,7 @@
 	type AddedRecord = {
 		el: HTMLElement;
 		kind: string;
+		label?: string;
 		initialSnap: LayoutSnapshot;
 		mounted?: ReturnType<typeof mountComponent> | null;
 	};
@@ -287,7 +288,12 @@
 		};
 	};
 
-	function makeAddedElement(id: string, kind: string, snap: LayoutSnapshot): HTMLElement {
+	function makeAddedElement(
+		id: string,
+		kind: string,
+		snap: LayoutSnapshot,
+		label?: string
+	): HTMLElement {
 		const el = document.createElement('div');
 		el.dataset[LAYOUT_DATASET.addedId] = id;
 		Object.assign(el.style, {
@@ -320,7 +326,7 @@
 		content.style.cssText = ADDED_CONTENT_FALLBACK_STYLE;
 		const fallback = document.createElement('span');
 		fallback.dataset.dryuiAddedFallback = '';
-		fallback.textContent = kind;
+		fallback.textContent = label ?? kind;
 		el.appendChild(content);
 		el.appendChild(fallback);
 		if (snap.rotation !== undefined) el.dataset[LAYOUT_DATASET.rotation] = snap.rotation;
@@ -445,7 +451,7 @@
 		if (target) target.style.cssText = ADDED_CONTENT_FALLBACK_STYLE;
 		const fallback = record.el.querySelector<HTMLElement>('[data-dryui-added-fallback]');
 		if (fallback) {
-			fallback.textContent = record.kind;
+			fallback.textContent = record.label ?? record.kind;
 			fallback.style.display = '';
 		}
 		delete record.el.dataset.dryuiAddedRendered;
@@ -481,7 +487,7 @@
 			const target = record.el.querySelector<HTMLElement>('[data-dryui-added-content]');
 			if (!target) return;
 			const labelSnippet = createRawSnippet(() => ({
-				render: () => `<span>${escapeHtml(record.kind)}</span>`
+				render: () => `<span>${escapeHtml(record.label ?? record.kind)}</span>`
 			}));
 			const props = usingDefault ? {} : { children: labelSnippet };
 			const instance = mountComponent(Component as Parameters<typeof mountComponent>[0], {
@@ -543,23 +549,30 @@
 		}
 	});
 
-	function createAddedClone(id: string, kind: string, snap: LayoutSnapshot): HTMLElement {
+	function createAddedClone(
+		id: string,
+		kind: string,
+		snap: LayoutSnapshot,
+		label?: string
+	): HTMLElement {
 		const existing = addedComponents.get(id);
 		if (existing) {
 			applyElementLayoutSnapshot(existing.el, snap);
-			if (existing.kind !== kind) {
+			if (existing.kind !== kind || existing.label !== label) {
 				unmountAdded(existing);
 				existing.kind = kind;
+				existing.label = label;
 				resetAddedFallback(existing);
 				void tryRenderInto(existing);
 			}
 			return existing.el;
 		}
-		const el = makeAddedElement(id, kind, snap);
+		const el = makeAddedElement(id, kind, snap, label);
 		layoutStageTarget().appendChild(el);
 		const record: AddedRecord = {
 			el,
 			kind,
+			label,
 			initialSnap: snap,
 			mounted: null
 		};
@@ -589,6 +602,7 @@
 			result.push({
 				id,
 				kind: record.kind,
+				...(record.label ? { label: record.label } : {}),
 				snap: snapshotElementLayout(record.el)
 			});
 		}
@@ -734,7 +748,7 @@
 
 			let layoutChanged = false;
 			for (const entry of state.added ?? []) {
-				createAddedClone(entry.id, entry.kind, entry.snap);
+				createAddedClone(entry.id, entry.kind, entry.snap, entry.label);
 				layoutChanged = true;
 			}
 			for (const entry of state.moved ?? []) {
@@ -787,7 +801,7 @@
 			}
 		}
 		for (const entry of frame.added) {
-			createAddedClone(entry.id, entry.kind, entry.snap);
+			createAddedClone(entry.id, entry.kind, entry.snap, entry.label);
 			layoutChanged = true;
 		}
 		const wantedRemoved = new Set(frame.removed);
@@ -1661,6 +1675,7 @@
 			added: Array.from(addedComponents, ([id, record]) => ({
 				id,
 				kind: record.kind,
+				...(record.label ? { label: record.label } : {}),
 				element: record.el
 			})),
 			removed: Array.from(removedElements.values(), (record) => ({

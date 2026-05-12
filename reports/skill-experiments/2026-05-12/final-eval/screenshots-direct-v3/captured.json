@@ -1,0 +1,585 @@
+[
+  {
+    "variant": "v22a-mobile-density-safe",
+    "case": "finance-planning",
+    "formalOk": true,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-direct-v22a-mobile-density-safe-finance-planning-9hamL9",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/direct-v22a-mobile-density-safe-finance-planning-1778537638282",
+    "devServer": {
+      "url": "http://127.0.0.1:63418/",
+      "pid": 6569
+    },
+    "agentSeconds": 126,
+    "source": {
+      "failures": [],
+      "dryuiComponents": [
+        "Badge",
+        "Button",
+        "Heading",
+        "Text"
+      ],
+      "visibleWords": 47
+    },
+    "visual": [
+      {
+        "viewport": "mobile",
+        "screenshot": "v22a-mobile-density-safe-finance-planning-mobile.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0,
+        "scrollHeight": 1982
+      },
+      {
+        "viewport": "tablet",
+        "screenshot": "v22a-mobile-density-safe-finance-planning-tablet.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0,
+        "scrollHeight": 1024
+      },
+      {
+        "viewport": "desktop",
+        "screenshot": "v22a-mobile-density-safe-finance-planning-desktop.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0,
+        "scrollHeight": 1024
+      }
+    ],
+    "assertionFailures": [],
+    "score": 100,
+    "auditOk": true,
+    "visualOk": true,
+    "ok": true
+  },
+  {
+    "variant": "v22a-mobile-density-safe",
+    "case": "course-portal",
+    "formalOk": true,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-direct-v22a-mobile-density-safe-course-portal-jTCXri",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/direct-v22a-mobile-density-safe-course-portal-1778537817141",
+    "devServer": {
+      "url": "http://127.0.0.1:63758/",
+      "pid": 10698
+    },
+    "agentSeconds": 141.5,
+    "source": {
+      "failures": [],
+      "dryuiComponents": [
+        "Badge",
+        "Button",
+        "Heading",
+        "Text"
+      ],
+      "visibleWords": 52
+    },
+    "visual": [
+      {
+        "viewport": "mobile",
+        "screenshot": "v22a-mobile-density-safe-course-portal-mobile.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0,
+        "scrollHeight": 2092
+      },
+      {
+        "viewport": "tablet",
+        "screenshot": "v22a-mobile-density-safe-course-portal-tablet.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0,
+        "scrollHeight": 1224
+      },
+      {
+        "viewport": "desktop",
+        "screenshot": "v22a-mobile-density-safe-course-portal-desktop.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0,
+        "scrollHeight": 1000
+      }
+    ],
+    "assertionFailures": [],
+    "score": 100,
+    "auditOk": true,
+    "visualOk": true,
+    "ok": true
+  },
+  {
+    "variant": "v24a-v22-plus-preview-guard",
+    "case": "finance-planning",
+    "formalOk": true,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-direct-v24a-v22-plus-preview-guard-finance-planning-iT7fWh",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/direct-v24a-v22-plus-preview-guard-finance-planning-1778538157955",
+    "devServer": {
+      "url": "http://127.0.0.1:64238/",
+      "pid": 22586
+    },
+    "agentSeconds": 161.2,
+    "source": {
+      "failures": [],
+      "dryuiComponents": [
+        "Badge",
+        "Button",
+        "Heading",
+        "Separator",
+        "Text"
+      ],
+      "visibleWords": 47
+    },
+    "visual": [
+      {
+        "viewport": "mobile",
+        "screenshot": "v24a-v22-plus-preview-guard-finance-planning-mobile.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.043478260869565216,
+        "scrollHeight": 1865
+      },
+      {
+        "viewport": "tablet",
+        "screenshot": "v24a-v22-plus-preview-guard-finance-planning-tablet.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.043478260869565216,
+        "scrollHeight": 1032
+      },
+      {
+        "viewport": "desktop",
+        "screenshot": "v24a-v22-plus-preview-guard-finance-planning-desktop.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.043478260869565216,
+        "scrollHeight": 1032
+      }
+    ],
+    "assertionFailures": [],
+    "score": 100,
+    "auditOk": true,
+    "visualOk": true,
+    "ok": true
+  },
+  {
+    "variant": "v24a-v22-plus-preview-guard",
+    "case": "course-portal",
+    "formalOk": true,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-direct-v24a-v22-plus-preview-guard-course-portal-JEz6Xh",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/direct-v24a-v22-plus-preview-guard-course-portal-1778538338077",
+    "devServer": {
+      "url": "http://127.0.0.1:64359/",
+      "pid": 26130
+    },
+    "agentSeconds": 150.9,
+    "source": {
+      "failures": [],
+      "dryuiComponents": [
+        "Badge",
+        "Button",
+        "Heading",
+        "Text"
+      ],
+      "visibleWords": 45
+    },
+    "visual": [
+      {
+        "viewport": "mobile",
+        "screenshot": "v24a-v22-plus-preview-guard-course-portal-mobile.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.04838709677419355,
+        "scrollHeight": 1906
+      },
+      {
+        "viewport": "tablet",
+        "screenshot": "v24a-v22-plus-preview-guard-course-portal-tablet.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.04838709677419355,
+        "scrollHeight": 1032
+      },
+      {
+        "viewport": "desktop",
+        "screenshot": "v24a-v22-plus-preview-guard-course-portal-desktop.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.04838709677419355,
+        "scrollHeight": 1032
+      }
+    ],
+    "assertionFailures": [],
+    "score": 100,
+    "auditOk": true,
+    "visualOk": true,
+    "ok": true
+  },
+  {
+    "variant": "v22a-mobile-density-safe",
+    "case": "support-inbox",
+    "formalOk": true,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-direct-v22a-mobile-density-safe-support-inbox-C562ni",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/direct-v22a-mobile-density-safe-support-inbox-1778537637592",
+    "devServer": {
+      "url": "http://127.0.0.1:63456/",
+      "pid": 7810
+    },
+    "agentSeconds": 171.6,
+    "source": {
+      "failures": [
+        "size layout outside defensive wrapper group in app.css"
+      ],
+      "dryuiComponents": [
+        "Badge",
+        "Button",
+        "Heading",
+        "Link",
+        "Separator",
+        "Text"
+      ],
+      "visibleWords": 44
+    },
+    "visual": [
+      {
+        "viewport": "mobile",
+        "screenshot": "v22a-mobile-density-safe-support-inbox-mobile.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0,
+        "scrollHeight": 1944
+      },
+      {
+        "viewport": "tablet",
+        "screenshot": "v22a-mobile-density-safe-support-inbox-tablet.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0,
+        "scrollHeight": 1028
+      },
+      {
+        "viewport": "desktop",
+        "screenshot": "v22a-mobile-density-safe-support-inbox-desktop.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0,
+        "scrollHeight": 1024
+      }
+    ],
+    "assertionFailures": [],
+    "score": 93,
+    "auditOk": false,
+    "visualOk": true,
+    "ok": false
+  },
+  {
+    "variant": "v24a-v22-plus-preview-guard",
+    "case": "support-inbox",
+    "formalOk": true,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-direct-v24a-v22-plus-preview-guard-support-inbox-hum6S0",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/direct-v24a-v22-plus-preview-guard-support-inbox-1778538156633",
+    "devServer": {
+      "url": "http://127.0.0.1:64206/",
+      "pid": 21310
+    },
+    "agentSeconds": 127.4,
+    "source": {
+      "failures": [
+        "size layout outside defensive wrapper group in app.css"
+      ],
+      "dryuiComponents": [
+        "Badge",
+        "Button",
+        "Heading",
+        "Text"
+      ],
+      "visibleWords": 45
+    },
+    "visual": [
+      {
+        "viewport": "mobile",
+        "screenshot": "v24a-v22-plus-preview-guard-support-inbox-mobile.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0,
+        "scrollHeight": 1931
+      },
+      {
+        "viewport": "tablet",
+        "screenshot": "v24a-v22-plus-preview-guard-support-inbox-tablet.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0,
+        "scrollHeight": 1039
+      },
+      {
+        "viewport": "desktop",
+        "screenshot": "v24a-v22-plus-preview-guard-support-inbox-desktop.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0,
+        "scrollHeight": 1000
+      }
+    ],
+    "assertionFailures": [],
+    "score": 93,
+    "auditOk": false,
+    "visualOk": true,
+    "ok": false
+  },
+  {
+    "variant": "v22a-mobile-density-safe",
+    "case": "inventory-admin",
+    "formalOk": true,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-direct-v22a-mobile-density-safe-inventory-admin-DpeEp4",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/direct-v22a-mobile-density-safe-inventory-admin-1778537396086",
+    "devServer": {
+      "url": "http://127.0.0.1:63294/",
+      "pid": 413
+    },
+    "agentSeconds": 129.8,
+    "source": {
+      "failures": [
+        "gap layout in app.css",
+        "size layout outside defensive wrapper group in app.css"
+      ],
+      "dryuiComponents": [
+        "Badge",
+        "Button",
+        "Heading",
+        "Separator",
+        "Text"
+      ],
+      "visibleWords": 56
+    },
+    "visual": [
+      {
+        "viewport": "mobile",
+        "screenshot": "v22a-mobile-density-safe-inventory-admin-mobile.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.05970149253731343,
+        "scrollHeight": 1767
+      },
+      {
+        "viewport": "tablet",
+        "screenshot": "v22a-mobile-density-safe-inventory-admin-tablet.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.05970149253731343,
+        "scrollHeight": 1024
+      },
+      {
+        "viewport": "desktop",
+        "screenshot": "v22a-mobile-density-safe-inventory-admin-desktop.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.05970149253731343,
+        "scrollHeight": 1024
+      }
+    ],
+    "assertionFailures": [],
+    "score": 86,
+    "auditOk": false,
+    "visualOk": true,
+    "ok": false
+  },
+  {
+    "variant": "v24a-v22-plus-preview-guard",
+    "case": "calendar-ops",
+    "formalOk": true,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-direct-v24a-v22-plus-preview-guard-calendar-ops-Bbs4BX",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/direct-v24a-v22-plus-preview-guard-calendar-ops-1778537977184",
+    "devServer": {
+      "url": "http://127.0.0.1:63838/",
+      "pid": 15436
+    },
+    "agentSeconds": 132.7,
+    "source": {
+      "failures": [
+        "gap layout in app.css",
+        "size layout outside defensive wrapper group in app.css",
+        "element selector in app.css"
+      ],
+      "dryuiComponents": [
+        "Badge",
+        "Button",
+        "Heading",
+        "Text"
+      ],
+      "visibleWords": 44
+    },
+    "visual": [
+      {
+        "viewport": "mobile",
+        "screenshot": "v24a-v22-plus-preview-guard-calendar-ops-mobile.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0,
+        "scrollHeight": 1868
+      },
+      {
+        "viewport": "tablet",
+        "screenshot": "v24a-v22-plus-preview-guard-calendar-ops-tablet.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0,
+        "scrollHeight": 1000
+      },
+      {
+        "viewport": "desktop",
+        "screenshot": "v24a-v22-plus-preview-guard-calendar-ops-desktop.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0,
+        "scrollHeight": 1000
+      }
+    ],
+    "assertionFailures": [],
+    "score": 79,
+    "auditOk": false,
+    "visualOk": true,
+    "ok": false
+  },
+  {
+    "variant": "v24a-v22-plus-preview-guard",
+    "case": "inventory-admin",
+    "formalOk": true,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-direct-v24a-v22-plus-preview-guard-inventory-admin-AjJMy7",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/direct-v24a-v22-plus-preview-guard-inventory-admin-1778537977901",
+    "devServer": {
+      "url": "http://127.0.0.1:63875/",
+      "pid": 16656
+    },
+    "agentSeconds": 160.7,
+    "source": {
+      "failures": [],
+      "dryuiComponents": [
+        "Badge",
+        "Button",
+        "Heading",
+        "Text"
+      ],
+      "visibleWords": 43
+    },
+    "visual": [
+      {
+        "viewport": "mobile",
+        "screenshot": "v24a-v22-plus-preview-guard-inventory-admin-mobile.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.1038961038961039,
+        "scrollHeight": 1669
+      },
+      {
+        "viewport": "tablet",
+        "screenshot": "v24a-v22-plus-preview-guard-inventory-admin-tablet.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.1038961038961039,
+        "scrollHeight": 1024
+      },
+      {
+        "viewport": "desktop",
+        "screenshot": "v24a-v22-plus-preview-guard-inventory-admin-desktop.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.1038961038961039,
+        "scrollHeight": 1024
+      }
+    ],
+    "assertionFailures": [],
+    "score": 76,
+    "auditOk": true,
+    "visualOk": false,
+    "ok": false
+  },
+  {
+    "variant": "v22a-mobile-density-safe",
+    "case": "calendar-ops",
+    "formalOk": false,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-direct-v22a-mobile-density-safe-calendar-ops-LiQf2H",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/direct-v22a-mobile-density-safe-calendar-ops-1778537394525",
+    "devServer": null,
+    "agentSeconds": 240.3,
+    "source": {
+      "failures": [
+        "route <style> block",
+        ":global selector",
+        "display in route style",
+        "@container in route style",
+        "size layout outside defensive wrapper group in app.css",
+        "element selector in app.css",
+        "missing page inline-size container"
+      ],
+      "dryuiComponents": [
+        "Button",
+        "Heading",
+        "Text"
+      ],
+      "visibleWords": 47
+    },
+    "visual": [],
+    "assertionFailures": [
+      "file-contains: src/layout.css missing \"container: page / inline-size\"",
+      "file-matches: src/routes/+page.svelte failed /data-layout-area=\"page\"/i",
+      "file-matches: src/routes/+page.svelte failed /data-layout-area=\"primary\"/i",
+      "file-matches: src/routes/+page.svelte failed /data-layout-area=\"(topbar|navigation)\"/i"
+    ],
+    "score": 0,
+    "auditOk": false,
+    "visualOk": true,
+    "ok": false
+  }
+]

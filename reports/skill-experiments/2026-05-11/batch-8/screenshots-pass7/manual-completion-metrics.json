@@ -1,0 +1,50 @@
+[
+  {
+    "case": "settings",
+    "viewport": "mobile",
+    "screenshot": "/Users/robertbalfre/dryui/reports/skill-experiments/2026-05-11/batch-8/screenshots-pass7/v17a-compact-evidence-settings-mobile.png",
+    "horizontalOverflow": 0,
+    "scrollHeight": 844,
+    "shellTop": 21.4375
+  },
+  {
+    "case": "settings",
+    "viewport": "tablet",
+    "screenshot": "/Users/robertbalfre/dryui/reports/skill-experiments/2026-05-11/batch-8/screenshots-pass7/v17a-compact-evidence-settings-tablet.png",
+    "horizontalOverflow": 0,
+    "scrollHeight": 1000,
+    "shellTop": 21.4375
+  },
+  {
+    "case": "settings",
+    "viewport": "desktop",
+    "screenshot": "/Users/robertbalfre/dryui/reports/skill-experiments/2026-05-11/batch-8/screenshots-pass7/v17a-compact-evidence-settings-desktop.png",
+    "horizontalOverflow": 0,
+    "scrollHeight": 1000,
+    "shellTop": 21.4375
+  },
+  {
+    "case": "crm",
+    "viewport": "mobile",
+    "screenshot": "/Users/robertbalfre/dryui/reports/skill-experiments/2026-05-11/batch-8/screenshots-pass7/v17a-compact-evidence-crm-mobile.png",
+    "horizontalOverflow": 0,
+    "scrollHeight": 3078,
+    "shellTop": 0
+  },
+  {
+    "case": "crm",
+    "viewport": "tablet",
+    "screenshot": "/Users/robertbalfre/dryui/reports/skill-experiments/2026-05-11/batch-8/screenshots-pass7/v17a-compact-evidence-crm-tablet.png",
+    "horizontalOverflow": 0,
+    "scrollHeight": 1670,
+    "shellTop": 0
+  },
+  {
+    "case": "crm",
+    "viewport": "desktop",
+    "screenshot": "/Users/robertbalfre/dryui/reports/skill-experiments/2026-05-11/batch-8/screenshots-pass7/v17a-compact-evidence-crm-desktop.png",
+    "horizontalOverflow": 0,
+    "scrollHeight": 1103,
+    "shellTop": 0
+  }
+]

@@ -662,6 +662,36 @@ describe('feedback overlay hosting', () => {
 		}
 	);
 
+	it('does not leak tool selection events to page popover dismiss handlers', () => {
+		mountFeedback('popover');
+
+		const closePagePopover = vi.fn();
+		const handlePageDismiss = (event: Event) => {
+			const popover = document.querySelector<HTMLElement>('[data-popover-content]');
+			if (event.target instanceof Node && popover?.contains(event.target)) return;
+			closePagePopover();
+		};
+
+		document.addEventListener('pointerdown', handlePageDismiss);
+
+		try {
+			const arrowButton = document.querySelector<HTMLButtonElement>('[aria-label="Arrow"]');
+			if (!arrowButton) throw new Error('Expected feedback arrow button');
+
+			arrowButton.dispatchEvent(
+				new PointerEvent('pointerdown', { bubbles: true, cancelable: true, pointerId: 7 })
+			);
+			arrowButton.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+			flushSync();
+
+			expect(closePagePopover).not.toHaveBeenCalled();
+			expect(arrowButton.getAttribute('aria-label')).toBe('Stop arrows');
+			expect(document.querySelector('[data-popover-content][data-state="open"]')).not.toBeNull();
+		} finally {
+			document.removeEventListener('pointerdown', handlePageDismiss);
+		}
+	});
+
 	it('hides the toolbar before capture and shows a success toast after submission', async () => {
 		const env = setupSubmissionEnvironment({
 			onCapture() {

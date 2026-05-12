@@ -45,6 +45,10 @@ const defaultTarballsDir = resolve(repoRoot, 'reports/e2e-tarballs');
 const BLANK_PNG_BASE64 =
 	'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
 const BLANK_WEBP_BASE64 = 'UklGRhoAAABXRUJQVlA4TA0AAAAvAAAAEAcQERGIiP4HAA==';
+const FEEDBACK_HEALTH_TIMEOUT_MS = 10_000;
+const FEEDBACK_HEALTH_MIN_ATTEMPTS = 40;
+const FEEDBACK_HEALTH_INTERVAL_MS = 250;
+const FEEDBACK_HEALTH_FETCH_TIMEOUT_MS = 500;
 const FEEDBACK_FETCH_TIMEOUT_MS = 10_000;
 const CODEX_HEARTBEAT_MS = 30_000;
 const CODEX_STDIN_NOTICE = 'Reading additional input from stdin...';
@@ -52,6 +56,7 @@ const CODEX_STDIN_NOTICE = 'Reading additional input from stdin...';
 export interface ScenarioDefinition {
 	readonly name: string;
 	readonly prompt: string;
+	readonly promptImages?: readonly string[];
 	readonly assets?: readonly ScenarioImageAsset[];
 	readonly assertions: readonly ScenarioAssertion[];
 	readonly codexTimeoutMs?: number;
@@ -255,22 +260,58 @@ function copyScenarioAssets(
 	return copied;
 }
 
+async function feedbackHealthResponds(url: string): Promise<boolean> {
+	try {
+		const response = await fetch(url, {
+			redirect: 'manual',
+			signal: AbortSignal.timeout(FEEDBACK_HEALTH_FETCH_TIMEOUT_MS)
+		});
+		return response.status >= 200 && response.status < 300;
+	} catch {
+		return false;
+	}
+}
+
+async function waitForFeedbackHealth(url: string): Promise<boolean> {
+	const startedAt = Date.now();
+	let attempts = 0;
+
+	while (
+		Date.now() - startedAt < FEEDBACK_HEALTH_TIMEOUT_MS ||
+		attempts < FEEDBACK_HEALTH_MIN_ATTEMPTS
+	) {
+		attempts++;
+		if (await feedbackHealthResponds(url)) return true;
+		await new Promise((sleep) => setTimeout(sleep, FEEDBACK_HEALTH_INTERVAL_MS));
+	}
+
+	return false;
+}
+
 function buildScenarioPrompt(scenario: ScenarioDefinition): string {
 	const assets = scenario.assets ?? [];
-	if (assets.length === 0) return scenario.prompt;
-
-	const assetLines = assets.map(
-		(asset) =>
-			`- ${asset.label}: use ${publicAssetPath(asset.targetPath)} (${asset.purpose}; project file ${asset.targetPath}).`
-	);
-	return [
+	const promptParts = [
 		scenario.prompt,
 		'',
-		'Supplied PNG assets are already present in this generated project. Use these files for product, destination, hero, thumbnail, or other photographic media placeholders instead of random inline SVGs, generated data URIs, or external stock URLs.',
-		'Do not crop, screenshot, or derive media assets from the mockup files; mockups are layout references only.',
-		'Reference them from Svelte markup with these public URLs:',
-		...assetLines
-	].join('\n');
+		'lucide-svelte is installed in this generated project. Use a few Lucide icons where they improve scanability, and do not draw custom inline SVG icons for common iconography.',
+		'Theme discipline: if you use app-owned fixed colors for a light editorial design, pair foregrounds and backgrounds in that same palette. Do not put fixed dark text or icons on adaptive DryUI surface tokens like --dry-color-bg-base, --dry-color-bg-raised, or --dry-color-bg-overlay, because theme-auto on a dark OS will turn those surfaces dark.'
+	];
+
+	if (assets.length > 0) {
+		const assetLines = assets.map(
+			(asset) =>
+				`- ${asset.label}: use ${publicAssetPath(asset.targetPath)} (${asset.purpose}; project file ${asset.targetPath}).`
+		);
+		promptParts.push(
+			'',
+			'Supplied PNG assets are already present in this generated project. Use these files for product, destination, hero, thumbnail, or other photographic media placeholders instead of random inline SVGs, generated data URIs, or external stock URLs.',
+			'Do not crop, screenshot, or derive media assets from the mockup files; mockups are layout references only.',
+			'Reference them from Svelte markup with these public URLs:',
+			...assetLines
+		);
+	}
+
+	return promptParts.join('\n');
 }
 
 async function startFeedbackServer(
@@ -312,7 +353,7 @@ async function startFeedbackServer(
 	closeSync(fd);
 
 	const healthUrl = `http://127.0.0.1:${port}/health`;
-	if (!(await waitForUrl(healthUrl, 10_000))) {
+	if (!(await waitForFeedbackHealth(healthUrl))) {
 		try {
 			child.kill('SIGTERM');
 		} catch {}
@@ -471,12 +512,17 @@ async function runAssertions(
 			return html;
 		}
 
-		async function shoot(label: string, pathname: string): Promise<void> {
+		async function shoot(
+			label: string,
+			pathname: string,
+			beforeCapture?: () => Promise<void>
+		): Promise<void> {
 			const effectiveLabel = `${screenshotLabelPrefix}${label}`;
 			// Force a real navigation so `emulateMedia` changes are applied — the
 			// `visit()` cache would short-circuit and give us a light-mode snap
 			// under a dark backdrop.
 			await page.goto(devUrlBase + pathname, { waitUntil: 'networkidle', timeout: 30_000 });
+			if (beforeCapture) await beforeCapture();
 			const filePath = resolve(screenshotDir, `${effectiveLabel}.png`);
 			await page.screenshot({ path: filePath, fullPage: false });
 			screenshots.push({ label: effectiveLabel, path: filePath, url: devUrlBase + pathname });
@@ -486,6 +532,11 @@ async function runAssertions(
 		try {
 			await page.emulateMedia({ colorScheme: 'dark' });
 			await shoot('home-dark', '/');
+			await shoot('home-auto-dark', '/', async () => {
+				await page.evaluate(() => {
+					document.documentElement.classList.add('theme-auto');
+				});
+			});
 			await page.emulateMedia({ colorScheme: 'light' });
 		} catch {}
 
@@ -868,6 +919,7 @@ export async function runScenario(
 					backend: agentBackend,
 					projectDir,
 					prompt: scenarioPrompt,
+					promptImages: scenario.promptImages,
 					logDir,
 					...(agentModel ? { model: agentModel } : {}),
 					...(options.usageLimitUsd !== undefined ? { usageLimitUsd: options.usageLimitUsd } : {}),

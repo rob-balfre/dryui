@@ -170,7 +170,38 @@
 
 	@media (max-width: 720px) {
 		.home-feedback-hint {
-			display: none;
+			inline-size: 11rem;
+			transform: translateX(-20px) rotate(-2deg);
+		}
+
+		.home-feedback-hint-text {
+			font-size: 1.4rem;
+		}
+
+		.home-feedback-hint-arrow {
+			inline-size: 64px;
+		}
+	}
+
+	@media (max-width: 480px) {
+		.home-feedback-hint {
+			display: grid;
+			grid-template-columns: minmax(0, 1fr) auto;
+			align-items: end;
+			gap: 0.4rem;
+			inline-size: auto;
+			max-inline-size: 12rem;
+			transform: translate(-6px, 4px) rotate(-2deg);
+		}
+
+		.home-feedback-hint-text {
+			font-size: 0.95rem;
+			line-height: 1.05;
+		}
+
+		.home-feedback-hint-arrow {
+			margin: 0;
+			inline-size: 32px;
 		}
 	}
 </style>

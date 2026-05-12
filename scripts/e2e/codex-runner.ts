@@ -10,9 +10,11 @@
  *   - The caller gets a typed summary (exit code, turn count, last message,
  *     file-change event list) instead of having to re-parse JSONL everywhere.
  *
- * Auth: Codex uses the user's ChatGPT session via `~/.codex/auth.json`; Claude
- * uses the local `claude` CLI session. The repo's E2E harness runs locally, not
- * in CI, on purpose.
+ * Auth: Codex uses the user's ChatGPT session via a symlinked auth.json in an
+ * isolated CODEX_HOME. Claude uses the local CLI auth by default, with user
+ * settings excluded; set DRYUI_E2E_CLAUDE_ISOLATED_CONFIG=1 plus API/token auth
+ * for an isolated CLAUDE_CONFIG_DIR. The repo's E2E harness runs locally, not in
+ * CI, on purpose.
  *
  * Gotcha (see codex issue #15696): `codex exec` itself cannot spawn child
  * processes that open loopback sockets or Chromium sandboxes, even with
@@ -23,6 +25,7 @@
 import { spawn } from 'node:child_process';
 import {
 	existsSync,
+	cpSync,
 	readFileSync,
 	writeFileSync,
 	mkdirSync,
@@ -45,6 +48,7 @@ export interface CodexRunOptions {
 	readonly backend?: AgentBackend;
 	readonly projectDir: string;
 	readonly prompt: string;
+	readonly promptImages?: readonly string[];
 	readonly model?: string;
 	readonly usageLimitUsd?: number;
 	readonly permissionMode?: string;
@@ -78,6 +82,28 @@ const DEFAULT_TIMEOUT_MS = 12 * 60 * 1_000;
 const TIMEOUT_KILL_GRACE_MS = 5_000;
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(scriptDir, '..', '..');
+const DRYUI_BUILD_SKILL_OVERRIDE_ENV = 'DRYUI_E2E_DRYUI_BUILD_SKILL_OVERRIDE';
+const CLAUDE_ISOLATED_CONFIG_ENV = 'DRYUI_E2E_CLAUDE_ISOLATED_CONFIG';
+const CLAUDE_AUTH_ENV_NAMES = [
+	'ANTHROPIC_API_KEY',
+	'ANTHROPIC_AUTH_TOKEN',
+	'CLAUDE_CODE_OAUTH_TOKEN',
+	'CLAUDE_CODE_OAUTH_REFRESH_TOKEN'
+] as const;
+const CLAUDE_HARDENED_ENV = {
+	CLAUDE_AGENT_SDK_DISABLE_BUILTIN_AGENTS: '1',
+	CLAUDE_CODE_DISABLE_AGENT_VIEW: '1',
+	CLAUDE_CODE_DISABLE_AUTO_MEMORY: '1',
+	CLAUDE_CODE_SKIP_PROMPT_HISTORY: '1',
+	CLAUDE_CODE_SUBPROCESS_ENV_SCRUB: '1',
+	ENABLE_CLAUDEAI_MCP_SERVERS: 'false',
+	DISABLE_AUTOUPDATER: '1',
+	DISABLE_ERROR_REPORTING: '1',
+	DISABLE_TELEMETRY: '1',
+	DO_NOT_TRACK: '1',
+	FORCE_COLOR: '0',
+	NO_COLOR: '1'
+} as const;
 const CLAUDE_GENERATED_PROJECT_PREFIX = [
 	'Claude generated-project harness notes:',
 	'- Do not inspect node_modules, package tarballs, generated .d.ts files, or dist internals. Those paths are intentionally blocked.',
@@ -88,6 +114,7 @@ const CLAUDE_GENERATED_PROJECT_PREFIX = [
 	'- For native wrappers, use meaningful data-layout/data-layout-area hooks. Put display: grid and display: flex only in src/layout.css.',
 	'- Keep generated UI code compact. Prefer arrays and {#each} loops over repeated markup; avoid giant one-off files.',
 	'- DryUI quick syntax: import named components from @dryui/ui when available.',
+	'- lucide-svelte is installed. Use a few Lucide icons where they improve scanability, such as nav actions, stat labels, product cards, and destination metadata.',
 	'- Compound examples: <Sidebar.Root><Sidebar.Item active>Analytics</Sidebar.Item></Sidebar.Root>, <Toolbar.Root>...</Toolbar.Root>, <Chart.Root data={chartData} width={760} height={260}><Chart.Line /><Chart.XAxis /><Chart.YAxis /></Chart.Root>, <Table.Root><Table.Header><Table.Row><Table.Head>Name</Table.Head></Table.Row></Table.Header><Table.Body><Table.Row><Table.Cell>Value</Table.Cell></Table.Row></Table.Body></Table.Root>, <SegmentedControl.Root value="7d"><SegmentedControl.Item value="7d">7d</SegmentedControl.Item></SegmentedControl.Root>.',
 	'- Simple examples: <Sparkline data={[1,2,3]} />, <ProgressRing value={99} max={100} />, <Progress value={42} />, <Badge>Healthy</Badge>, <Avatar initials="RB" />, <Input placeholder="Search" />, <Separator />, <Kbd>Cmd+K</Kbd>.',
 	'- If an advanced DryUI API is uncertain, use a plain native wrapper with scoped CSS instead of continuing discovery.',
@@ -100,6 +127,7 @@ const CODEX_GENERATED_PROJECT_PREFIX = [
 	'- Load ./skills/dryui-build/SKILL.md before editing UI. If native skill discovery does not trigger, read that file directly.',
 	'- Make the page edit directly in src/routes/+page.svelte. If layout hooks need grid/flex rules, edit src/layout.css too.',
 	'- For native wrappers, use meaningful data-layout/data-layout-area hooks. Put display: grid and display: flex only in src/layout.css.',
+	'- lucide-svelte is installed. Use a few Lucide icons where they improve scanability instead of drawing custom inline SVG icons.',
 	''
 ].join('\n');
 
@@ -112,6 +140,76 @@ function tomlString(value: string): string {
 
 function getCodexHomeSource(): string {
 	return process.env.CODEX_HOME ? resolve(process.env.CODEX_HOME) : resolve(homedir(), '.codex');
+}
+
+function truthyEnv(name: string): boolean {
+	const value = process.env[name]?.trim().toLowerCase();
+	return value === '1' || value === 'true' || value === 'yes' || value === 'on';
+}
+
+function exposeDryuiSkills(codexHome: string): void {
+	const override = process.env[DRYUI_BUILD_SKILL_OVERRIDE_ENV];
+	const source = resolve(repoRoot, 'skills');
+	const target = resolve(codexHome, 'skills');
+
+	cpSync(source, target, {
+		recursive: true,
+		filter: (path) => {
+			if (path === source) return true;
+			const rel = path.slice(source.length + 1);
+			return (
+				!rel.startsWith('.system') &&
+				!rel.includes('/.system/') &&
+				rel !== '.DS_Store' &&
+				!rel.endsWith('/.DS_Store')
+			);
+		}
+	});
+
+	if (!override) return;
+
+	const overridePath = resolve(override);
+	if (!existsSync(overridePath)) {
+		throw new Error(`${DRYUI_BUILD_SKILL_OVERRIDE_ENV} does not exist: ${overridePath}`);
+	}
+
+	writeFileSync(resolve(target, 'dryui-build/SKILL.md'), readFileSync(overridePath, 'utf8'));
+}
+
+function writeCodexConfig(
+	codexHome: string,
+	options: {
+		readonly feedbackBaseUrl?: string;
+		readonly includeFeedbackMcp: boolean;
+	}
+): void {
+	const lines = [
+		'[shell_environment_policy]',
+		'inherit = "core"',
+		'experimental_use_profile = false',
+		'ignore_default_excludes = false',
+		'exclude = ["ANTHROPIC_*", "CLAUDE_*", "OPENAI_*", "AWS_*", "AZURE_*", "GITHUB_TOKEN", "GH_TOKEN", "NPM_TOKEN", "BUN_AUTH_TOKEN"]',
+		'set = { FORCE_COLOR = "0", NO_COLOR = "1" }',
+		'',
+		'[sandbox_workspace_write]',
+		'network_access = false',
+		''
+	];
+
+	if (options.includeFeedbackMcp) {
+		const feedbackEnv = options.feedbackBaseUrl
+			? `DRYUI_FEEDBACK_URL=${tomlString(options.feedbackBaseUrl)} `
+			: '';
+		const feedbackCmd = `cd ${tomlString(repoRoot)} && ${feedbackEnv}exec bun packages/feedback-server/src/mcp.ts`;
+		lines.push(
+			'[mcp_servers."dryui-feedback"]',
+			'command = "sh"',
+			`args = ["-c", ${tomlString(feedbackCmd)}]`,
+			''
+		);
+	}
+
+	writeFileSync(resolve(codexHome, 'config.toml'), lines.join('\n'));
 }
 
 function prepareIsolatedCodexHome(options: {
@@ -129,22 +227,8 @@ function prepareIsolatedCodexHome(options: {
 	// and machine-local settings that make runs non-reproducible.
 	const codexHome = mkdtempSync(resolve(tmpdir(), 'dryui-e2e-codex-home-'));
 	symlinkSync(sourceAuthPath, resolve(codexHome, 'auth.json'));
-	symlinkSync(resolve(repoRoot, 'skills'), resolve(codexHome, 'skills'), 'dir');
-	if (!options.includeFeedbackMcp) return codexHome;
-
-	const feedbackEnv = options.feedbackBaseUrl
-		? `DRYUI_FEEDBACK_URL=${tomlString(options.feedbackBaseUrl)} `
-		: '';
-	const feedbackCmd = `cd ${tomlString(repoRoot)} && ${feedbackEnv}exec bun packages/feedback-server/src/mcp.ts`;
-	writeFileSync(
-		resolve(codexHome, 'config.toml'),
-		[
-			'[mcp_servers."dryui-feedback"]',
-			'command = "sh"',
-			`args = ["-c", ${tomlString(feedbackCmd)}]`,
-			''
-		].join('\n')
-	);
+	exposeDryuiSkills(codexHome);
+	writeCodexConfig(codexHome, options);
 	return codexHome;
 }
 
@@ -178,6 +262,138 @@ function prepareClaudeMcpConfig(feedbackBaseUrl?: string): string {
 		) + '\n'
 	);
 	return configPath;
+}
+
+function prepareClaudeSettings(options: {
+	readonly allowShell?: boolean;
+	readonly includeFeedbackMcp: boolean;
+}): string {
+	const dir = mkdtempSync(resolve(tmpdir(), 'dryui-e2e-claude-settings-'));
+	const settingsPath = resolve(dir, 'settings.json');
+	const allow = [
+		'Read',
+		'Write',
+		'Edit',
+		'Glob',
+		'Grep',
+		...(options.includeFeedbackMcp ? ['mcp__dryui-feedback__*'] : []),
+		...(options.allowShell === true
+			? [
+					'Bash(bun run *)',
+					'Bash(bun --version)',
+					'Bash(node --version)',
+					'Bash(git status *)',
+					'Bash(git diff *)'
+				]
+			: [])
+	];
+	const deny = [
+		'Agent',
+		'WebFetch',
+		'WebSearch',
+		'Bash(curl *)',
+		'Bash(wget *)',
+		'Bash(nc *)',
+		'Bash(ncat *)',
+		'Bash(ssh *)',
+		'Bash(scp *)',
+		'Bash(rsync *)',
+		'Bash(open *)',
+		'Bash(osascript *)',
+		'Bash(git push *)',
+		'Bash(git pull *)',
+		'Bash(git fetch *)',
+		'Bash(git checkout *)',
+		'Bash(git reset *)',
+		'Bash(rm -rf *)',
+		'Read(./.env)',
+		'Read(./.env.*)',
+		'Read(./secrets/**)',
+		'Read(./config/credentials.json)',
+		'Read(//**/.env)',
+		'Read(~/.ssh/**)',
+		'Read(~/.aws/**)',
+		'Read(~/.config/**)',
+		'Read(~/.npmrc)',
+		'Read(~/.netrc)',
+		'Read(~/.claude/**)',
+		'Read(~/.codex/**)',
+		...(options.allowShell === true ? [] : ['Bash'])
+	];
+	const settings = {
+		$schema: 'https://json.schemastore.org/claude-code-settings.json',
+		autoMemoryEnabled: false,
+		claudeMdExcludes: ['**/CLAUDE.md', '**/CLAUDE.local.md'],
+		disableAgentView: true,
+		disableAllHooks: true,
+		disableAutoMode: 'disable',
+		disableDeepLinkRegistration: 'disable',
+		disableRemoteControl: true,
+		disableSkillShellExecution: true,
+		enableAllProjectMcpServers: false,
+		feedbackSurveyRate: 0,
+		includeGitInstructions: false,
+		env: CLAUDE_HARDENED_ENV,
+		permissions: {
+			defaultMode: 'dontAsk',
+			disableBypassPermissionsMode: 'disable',
+			allow,
+			deny
+		},
+		sandbox: {
+			enabled: options.allowShell === true,
+			failIfUnavailable: options.allowShell === true,
+			autoAllowBashIfSandboxed: true,
+			allowUnsandboxedCommands: false,
+			filesystem: {
+				allowRead: ['.'],
+				allowWrite: ['.'],
+				denyRead: [
+					'~/.ssh/**',
+					'~/.aws/**',
+					'~/.config/**',
+					'~/.npmrc',
+					'~/.netrc',
+					'~/.claude/**',
+					'~/.codex/**'
+				]
+			},
+			network: {
+				allowLocalBinding: false,
+				allowedDomains: [],
+				deniedDomains: ['*']
+			}
+		}
+	};
+
+	writeFileSync(settingsPath, JSON.stringify(settings, null, 2) + '\n');
+	return settingsPath;
+}
+
+function prepareClaudeConfigDir(): string | null {
+	if (!truthyEnv(CLAUDE_ISOLATED_CONFIG_ENV)) return null;
+	if (!CLAUDE_AUTH_ENV_NAMES.some((name) => process.env[name])) {
+		throw new Error(
+			`${CLAUDE_ISOLATED_CONFIG_ENV}=1 requires API/token auth in one of: ${CLAUDE_AUTH_ENV_NAMES.join(', ')}`
+		);
+	}
+	return mkdtempSync(resolve(tmpdir(), 'dryui-e2e-claude-home-'));
+}
+
+function buildClaudeEnv(options: {
+	readonly configDir: string | null;
+	readonly tmpDir: string;
+}): NodeJS.ProcessEnv {
+	return {
+		...process.env,
+		...CLAUDE_HARDENED_ENV,
+		CLAUDE_CODE_TMPDIR: options.tmpDir,
+		...(options.configDir ? { CLAUDE_CONFIG_DIR: options.configDir } : {})
+	};
+}
+
+function canUseClaudeBareMode(): boolean {
+	return Boolean(process.env.ANTHROPIC_API_KEY);
 }
 
 function killProcessGroup(child: ReturnType<typeof spawn>, signal: NodeJS.Signals): void {
@@ -320,6 +536,7 @@ export async function runCodexExec(options: CodexRunOptions): Promise<CodexRunRe
 		'--sandbox',
 		'workspace-write',
 		'--skip-git-repo-check',
+		'--ignore-rules',
 		'--json',
 		'--ephemeral',
 		'--output-last-message',
@@ -333,7 +550,11 @@ export async function runCodexExec(options: CodexRunOptions): Promise<CodexRunRe
 	if (options.effort && options.effort !== 'auto') {
 		args.push('--config', `model_reasoning_effort=${tomlString(options.effort)}`);
 	}
+	for (const imagePath of options.promptImages ?? []) {
+		args.push('--image', resolve(imagePath));
+	}
 	args.push(
+		'--',
 		withGeneratedProjectSkillPrompt(
 			options.prompt,
 			CODEX_GENERATED_PROJECT_PREFIX,
@@ -455,8 +676,15 @@ export async function runClaudeExec(options: CodexRunOptions): Promise<CodexRunR
 	if (logDir) mkdirSync(logDir, { recursive: true });
 	const transcriptPath = logDir ? resolve(logDir, 'codex-transcript.jsonl') : null;
 	const lastMessagePath = logDir ? resolve(logDir, 'codex-last-message.txt') : null;
-	const mcpConfigPath =
-		options.useLocalFeedbackMcp === false ? null : prepareClaudeMcpConfig(options.feedbackBaseUrl);
+	const includeFeedbackMcp = options.useLocalFeedbackMcp !== false;
+	const claudeConfigDir = prepareClaudeConfigDir();
+	const claudeTmpDir = mkdtempSync(resolve(tmpdir(), 'dryui-e2e-claude-tmp-'));
+	const mcpConfigPath = includeFeedbackMcp ? prepareClaudeMcpConfig(options.feedbackBaseUrl) : null;
+	const settingsPath = prepareClaudeSettings({
+		allowShell: options.allowShell,
+		includeFeedbackMcp
+	});
+	const useBareMode = claudeConfigDir !== null && canUseClaudeBareMode();
 	const prompt =
 		options.allowShell === true
 			? options.prompt
@@ -465,24 +693,68 @@ export async function runClaudeExec(options: CodexRunOptions): Promise<CodexRunR
 					CLAUDE_GENERATED_PROJECT_PREFIX,
 					options.allowShell
 				);
+	const builtInTools =
+		options.allowShell === true ? 'Read,Write,Edit,Bash,Glob,Grep' : 'Read,Write,Edit,Glob,Grep';
+	const allowedTools = [
+		'Read',
+		'Write',
+		'Edit',
+		'Glob',
+		'Grep',
+		...(includeFeedbackMcp ? ['mcp__dryui-feedback__*'] : []),
+		...(options.allowShell === true
+			? [
+					'Bash(bun run *)',
+					'Bash(bun --version)',
+					'Bash(node --version)',
+					'Bash(git status *)',
+					'Bash(git diff *)'
+				]
+			: [])
+	].join(',');
 
 	const args = [
+		...(useBareMode ? ['--bare'] : []),
 		'-p',
 		'--verbose',
 		'--output-format',
 		'stream-json',
+		'--settings',
+		settingsPath,
+		'--setting-sources',
+		'project,local',
+		'--no-chrome',
 		'--permission-mode',
-		options.permissionMode ?? 'bypassPermissions',
+		options.permissionMode ?? 'dontAsk',
 		'--model',
 		options.model ?? 'sonnet',
 		'--no-session-persistence',
 		'--tools',
-		options.allowShell === true ? 'Read,Write,Edit,Bash,Glob,Grep' : 'Read,Write,Edit,Glob,Grep',
+		builtInTools,
+		'--allowedTools',
+		allowedTools,
 		'--disallowedTools',
+		'Agent',
+		'WebFetch',
+		'WebSearch',
 		'Read(*node_modules*)',
+		'Read(~/.ssh/**)',
+		'Read(~/.aws/**)',
+		'Read(~/.config/**)',
+		'Read(~/.claude/**)',
+		'Read(~/.codex/**)',
 		'Bash(*node_modules*)',
 		'Bash(*reports/e2e-tarballs*)',
 		'Bash(tar *)',
+		'Bash(curl *)',
+		'Bash(wget *)',
+		'Bash(nc *)',
+		'Bash(ssh *)',
+		'Bash(open *)',
+		'Bash(osascript *)',
+		'Bash(git push *)',
+		'Bash(git pull *)',
+		'Bash(git fetch *)',
 		'Glob(*node_modules*)',
 		'Grep(*node_modules*)',
 		'--append-system-prompt',
@@ -517,10 +789,7 @@ export async function runClaudeExec(options: CodexRunOptions): Promise<CodexRunR
 		const child = spawn('claude', args, {
 			cwd: options.projectDir,
 			stdio: ['ignore', 'pipe', 'pipe'],
-			env: {
-				...process.env,
-				FORCE_COLOR: '0'
-			},
+			env: buildClaudeEnv({ configDir: claudeConfigDir, tmpDir: claudeTmpDir }),
 			detached: true
 		});
 
@@ -597,6 +866,17 @@ export async function runClaudeExec(options: CodexRunOptions): Promise<CodexRunR
 					rmSync(dirname(mcpConfigPath), { recursive: true, force: true });
 				} catch {}
 			}
+			try {
+				rmSync(dirname(settingsPath), { recursive: true, force: true });
+			} catch {}
+			if (claudeConfigDir) {
+				try {
+					rmSync(claudeConfigDir, { recursive: true, force: true });
+				} catch {}
+			}
+			try {
+				rmSync(claudeTmpDir, { recursive: true, force: true });
+			} catch {}
 
 			resolvePromise({
 				backend: 'claude',

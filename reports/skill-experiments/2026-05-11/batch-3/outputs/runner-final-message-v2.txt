@@ -1,0 +1,3 @@
+Done. I wrote the report to [merged-best-v2.md](/Users/robertbalfre/dryui/reports/skill-experiments/2026-05-11/batch-3/outputs/merged-best-v2.md).
+
+It includes all seven requested sections, verified component APIs before naming them, applies the snippet integrity gate, and only adds the requested output report file. No production app/package/docs/canonical skill files were edited.

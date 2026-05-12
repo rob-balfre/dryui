@@ -1,0 +1,704 @@
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { basename, resolve } from 'node:path';
+import { chromium, type Browser } from 'playwright';
+import { formatScenarioResult, runScenario } from '../../../../scripts/e2e/scenario-harness.ts';
+
+const root = resolve(import.meta.dir, '../../../..');
+const batch = resolve(root, 'reports/skill-experiments/2026-05-11/batch-8');
+const refs = resolve(root, 'reports/skill-experiments/2026-05-11/batch-5/design-references');
+const shotsDir = resolve(batch, 'screenshots-pass15');
+mkdirSync(shotsDir, { recursive: true });
+const runLabel = 'stage123-pass15';
+
+const variants = [
+	{ id: 'v25a-crm-density-guard', skill: resolve(batch, 'v25a-crm-density-guard/SKILL.md') }
+];
+
+const cases = [
+	{ id: 'analytics', image: resolve(refs, 'analytics-dashboard.png') },
+	{ id: 'settings', image: resolve(refs, 'settings-admin.png') },
+	{ id: 'crm', image: resolve(refs, 'crm-pipeline.png') },
+	{ id: 'kanban', image: resolve(refs, 'project-kanban.png') },
+	{ id: 'knowledge', image: resolve(refs, 'ai-knowledge.png') }
+];
+
+const viewports = [
+	{ id: 'mobile', width: 390, height: 844 },
+	{ id: 'tablet', width: 820, height: 1000 },
+	{ id: 'desktop', width: 1440, height: 1000 }
+];
+
+const assertions = [
+	{ kind: 'file-exists' as const, path: 'src/routes/+page.svelte' },
+	{ kind: 'file-exists' as const, path: 'src/layout.css' },
+	{
+		kind: 'file-contains' as const,
+		path: 'src/layout.css',
+		needle: 'container: page / inline-size'
+	},
+	{
+		kind: 'file-matches' as const,
+		path: 'src/layout.css',
+		regex: '@container\\s+page\\s+\\(min-width:\\s*48rem\\)'
+	},
+	{
+		kind: 'file-matches' as const,
+		path: 'src/layout.css',
+		regex: '@container\\s+page\\s+\\(min-width:\\s*72rem\\)'
+	},
+	{ kind: 'file-contains' as const, path: 'src/layout.css', needle: 'grid-template-areas' },
+	{ kind: 'file-contains' as const, path: 'src/routes/+page.svelte', needle: '@dryui/ui' },
+	{
+		kind: 'file-matches' as const,
+		path: 'src/routes/+page.svelte',
+		regex: 'data-layout="[a-z0-9-]+-shell"'
+	},
+	{
+		kind: 'file-matches' as const,
+		path: 'src/routes/+page.svelte',
+		regex: 'data-layout-area="page"'
+	},
+	{
+		kind: 'file-matches' as const,
+		path: 'src/routes/+page.svelte',
+		regex: 'data-layout-area="primary"'
+	},
+	{
+		kind: 'file-matches' as const,
+		path: 'src/routes/+page.svelte',
+		regex: 'data-layout-area="(topbar|navigation)"'
+	}
+];
+
+interface SourceAudit {
+	readonly failures: string[];
+	readonly dryuiComponents: string[];
+	readonly visibleWords: number;
+}
+
+interface ViewportAudit {
+	readonly viewport: string;
+	readonly screenshot: string;
+	readonly horizontalOverflow: number;
+	readonly shellWidthRatio: number;
+	readonly shellTop: number;
+	readonly primaryLargest: boolean;
+	readonly lowContrastRatio: number;
+	readonly scrollHeight: number;
+}
+
+interface ExperimentSummary {
+	readonly variant: string;
+	readonly case: string;
+	readonly ok: boolean;
+	readonly score: number;
+	readonly formalOk: boolean;
+	readonly auditOk: boolean;
+	readonly visualOk: boolean;
+	readonly projectDir: string;
+	readonly logDir: string;
+	readonly devServer: { url: string; pid: number } | null;
+	readonly agentSeconds: number | null;
+	readonly source: SourceAudit;
+	readonly visual: ViewportAudit[];
+	readonly assertionFailures: readonly string[];
+}
+
+function routeStyleBlocks(page: string): string {
+	return [...page.matchAll(/<style(?:\s[^>]*)?>([\s\S]*?)<\/style>/gi)]
+		.map((match) => match[1])
+		.join('\n');
+}
+
+function routeMarkup(page: string): string {
+	return page
+		.replace(/<script(?:\s[^>]*)?>[\s\S]*?<\/script>/gi, '')
+		.replace(/<style(?:\s[^>]*)?>[\s\S]*?<\/style>/gi, '');
+}
+
+function visibleWordCount(markup: string): number {
+	return (
+		markup
+			.replace(/<[^>]+>/g, ' ')
+			.replace(/[{}()[\].,;:'"`/\\|+=*_<>-]/g, ' ')
+			.toLowerCase()
+			.match(/[a-z][a-z0-9]+/g) ?? []
+	).length;
+}
+
+function countMatches(input: string, regex: RegExp): number {
+	return [...input.matchAll(regex)].length;
+}
+
+function importedDryuiComponents(page: string): string[] {
+	const components: string[] = [];
+	for (const match of page.matchAll(
+		/import\s*{([^}]+)}\s*from\s*['"]@dryui\/ui(?:\/[^'"]+)?['"]/g
+	)) {
+		components.push(
+			...match[1]
+				.split(',')
+				.map((part) =>
+					part
+						.trim()
+						.split(/\s+as\s+/i)[0]
+						?.trim()
+				)
+				.filter(Boolean)
+		);
+	}
+	for (const match of page.matchAll(
+		/import\s+([A-Z][A-Za-z0-9]*)\s+from\s*['"]@dryui\/ui\/[^'"]+['"]/g
+	)) {
+		components.push(match[1]);
+	}
+	return [...new Set(components)];
+}
+
+function sourceAudit(projectDir: string): SourceAudit {
+	const failures: string[] = [];
+	const pagePath = resolve(projectDir, 'src/routes/+page.svelte');
+	const layoutPath = resolve(projectDir, 'src/layout.css');
+	const appPath = resolve(projectDir, 'src/app.css');
+	const page = existsSync(pagePath) ? readFileSync(pagePath, 'utf8') : '';
+	const layout = existsSync(layoutPath) ? readFileSync(layoutPath, 'utf8') : '';
+	const app = existsSync(appPath) ? readFileSync(appPath, 'utf8') : '';
+	const routeStyle = routeStyleBlocks(page);
+	const markup = routeMarkup(page);
+	const visibleWords = visibleWordCount(markup);
+	const combined = `${page}\n${layout}\n${app}`;
+	const dryuiComponents = importedDryuiComponents(page);
+
+	if (!/from\s*['"]@dryui\/ui(?:\/[^'"]+)?['"]/.test(page))
+		failures.push('missing @dryui/ui import');
+	if (dryuiComponents.length < 3)
+		failures.push(`too few DryUI imports (${dryuiComponents.length})`);
+	if (visibleWords < 35) failures.push(`too little real visible content (${visibleWords} words)`);
+	if (/<style(?:\s[^>]*)?>/i.test(page)) failures.push('route <style> block');
+
+	const forbiddenAll = [
+		[/@media\b/i, '@media layout breakpoint'],
+		[/\sstyle\s*=/i, 'inline style attribute'],
+		[/\sstyle:/i, 'Svelte style directive'],
+		[/:global\(/i, ':global selector'],
+		[/!important/i, '!important'],
+		[/<\s*(button|input|select|textarea|form|table)\b/, 'raw native control/table']
+	] as const;
+
+	for (const [regex, label] of forbiddenAll) {
+		if (regex.test(combined)) failures.push(label);
+	}
+
+	const dryuiWithClass =
+		/<\s*(Button|Input|Badge|Separator|Table\.[A-Za-z]+|Tabs\.[A-Za-z]+)\b[^>]*(\sclass\s*=|\sclass:)/;
+	if (dryuiWithClass.test(page)) failures.push('class prop/directive on DryUI component');
+	if (/from\s*['"]@dryui\/ui\/table['"]/.test(page) || /<\s*Table(?:\s|>|\\.)/.test(page)) {
+		failures.push('Table import/use can pass build but fail at runtime');
+	}
+
+	const forbiddenRouteStyle = [
+		[/display\s*:/i, 'display in route style'],
+		[/grid-(template|area|column|row|auto|gap)\s*:/i, 'grid layout in route style'],
+		[/flex(-direction|-wrap|-basis|-grow|-shrink)?\s*:/i, 'flex layout in route style'],
+		[/container\s*:/i, 'container in route style'],
+		[/@container\b/i, '@container in route style']
+	] as const;
+
+	for (const [regex, label] of forbiddenRouteStyle) {
+		if (regex.test(routeStyle)) failures.push(label);
+	}
+
+	const forbiddenAppLayout = [
+		[/display\s*:\s*(grid|flex)\b/i, 'display grid/flex in app.css'],
+		[/grid-(template|area|column|row|auto|gap)\s*:/i, 'grid layout in app.css'],
+		[/flex(-direction|-wrap|-basis|-grow|-shrink)?\s*:/i, 'flex layout in app.css'],
+		[/(justify|align|place)-(content|items|self)\s*:/i, 'alignment layout in app.css'],
+		[/(^|[{\s;])(row-|column-)?gap\s*:/i, 'gap layout in app.css'],
+		[/(^|[{\s;])order\s*:/i, 'order layout in app.css'],
+		[/(^|[{\s;])position\s*:/i, 'position layout in app.css'],
+		[/(^|[{\s;])(inset|top|right|bottom|left)\s*:/i, 'offset layout in app.css'],
+		[/(^|[{\s;])float\s*:/i, 'float layout in app.css'],
+		[/container\s*:/i, 'container in app.css'],
+		[/@container\b/i, '@container in app.css']
+	] as const;
+
+	for (const [regex, label] of forbiddenAppLayout) {
+		if (regex.test(app)) failures.push(label);
+	}
+
+	const appWithoutAllowedDefensiveSize = app.replace(
+		/\[data-layout-area='primary'\][\s\S]*?\[data-layout='toolbar-cluster'\]\s*\{[\s\S]*?\}/g,
+		''
+	);
+	if (
+		/(^|[{\s;])(?:min-|max-)?(?:inline-size|block-size)\s*:/i.test(appWithoutAllowedDefensiveSize)
+	) {
+		failures.push('size layout outside defensive wrapper group in app.css');
+	}
+
+	const forbiddenAppElementSelectors =
+		/(^|,|\})\s*(button|input|textarea|select|svg|h1|h2|h3|p|a|span|div|section|article|ul|li|main)\b/im;
+	if (forbiddenAppElementSelectors.test(app)) failures.push('element selector in app.css');
+
+	const forbiddenLayoutLintTrips = [
+		[
+			/display\s*:\s*(none|block|contents|inline-flex|inline-block)\b/i,
+			'invalid display in layout.css'
+		],
+		[/(^|[{\s;])(?:min-|max-)?inline-size\s*:/i, 'inline-size in layout.css'],
+		[/(^|[{\s;])width\s*:/i, 'width in layout.css'],
+		[/position\s*:/i, 'position in layout.css'],
+		[/\[data-ui/i, 'data-ui selector in layout.css'],
+		[/:(first-child|last-child|nth-child|not|is|where)\b/i, 'pseudo selector in layout.css'],
+		[/(^|,|\})\s*(span|button|p|div|section|article|ul|li)\b/im, 'element selector in layout.css']
+	] as const;
+
+	for (const [regex, label] of forbiddenLayoutLintTrips) {
+		if (regex.test(layout)) failures.push(label);
+	}
+
+	if (!/container:\s*page\s*\/\s*inline-size/i.test(layout)) {
+		failures.push('missing exact page container');
+	}
+	for (const width of ['48rem', '72rem']) {
+		const query = new RegExp(`@container\\s+page\\s+\\(min-width:\\s*${width}\\)`, 'i');
+		if (!query.test(layout)) failures.push(`missing exact ${width} page query`);
+	}
+
+	const primitiveArea = /<\s*(span|p|article|li|small|strong|div)\b[^>]*data-layout-area=/i;
+	if (primitiveArea.test(markup.replace(/<div\s+data-layout-area=["']page["'][^>]*>/, ''))) {
+		failures.push('nested primitive data-layout-area');
+	}
+
+	for (const area of [
+		'primary',
+		'topbar',
+		'navigation',
+		'secondary',
+		'utility',
+		'summary',
+		'actions',
+		'rail'
+	]) {
+		const count = countMatches(markup, new RegExp(`data-layout-area=["']${area}["']`, 'g'));
+		if (count > 1) failures.push(`duplicate shell area ${area}`);
+	}
+
+	const broadAreaSelector =
+		/\[data-layout=['"][^'"]+-shell['"]\]\s+\[data-layout-area=['"](rail|topbar|navigation|summary|primary|secondary|utility|actions)['"]\]/;
+	if (broadAreaSelector.test(layout)) failures.push('broad descendant shell-area selector');
+
+	return { failures, dryuiComponents, visibleWords };
+}
+
+async function visualAudit(
+	browser: Browser,
+	url: string,
+	variant: string,
+	caseId: string
+): Promise<ViewportAudit[]> {
+	const audits: ViewportAudit[] = [];
+	for (const viewport of viewports) {
+		const page = await browser.newPage({
+			viewport: { width: viewport.width, height: viewport.height },
+			deviceScaleFactor: 1
+		});
+		await page.emulateMedia({ colorScheme: 'light' });
+		const response = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 20_000 });
+		const status = response?.status() ?? 200;
+		if (status >= 400) {
+			throw new Error(`${viewport.id} returned HTTP ${status}`);
+		}
+		await page.waitForTimeout(600);
+		const screenshot = resolve(shotsDir, `${variant}-${caseId}-${viewport.id}.png`);
+		await page.screenshot({ path: screenshot, fullPage: true });
+		const metrics = await page.evaluate(() => {
+			function parseRgb(value: string): [number, number, number, number] | null {
+				const match = value.match(/rgba?\(([^)]+)\)/);
+				if (!match) return null;
+				const parts = match[1].split(',').map((part) => Number.parseFloat(part.trim()));
+				if (parts.length < 3) return null;
+				return [parts[0], parts[1], parts[2], parts[3] ?? 1];
+			}
+
+			function luminance(rgb: [number, number, number, number]): number {
+				const [r, g, b] = rgb.slice(0, 3).map((channel) => {
+					const value = channel / 255;
+					return value <= 0.03928 ? value / 12.92 : Math.pow((value + 0.055) / 1.055, 2.4);
+				});
+				return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+			}
+
+			function contrast(
+				fg: [number, number, number, number],
+				bg: [number, number, number, number]
+			): number {
+				const a = luminance(fg);
+				const b = luminance(bg);
+				return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+			}
+
+			function backgroundFor(element: Element): [number, number, number, number] {
+				let current: Element | null = element;
+				while (current) {
+					const parsed = parseRgb(getComputedStyle(current).backgroundColor);
+					if (parsed && parsed[3] > 0.05) return parsed;
+					current = current.parentElement;
+				}
+				return [255, 255, 255, 1];
+			}
+
+			const shell = document.querySelector('[data-layout$="-shell"]') ?? document.body;
+			const shellRect = shell.getBoundingClientRect();
+			const body = document.body;
+			const root = document.documentElement;
+			const areas = [...document.querySelectorAll('[data-layout-area]')]
+				.filter((element) => element.getAttribute('data-layout-area') !== 'page')
+				.map((element) => {
+					const rect = element.getBoundingClientRect();
+					return {
+						area: element.getAttribute('data-layout-area') ?? '',
+						value: Math.max(0, rect.width) * Math.max(0, rect.height)
+					};
+				});
+			const primary = areas.find((area) => area.area === 'primary')?.value ?? 0;
+			const otherMax = Math.max(
+				0,
+				...areas.filter((area) => area.area !== 'primary').map((area) => area.value)
+			);
+			const textNodes = [...document.querySelectorAll('body *')].filter((element) => {
+				const text = element.textContent?.trim() ?? '';
+				const rect = element.getBoundingClientRect();
+				return text.length > 0 && rect.width > 0 && rect.height > 0;
+			});
+			let contrastChecks = 0;
+			let lowContrast = 0;
+			for (const element of textNodes) {
+				const style = getComputedStyle(element);
+				const fg = parseRgb(style.color);
+				if (!fg) continue;
+				contrastChecks += 1;
+				if (contrast(fg, backgroundFor(element)) < 4.2) lowContrast += 1;
+			}
+			return {
+				horizontalOverflow: Math.max(0, root.scrollWidth - window.innerWidth),
+				shellWidthRatio: shellRect.width / window.innerWidth,
+				shellTop: shellRect.top,
+				primaryLargest: primary >= otherMax * 0.9,
+				lowContrastRatio: contrastChecks === 0 ? 0 : lowContrast / contrastChecks,
+				scrollHeight: Math.max(body.scrollHeight, root.scrollHeight)
+			};
+		});
+		await page.close();
+		audits.push({
+			viewport: viewport.id,
+			screenshot,
+			...metrics
+		});
+	}
+	return audits;
+}
+
+function scoreExperiment(
+	summary: Omit<ExperimentSummary, 'score' | 'ok' | 'visualOk' | 'auditOk'>
+): {
+	score: number;
+	auditOk: boolean;
+	visualOk: boolean;
+	ok: boolean;
+} {
+	let score = 100;
+	score -= summary.assertionFailures.length * 8;
+	score -= summary.source.failures.length * 7;
+	if (!summary.formalOk) score -= 20;
+
+	const visualFailures: string[] = [];
+	for (const viewport of summary.visual) {
+		if (viewport.horizontalOverflow > 2) {
+			score -= 10;
+			visualFailures.push(`${viewport.viewport} overflow`);
+		}
+		if (viewport.lowContrastRatio > 0.08) {
+			score -= 8;
+			visualFailures.push(`${viewport.viewport} contrast`);
+		}
+		if (viewport.shellTop > 24) {
+			score -= 4;
+			visualFailures.push(`${viewport.viewport} delayed shell`);
+		}
+		if (viewport.viewport !== 'mobile' && viewport.shellWidthRatio < 0.78) {
+			score -= 7;
+			visualFailures.push(`${viewport.viewport} narrow shell`);
+		}
+		if (viewport.viewport === 'desktop' && !viewport.primaryLargest) {
+			score -= 8;
+			visualFailures.push('desktop primary not dominant');
+		}
+		if (viewport.viewport === 'mobile' && viewport.scrollHeight > 2800) {
+			score -= 5;
+			visualFailures.push('mobile overlong');
+		}
+	}
+	const auditOk = summary.source.failures.length === 0;
+	const visualOk = visualFailures.length === 0;
+	const ok = summary.formalOk && auditOk && visualOk;
+	return { score: Math.max(0, Math.round(score)), auditOk, visualOk, ok };
+}
+
+function scenarioFor(variantId: string, testCase: (typeof cases)[number]) {
+	return {
+		name: `stage123-${variantId}-${testCase.id}`,
+		promptImages: [testCase.image],
+		prompt: [
+			'Use the supplied web-app design image as the reference.',
+			'Build a finished DryUI web app page with the mobile-density plus preview-guard fixture skill.',
+			'Complete all three stages: classify the page recipe, implement real DryUI content, then build and repair once if needed.',
+			'Keep the fixed page container-query contract exactly: container: page / inline-size, then @container page (min-width: 48rem) and @container page (min-width: 72rem).',
+			'Copy the skill src/layout.css fixture exactly, including mobile order topbar, navigation, primary, secondary. Do not invent new layout.css selector forms or structural properties.',
+			'Do not add any <style> block to src/routes/+page.svelte.',
+			'Put visual CSS only in src/app.css. Do not use display/grid/flex/container/@media, justify/align/place, gap, position, width, height, inline-size, block-size, or element selectors in src/app.css.',
+			'Do not use raw <p>, <span>, <strong>, <img>, <a>, <ul>, or <li>. Use DryUI Heading, Text, Image, Link, Button, Badge, Input, and Separator.',
+			'Do not import or use Table. Represent rows with data-layout=\"list-stack\" and Text/Badge/Button children because direct <Table> can build but fail at runtime.',
+			'Every raw structural element must have data-layout or data-layout-area, and every data-layout name must exist in the copied fixture.',
+			'Keep repeated content compact: up to 3 metrics, 3 list rows, 3 board columns, 1 card per board column, and 1 to 2 secondary panels.',
+			'Keep mobile density under control: target full mobile page height under 2800px, avoid awkward mid-word header wraps, and keep document/media previews compact.',
+			'For knowledge/document pages, use only 2 document rows, 2 key points, 2 source rows, and 1 compact media preview unless the reference cannot be represented without more.',
+			'For knowledge/document preview areas, do not use Image. Use a compact data-layout=\"preview-stack\" panel with Text, Badge, and Separator so the preview cannot become a tall image well.',
+			'For settings pages, use two primary panels and no more than two secondary panels; each secondary panel should have at most two rows.',
+			'Hard panel budget: after topbar and navigation, use no more than five top-level panels/cards total; a metric grid counts as one panel.',
+			'For knowledge and settings, prefer light navigation. If navigation is dark, all labels, icons, counts, and muted text on it must be #e5eefb or lighter.',
+			'For this experiment, use light navigation for all recipes. Do not use a dark navigation surface.',
+			'Paste the defensive min-inline-size/max-inline-size wrapper group exactly once in app.css and do not write min-inline-size, max-inline-size, inline-size, block-size, width, or height anywhere else.',
+			'Do not style html or body > div in app.css. Do not set min-block-size anywhere in app.css. Body may use margin, background, color, font-family, and overflow-x only.',
+			'For dashboards and analytics, do not create tall decorative charts, huge pills, radial charts, canvas, SVG, or proportional fake chart bars. Use compact evidence panels or short list rows instead.',
+			'For image/document preview surfaces, use data-layout="preview-stack" and compact visual CSS with overflow: clip and aspect-ratio: 4 / 3; do not create tall portrait preview wells on mobile.',
+			'Prevent mobile overflow with app.css visual constraints such as overflow-x: clip, min-inline-size: 0, max-inline-size: 100%, and overflow-wrap: anywhere on panel-like surfaces.',
+			'Use high-contrast colors; muted text should still be readable. Keep navigation light.',
+			'Do not inspect node_modules unless bun run build fails with an import error. Use the safe imports listed in the skill.',
+			'The final page should be app-like, responsive at mobile/tablet/desktop, readable, and close to the reference shell.',
+			'During the agent step, run bun run build only. Do not run bun run dev, bun run check, or any long-running screenshot/browser server; the experiment harness does browser capture and visual scoring after you finish.'
+		].join('\n'),
+		assertions,
+		codexTimeoutMs: 300_000
+	};
+}
+
+const browser = await chromium.launch();
+const summaries: ExperimentSummary[] = [];
+
+try {
+	for (const variant of variants) {
+		process.env.DRYUI_E2E_DRYUI_BUILD_SKILL_OVERRIDE = variant.skill;
+		console.log(`[stage123-pass15] running ${variant.id} with ${variant.skill}`);
+		for (let index = 0; index < cases.length; index += 2) {
+			const group = cases.slice(index, index + 2);
+			const groupResults = await Promise.all(
+				group.map(async (testCase) => {
+					const result = await runScenario(scenarioFor(variant.id, testCase), {
+						keepProject: true,
+						verbose: false,
+						streamCodex: false,
+						useLocalFeedbackMcp: true,
+						visualFeedbackPass: false,
+						agentBackend: 'codex',
+						agentModel: 'gpt-5.5',
+						effort: 'low',
+						permissionMode: 'danger-full-access',
+						codexTimeoutMs: 300_000,
+						runLabel
+					});
+					const sourceBase = sourceAudit(result.projectDir);
+					let source = sourceBase;
+					let visual: ViewportAudit[] = [];
+					if (result.devServer?.url) {
+						try {
+							visual = await visualAudit(browser, result.devServer.url, variant.id, testCase.id);
+						} catch (err) {
+							source = {
+								...sourceBase,
+								failures: [
+									...sourceBase.failures,
+									`visual audit error: ${err instanceof Error ? err.message : String(err)}`
+								]
+							};
+						}
+					}
+					const partial = {
+						variant: variant.id,
+						case: testCase.id,
+						formalOk: result.ok,
+						projectDir: result.projectDir,
+						logDir: result.logDir,
+						devServer: result.devServer,
+						agentSeconds: result.phases.find((phase) => phase.name.startsWith('agent-'))?.durationMs
+							? Math.round(
+									result.phases.find((phase) => phase.name.startsWith('agent-'))!.durationMs / 100
+								) / 10
+							: null,
+						source,
+						visual,
+						assertionFailures: result.assertionFailures
+					};
+					const scored = scoreExperiment(partial);
+					const summary: ExperimentSummary = { ...partial, ...scored };
+					console.log(formatScenarioResult(result));
+					console.log(
+						`  stage123-score: ${summary.score}/100 (${summary.ok ? 'PASS' : 'CHECK'}) source=${source.failures.length ? source.failures.join('; ') : 'ok'}`
+					);
+					return summary;
+				})
+			);
+			summaries.push(...groupResults);
+			writeFileSync(
+				resolve(batch, 'pass15-summary.json'),
+				`${JSON.stringify(summaries, null, 2)}\n`
+			);
+		}
+	}
+} finally {
+	await browser.close();
+}
+
+summaries.sort((a, b) => b.score - a.score);
+writeFileSync(resolve(batch, 'pass15-summary.json'), `${JSON.stringify(summaries, null, 2)}\n`);
+
+const htmlPath = resolve(shotsDir, 'contact-sheet.html');
+const html = `<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Stage 123 Pass 14 Contact Sheet</title>
+	<style>
+		body {
+			margin: 0;
+			padding: 24px;
+			font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+			background: #f3f4f6;
+			color: #111827;
+		}
+		h1 {
+			margin: 0 0 6px;
+			font-size: 24px;
+		}
+		.note {
+			margin: 0 0 18px;
+			color: #4b5563;
+			font-size: 13px;
+		}
+		.run {
+			margin: 0 0 22px;
+			padding: 16px;
+			background: #fff;
+			border: 1px solid #d1d5db;
+			border-radius: 8px;
+		}
+		.title {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 10px;
+			align-items: baseline;
+			margin: 0 0 10px;
+			font-weight: 700;
+		}
+		.score {
+			padding: 3px 8px;
+			border-radius: 999px;
+			background: #111827;
+			color: #fff;
+			font-size: 12px;
+		}
+		.score.good { background: #047857; }
+		.score.warn { background: #b45309; }
+		.meta {
+			color: #4b5563;
+			font-size: 12px;
+			font-weight: 500;
+		}
+		.failures {
+			margin: -2px 0 12px;
+			color: #991b1b;
+			font-size: 12px;
+		}
+		.grid {
+			display: grid;
+			grid-template-columns: 390px 410px 720px;
+			gap: 12px;
+			align-items: start;
+		}
+		.shot {
+			margin: 0;
+			background: #e5e7eb;
+			border: 1px solid #cbd5e1;
+			overflow: visible;
+		}
+		.shot h2 {
+			margin: 0;
+			padding: 8px 10px;
+			background: #111827;
+			color: #fff;
+			font-size: 12px;
+		}
+		.shot img {
+			display: block;
+			width: 100%;
+			height: auto;
+		}
+	</style>
+</head>
+<body>
+	<h1>Stage 1 + 2 + 3 Pass 14</h1>
+	<p class="note">One mobile-density plus preview-guard fixture skill × five references. Full-page screenshots are scaled to fit; they are not cropped.</p>
+	${summaries
+		.map((entry) => {
+			const failures = [...entry.assertionFailures, ...entry.source.failures];
+			const scoreClass = entry.score >= 85 ? 'good' : entry.score >= 70 ? 'warn' : '';
+			return `<section class="run">
+		<p class="title">${entry.variant} / ${entry.case} <span class="score ${scoreClass}">${entry.score}/100</span> <span class="meta">${entry.devServer?.url ?? 'no dev server'}</span></p>
+		${failures.length ? `<p class="failures">${failures.join('<br>')}</p>` : ''}
+		<div class="grid">
+			${viewports
+				.map((viewport) => {
+					const shot = entry.visual.find((item) => item.viewport === viewport.id)?.screenshot;
+					return `<figure class="shot"><h2>${viewport.id} ${viewport.width}px</h2>${shot ? `<img src="file://${shot}" alt="${entry.variant} ${entry.case} ${viewport.id}">` : ''}</figure>`;
+				})
+				.join('')}
+		</div>
+	</section>`;
+		})
+		.join('\n')}
+</body>
+</html>`;
+
+writeFileSync(htmlPath, html);
+
+const sheetPath = resolve(shotsDir, 'contact-sheet.png');
+const sheetBrowser = await chromium.launch();
+try {
+	const page = await sheetBrowser.newPage({
+		viewport: { width: 1620, height: 1100 },
+		deviceScaleFactor: 1
+	});
+	await page.goto(`file://${htmlPath}`, { waitUntil: 'load' });
+	await page.screenshot({ path: sheetPath, fullPage: true });
+	await page.close();
+} finally {
+	await sheetBrowser.close();
+}
+
+writeFileSync(
+	resolve(shotsDir, 'captured.json'),
+	`${JSON.stringify(
+		summaries.map((entry) => ({
+			...entry,
+			visual: entry.visual.map((item) => ({
+				...item,
+				screenshot: basename(item.screenshot)
+			}))
+		})),
+		null,
+		2
+	)}\n`
+);
+
+console.log(`STAGE123_PASS15_SUMMARY ${JSON.stringify(summaries, null, 2)}`);
+console.log(`STAGE123_PASS15_CONTACT_SHEET ${sheetPath}`);

@@ -1,0 +1,386 @@
+[
+  {
+    "variant": "current-real-dryui-build",
+    "case": "analytics",
+    "formalOk": false,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-stage123-current-real-dryui-build-analytics-final-skill-eval-sQ90VG",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/stage123-current-real-dryui-build-analytics-final-skill-eval-1778533241079",
+    "devServer": null,
+    "agentSeconds": 300.3,
+    "source": {
+      "failures": [
+        "route <style> block",
+        "Table import/use can pass build but fail at runtime",
+        "display in route style",
+        "@container in route style",
+        "size layout outside defensive wrapper group in app.css",
+        "element selector in app.css",
+        "missing page inline-size container"
+      ],
+      "dryuiComponents": [
+        "Button",
+        "Heading",
+        "Input",
+        "Table"
+      ],
+      "visibleWords": 91
+    },
+    "visual": [],
+    "assertionFailures": [],
+    "score": 31,
+    "auditOk": false,
+    "visualOk": true,
+    "ok": false
+  },
+  {
+    "variant": "current-real-dryui-build",
+    "case": "settings",
+    "formalOk": false,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-stage123-current-real-dryui-build-settings-final-skill-eval-Ivm0ii",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/stage123-current-real-dryui-build-settings-final-skill-eval-1778533241082",
+    "devServer": null,
+    "agentSeconds": 302,
+    "source": {
+      "failures": [
+        "route <style> block",
+        "raw native control/table",
+        "@container in route style",
+        "size layout outside defensive wrapper group in app.css",
+        "element selector in app.css",
+        "missing page inline-size container",
+        "fewer than two page container breakpoints"
+      ],
+      "dryuiComponents": [
+        "Button",
+        "Field",
+        "Input",
+        "Label",
+        "Select"
+      ],
+      "visibleWords": 139
+    },
+    "visual": [],
+    "assertionFailures": [],
+    "score": 31,
+    "auditOk": false,
+    "visualOk": true,
+    "ok": false
+  },
+  {
+    "variant": "current-real-dryui-build",
+    "case": "crm",
+    "formalOk": false,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-stage123-current-real-dryui-build-crm-final-skill-eval-uE7SY7",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/stage123-current-real-dryui-build-crm-final-skill-eval-1778533546841",
+    "devServer": null,
+    "agentSeconds": 300.3,
+    "source": {
+      "failures": [
+        "route <style> block",
+        "raw native control/table",
+        "size layout outside defensive wrapper group in app.css",
+        "element selector in app.css",
+        "missing page inline-size container",
+        "fewer than two page container breakpoints"
+      ],
+      "dryuiComponents": [
+        "Badge",
+        "Button",
+        "Heading",
+        "Input"
+      ],
+      "visibleWords": 144
+    },
+    "visual": [],
+    "assertionFailures": [],
+    "score": 38,
+    "auditOk": false,
+    "visualOk": true,
+    "ok": false
+  },
+  {
+    "variant": "current-real-dryui-build",
+    "case": "kanban",
+    "formalOk": false,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-stage123-current-real-dryui-build-kanban-final-skill-eval-BAKJUz",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/stage123-current-real-dryui-build-kanban-final-skill-eval-1778533546842",
+    "devServer": null,
+    "agentSeconds": 302,
+    "source": {
+      "failures": [
+        "too few DryUI imports (1)",
+        "route <style> block",
+        ":global selector",
+        "raw native control/table",
+        "size layout outside defensive wrapper group in app.css",
+        "element selector in app.css",
+        "missing page inline-size container",
+        "fewer than two page container breakpoints"
+      ],
+      "dryuiComponents": [
+        "Button"
+      ],
+      "visibleWords": 194
+    },
+    "visual": [],
+    "assertionFailures": [],
+    "score": 24,
+    "auditOk": false,
+    "visualOk": true,
+    "ok": false
+  },
+  {
+    "variant": "current-real-dryui-build",
+    "case": "knowledge",
+    "formalOk": false,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-stage123-current-real-dryui-build-knowledge-final-skill-eval-yx25CD",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/stage123-current-real-dryui-build-knowledge-final-skill-eval-1778533852370",
+    "devServer": null,
+    "agentSeconds": 300.3,
+    "source": {
+      "failures": [
+        "route <style> block",
+        "raw native control/table",
+        "size layout outside defensive wrapper group in app.css",
+        "element selector in app.css",
+        "missing page inline-size container"
+      ],
+      "dryuiComponents": [
+        "Button",
+        "Input",
+        "Heading"
+      ],
+      "visibleWords": 195
+    },
+    "visual": [],
+    "assertionFailures": [],
+    "score": 45,
+    "auditOk": false,
+    "visualOk": true,
+    "ok": false
+  },
+  {
+    "variant": "current-real-dryui-build",
+    "case": "calendar-ops",
+    "formalOk": false,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-stage123-current-real-dryui-build-calendar-ops-final-skill-eval-Gooaz1",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/stage123-current-real-dryui-build-calendar-ops-final-skill-eval-1778533852371",
+    "devServer": {
+      "url": "http://127.0.0.1:59323/",
+      "pid": 1315
+    },
+    "agentSeconds": 228.8,
+    "source": {
+      "failures": [
+        "too few DryUI imports (2)",
+        "route <style> block",
+        "size layout outside defensive wrapper group in app.css",
+        "element selector in app.css",
+        "missing page inline-size container"
+      ],
+      "dryuiComponents": [
+        "Badge",
+        "Button"
+      ],
+      "visibleWords": 69
+    },
+    "visual": [
+      {
+        "viewport": "mobile",
+        "screenshot": "/Users/robertbalfre/dryui/reports/skill-experiments/2026-05-12/final-eval/screenshots/current-real-dryui-build-calendar-ops-mobile.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0,
+        "scrollHeight": 1759
+      },
+      {
+        "viewport": "tablet",
+        "screenshot": "/Users/robertbalfre/dryui/reports/skill-experiments/2026-05-12/final-eval/screenshots/current-real-dryui-build-calendar-ops-tablet.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0,
+        "scrollHeight": 1300
+      },
+      {
+        "viewport": "desktop",
+        "screenshot": "/Users/robertbalfre/dryui/reports/skill-experiments/2026-05-12/final-eval/screenshots/current-real-dryui-build-calendar-ops-desktop.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0,
+        "scrollHeight": 1000
+      }
+    ],
+    "assertionFailures": [
+      "file-contains: src/layout.css missing \"container: page / inline-size\"",
+      "file-contains: src/layout.css missing \"grid-template-areas\"",
+      "file-matches: src/routes/+page.svelte failed /data-layout=\"[a-z0-9-]+-shell\"/i",
+      "file-matches: src/routes/+page.svelte failed /data-layout-area=\"page\"/i",
+      "file-matches: src/routes/+page.svelte failed /data-layout-area=\"primary\"/i",
+      "file-matches: src/routes/+page.svelte failed /data-layout-area=\"(topbar|navigation)\"/i"
+    ],
+    "score": 0,
+    "auditOk": false,
+    "visualOk": true,
+    "ok": false
+  },
+  {
+    "variant": "current-real-dryui-build",
+    "case": "inventory-admin",
+    "formalOk": false,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-stage123-current-real-dryui-build-inventory-admin-final-skill-eval-mbYyog",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/stage123-current-real-dryui-build-inventory-admin-final-skill-eval-1778534156360",
+    "devServer": null,
+    "agentSeconds": 300.3,
+    "source": {
+      "failures": [
+        "route <style> block",
+        "size layout outside defensive wrapper group in app.css",
+        "element selector in app.css"
+      ],
+      "dryuiComponents": [
+        "Button",
+        "Heading",
+        "Text"
+      ],
+      "visibleWords": 59
+    },
+    "visual": [],
+    "assertionFailures": [],
+    "score": 59,
+    "auditOk": false,
+    "visualOk": true,
+    "ok": false
+  },
+  {
+    "variant": "current-real-dryui-build",
+    "case": "support-inbox",
+    "formalOk": false,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-stage123-current-real-dryui-build-support-inbox-final-skill-eval-RFgkyT",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/stage123-current-real-dryui-build-support-inbox-final-skill-eval-1778534156361",
+    "devServer": null,
+    "agentSeconds": 302,
+    "source": {
+      "failures": [
+        "route <style> block",
+        "size layout outside defensive wrapper group in app.css",
+        "element selector in app.css",
+        "nested primitive data-layout-area"
+      ],
+      "dryuiComponents": [
+        "Button",
+        "Heading",
+        "Text"
+      ],
+      "visibleWords": 47
+    },
+    "visual": [],
+    "assertionFailures": [],
+    "score": 52,
+    "auditOk": false,
+    "visualOk": true,
+    "ok": false
+  },
+  {
+    "variant": "current-real-dryui-build",
+    "case": "finance-planning",
+    "formalOk": false,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-stage123-current-real-dryui-build-finance-planning-final-skill-eval-ZCfDJO",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/stage123-current-real-dryui-build-finance-planning-final-skill-eval-1778534462020",
+    "devServer": null,
+    "agentSeconds": 300.3,
+    "source": {
+      "failures": [
+        "too few DryUI imports (2)",
+        "route <style> block",
+        "size layout outside defensive wrapper group in app.css",
+        "element selector in app.css"
+      ],
+      "dryuiComponents": [
+        "Button",
+        "Heading"
+      ],
+      "visibleWords": 54
+    },
+    "visual": [],
+    "assertionFailures": [],
+    "score": 52,
+    "auditOk": false,
+    "visualOk": true,
+    "ok": false
+  },
+  {
+    "variant": "current-real-dryui-build",
+    "case": "course-portal",
+    "formalOk": false,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-stage123-current-real-dryui-build-course-portal-final-skill-eval-VZZtFN",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/stage123-current-real-dryui-build-course-portal-final-skill-eval-1778534462022",
+    "devServer": {
+      "url": "http://127.0.0.1:59982/",
+      "pid": 33846
+    },
+    "agentSeconds": 262.2,
+    "source": {
+      "failures": [
+        "route <style> block",
+        "size layout outside defensive wrapper group in app.css",
+        "element selector in app.css",
+        "missing page inline-size container"
+      ],
+      "dryuiComponents": [
+        "Button",
+        "Heading",
+        "Text"
+      ],
+      "visibleWords": 47
+    },
+    "visual": [
+      {
+        "viewport": "mobile",
+        "screenshot": "/Users/robertbalfre/dryui/reports/skill-experiments/2026-05-12/final-eval/screenshots/current-real-dryui-build-course-portal-mobile.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": false,
+        "lowContrastRatio": 0.15384615384615385,
+        "scrollHeight": 1964
+      },
+      {
+        "viewport": "tablet",
+        "screenshot": "/Users/robertbalfre/dryui/reports/skill-experiments/2026-05-12/final-eval/screenshots/current-real-dryui-build-course-portal-tablet.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": false,
+        "lowContrastRatio": 0.15384615384615385,
+        "scrollHeight": 1589
+      },
+      {
+        "viewport": "desktop",
+        "screenshot": "/Users/robertbalfre/dryui/reports/skill-experiments/2026-05-12/final-eval/screenshots/current-real-dryui-build-course-portal-desktop.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": false,
+        "lowContrastRatio": 0.15384615384615385,
+        "scrollHeight": 1000
+      }
+    ],
+    "assertionFailures": [
+      "file-contains: src/layout.css missing \"container: page / inline-size\"",
+      "file-contains: src/layout.css missing \"grid-template-areas\"",
+      "file-matches: src/routes/+page.svelte failed /data-layout-area=\"page\"/i",
+      "file-matches: src/routes/+page.svelte failed /data-layout-area=\"primary\"/i",
+      "file-matches: src/routes/+page.svelte failed /data-layout-area=\"(topbar|navigation)\"/i"
+    ],
+    "score": 0,
+    "auditOk": false,
+    "visualOk": false,
+    "ok": false
+  }
+]

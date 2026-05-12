@@ -1,0 +1,125 @@
+[
+  {
+    "variant": "v25a-crm-density-guard",
+    "case": "analytics",
+    "formalOk": true,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-stage123-v25a-crm-density-guard-analytics-stage123-pass15-Y0houR",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/stage123-v25a-crm-density-guard-analytics-stage123-pass15-1778483531248",
+    "devServer": {
+      "url": "http://127.0.0.1:54008/",
+      "pid": 17444
+    },
+    "agentSeconds": 125.2,
+    "source": {
+      "failures": [],
+      "dryuiComponents": [
+        "Badge",
+        "Button",
+        "Heading",
+        "Input",
+        "Separator",
+        "Text"
+      ],
+      "visibleWords": 62
+    },
+    "visual": [
+      {
+        "viewport": "mobile",
+        "screenshot": "/Users/robertbalfre/dryui/reports/skill-experiments/2026-05-11/batch-8/screenshots-pass15/v25a-crm-density-guard-analytics-mobile.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.1917808219178082,
+        "scrollHeight": 1919
+      },
+      {
+        "viewport": "tablet",
+        "screenshot": "/Users/robertbalfre/dryui/reports/skill-experiments/2026-05-11/batch-8/screenshots-pass15/v25a-crm-density-guard-analytics-tablet.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.1917808219178082,
+        "scrollHeight": 1073
+      },
+      {
+        "viewport": "desktop",
+        "screenshot": "/Users/robertbalfre/dryui/reports/skill-experiments/2026-05-11/batch-8/screenshots-pass15/v25a-crm-density-guard-analytics-desktop.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.1917808219178082,
+        "scrollHeight": 1271
+      }
+    ],
+    "assertionFailures": [],
+    "score": 76,
+    "auditOk": true,
+    "visualOk": false,
+    "ok": false
+  },
+  {
+    "variant": "v25a-crm-density-guard",
+    "case": "settings",
+    "formalOk": true,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-stage123-v25a-crm-density-guard-settings-stage123-pass15-BCJeI8",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/stage123-v25a-crm-density-guard-settings-stage123-pass15-1778483531250",
+    "devServer": {
+      "url": "http://127.0.0.1:54010/",
+      "pid": 18534
+    },
+    "agentSeconds": 133.1,
+    "source": {
+      "failures": [],
+      "dryuiComponents": [
+        "Badge",
+        "Button",
+        "Heading",
+        "Input",
+        "Link",
+        "Separator",
+        "Text"
+      ],
+      "visibleWords": 67
+    },
+    "visual": [
+      {
+        "viewport": "mobile",
+        "screenshot": "/Users/robertbalfre/dryui/reports/skill-experiments/2026-05-11/batch-8/screenshots-pass15/v25a-crm-density-guard-settings-mobile.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.05194805194805195,
+        "scrollHeight": 1946
+      },
+      {
+        "viewport": "tablet",
+        "screenshot": "/Users/robertbalfre/dryui/reports/skill-experiments/2026-05-11/batch-8/screenshots-pass15/v25a-crm-density-guard-settings-tablet.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.05194805194805195,
+        "scrollHeight": 1000
+      },
+      {
+        "viewport": "desktop",
+        "screenshot": "/Users/robertbalfre/dryui/reports/skill-experiments/2026-05-11/batch-8/screenshots-pass15/v25a-crm-density-guard-settings-desktop.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.05194805194805195,
+        "scrollHeight": 1000
+      }
+    ],
+    "assertionFailures": [],
+    "score": 100,
+    "auditOk": true,
+    "visualOk": true,
+    "ok": true
+  }
+]

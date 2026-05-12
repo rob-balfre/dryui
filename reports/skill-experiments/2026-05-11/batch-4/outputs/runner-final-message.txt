@@ -1,0 +1,5 @@
+Wrote the report to:
+
+[final-candidate.md](/Users/robertbalfre/dryui/reports/skill-experiments/2026-05-11/batch-4/outputs/final-candidate.md)
+
+I only created the requested output report. No production app, package, docs, or canonical skill files were edited. Validation was not run because this was a report-only task with no implementation files changed.

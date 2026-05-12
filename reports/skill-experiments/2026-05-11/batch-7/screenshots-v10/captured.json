@@ -1,0 +1,107 @@
+[
+  {
+    "variant": "v10-consolidated-layout",
+    "case": "analytics",
+    "ok": true,
+    "formalOk": true,
+    "auditOk": true,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-consolidated-analytics-layout-tighten-v10-consolidated-layout-iRvRa2",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/consolidated-analytics-layout-tighten-v10-consolidated-layout-1778468552410",
+    "devServer": {
+      "url": "http://127.0.0.1:58257/",
+      "pid": 69365
+    },
+    "captureUrl": "http://127.0.0.1:58257/",
+    "captureServerSource": "e2e",
+    "failures": [],
+    "shots": {
+      "mobile": "v10-consolidated-layout-analytics-mobile.png",
+      "tablet": "v10-consolidated-layout-analytics-tablet.png",
+      "desktop": "v10-consolidated-layout-analytics-desktop.png"
+    }
+  },
+  {
+    "variant": "v10-consolidated-layout",
+    "case": "kanban",
+    "ok": true,
+    "formalOk": true,
+    "auditOk": true,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-consolidated-kanban-layout-tighten-v10-consolidated-layout-n48Sxp",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/consolidated-kanban-layout-tighten-v10-consolidated-layout-1778468552412",
+    "devServer": {
+      "url": "http://127.0.0.1:58259/",
+      "pid": 67252
+    },
+    "captureUrl": "http://127.0.0.1:58259/",
+    "captureServerSource": "e2e",
+    "failures": [],
+    "shots": {
+      "mobile": "v10-consolidated-layout-kanban-mobile.png",
+      "tablet": "v10-consolidated-layout-kanban-tablet.png",
+      "desktop": "v10-consolidated-layout-kanban-desktop.png"
+    }
+  },
+  {
+    "variant": "v10-consolidated-layout",
+    "case": "crm",
+    "ok": true,
+    "formalOk": true,
+    "auditOk": true,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-consolidated-crm-layout-tighten-v10-consolidated-layout-yOSS4L",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/consolidated-crm-layout-tighten-v10-consolidated-layout-1778468552413",
+    "devServer": {
+      "url": "http://127.0.0.1:58261/",
+      "pid": 71490
+    },
+    "captureUrl": "http://127.0.0.1:58261/",
+    "captureServerSource": "e2e",
+    "failures": [],
+    "shots": {
+      "mobile": "v10-consolidated-layout-crm-mobile.png",
+      "tablet": "v10-consolidated-layout-crm-tablet.png",
+      "desktop": "v10-consolidated-layout-crm-desktop.png"
+    }
+  },
+  {
+    "variant": "v10-consolidated-layout",
+    "case": "settings",
+    "ok": true,
+    "formalOk": true,
+    "auditOk": true,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-consolidated-settings-layout-tighten-v10-consolidated-layout-uBdeeT",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/consolidated-settings-layout-tighten-v10-consolidated-layout-1778468552413",
+    "devServer": {
+      "url": "http://127.0.0.1:58263/",
+      "pid": 76660
+    },
+    "captureUrl": "http://127.0.0.1:58263/",
+    "captureServerSource": "e2e",
+    "failures": [],
+    "shots": {
+      "mobile": "v10-consolidated-layout-settings-mobile.png",
+      "tablet": "v10-consolidated-layout-settings-tablet.png",
+      "desktop": "v10-consolidated-layout-settings-desktop.png"
+    }
+  },
+  {
+    "variant": "v10-consolidated-layout",
+    "case": "knowledge",
+    "ok": true,
+    "formalOk": true,
+    "auditOk": true,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-consolidated-knowledge-layout-tighten-v10-consolidated-layout-OVJcmX",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/consolidated-knowledge-layout-tighten-v10-consolidated-layout-1778468552413",
+    "devServer": {
+      "url": "http://127.0.0.1:58265/",
+      "pid": 73923
+    },
+    "captureUrl": "http://127.0.0.1:58265/",
+    "captureServerSource": "e2e",
+    "failures": [],
+    "shots": {
+      "mobile": "v10-consolidated-layout-knowledge-mobile.png",
+      "tablet": "v10-consolidated-layout-knowledge-tablet.png",
+      "desktop": "v10-consolidated-layout-knowledge-desktop.png"
+    }
+  }
+]

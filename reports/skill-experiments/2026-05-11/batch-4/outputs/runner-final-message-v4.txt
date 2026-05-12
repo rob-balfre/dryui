@@ -1,0 +1,3 @@
+Wrote the report to [final-candidate-v4.md](/Users/robertbalfre/dryui/reports/skill-experiments/2026-05-11/batch-4/outputs/final-candidate-v4.md).
+
+I verified it includes all seven requested sections and checked that the report does not include banned snippet patterns like `:global`, `!important`, inline `style=`, or `style:` directives. Only the requested output report file was edited.

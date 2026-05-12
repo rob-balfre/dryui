@@ -96,6 +96,7 @@ describe('E2E scaffold Adapter', () => {
 			check: 'svelte-kit sync && svelte-check --tsconfig ./tsconfig.json'
 		});
 		expect(packageJson.dependencies['@dryui/ui']?.startsWith('file:')).toBe(true);
+		expect(packageJson.dependencies['lucide-svelte']).toBe('^1.0.1');
 		expect(packageJson.devDependencies['@dryui/primitives']?.startsWith('file:')).toBe(true);
 		expect(packageJson.devDependencies['@dryui/feedback']?.startsWith('file:')).toBe(true);
 		expect(packageJson.devDependencies['@dryui/lint']?.startsWith('file:')).toBe(true);
@@ -127,8 +128,12 @@ describe('E2E scaffold Adapter', () => {
 		);
 		expect(rootLayout).not.toContain('@dryui/feedback');
 		expect(rootLayout).not.toContain('<Feedback');
-		expect(read(projectDir, 'src/app.css')).toContain('container-type: inline-size;');
-		expect(read(projectDir, 'src/app.css')).toContain('container-name: page;');
+		const appCss = read(projectDir, 'src/app.css');
+		expect(appCss).not.toContain('color-scheme: light dark;');
+		expect(appCss).toContain('background: var(--dry-color-bg-base);');
+		expect(appCss).toContain('color: var(--dry-color-text);');
+		expect(appCss).toContain('container-type: inline-size;');
+		expect(appCss).toContain('container-name: page;');
 		expect(read(projectDir, 'src/routes/+page.svelte')).toContain('@dryui/ui/heading');
 		expect(read(projectDir, 'AGENTS.md')).toContain('skills/dryui-build/SKILL.md');
 		expect(read(projectDir, 'CLAUDE.md')).toContain('skills/dryui-build/SKILL.md');

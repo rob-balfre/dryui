@@ -1,0 +1,227 @@
+[
+  {
+    "variant": "v11a-contract-first",
+    "case": "analytics",
+    "formalOk": false,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-stage123-v11a-contract-first-analytics-stage123-pass1b-BPeKsN",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/stage123-v11a-contract-first-analytics-stage123-pass1b-1778471898913",
+    "devServer": null,
+    "agentSeconds": 420.3,
+    "source": {
+      "failures": [
+        "@container in route style"
+      ],
+      "dryuiComponents": [
+        "Badge",
+        "Button",
+        "Heading",
+        "Input",
+        "Select",
+        "Separator",
+        "Table",
+        "Text"
+      ],
+      "visibleWords": 86
+    },
+    "visual": [],
+    "assertionFailures": [],
+    "score": 73,
+    "auditOk": false,
+    "visualOk": true,
+    "ok": false
+  },
+  {
+    "variant": "v11a-contract-first",
+    "case": "settings",
+    "formalOk": true,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-stage123-v11a-contract-first-settings-stage123-pass1b-qMgu2W",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/stage123-v11a-contract-first-settings-stage123-pass1b-1778471898914",
+    "devServer": {
+      "url": "http://127.0.0.1:60305/",
+      "pid": 25619
+    },
+    "agentSeconds": 380,
+    "source": {
+      "failures": [
+        "display in route style",
+        "@container in route style"
+      ],
+      "dryuiComponents": [
+        "Avatar",
+        "Badge",
+        "Button",
+        "Heading",
+        "Input",
+        "Separator",
+        "Table",
+        "Tabs",
+        "Text"
+      ],
+      "visibleWords": 109
+    },
+    "visual": [
+      {
+        "viewport": "mobile",
+        "screenshot": "/Users/robertbalfre/dryui/reports/skill-experiments/2026-05-11/batch-8/screenshots-pass1/v11a-contract-first-settings-mobile.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.04697986577181208,
+        "scrollHeight": 2626
+      },
+      {
+        "viewport": "tablet",
+        "screenshot": "/Users/robertbalfre/dryui/reports/skill-experiments/2026-05-11/batch-8/screenshots-pass1/v11a-contract-first-settings-tablet.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.04697986577181208,
+        "scrollHeight": 1736
+      },
+      {
+        "viewport": "desktop",
+        "screenshot": "/Users/robertbalfre/dryui/reports/skill-experiments/2026-05-11/batch-8/screenshots-pass1/v11a-contract-first-settings-desktop.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.1388888888888889,
+        "scrollHeight": 1343
+      }
+    ],
+    "assertionFailures": [],
+    "score": 78,
+    "auditOk": false,
+    "visualOk": false,
+    "ok": false
+  },
+  {
+    "variant": "v11b-recipes-first",
+    "case": "analytics",
+    "formalOk": false,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-stage123-v11b-recipes-first-analytics-stage123-pass1b-NweoaG",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/stage123-v11b-recipes-first-analytics-stage123-pass1b-1778472320425",
+    "devServer": null,
+    "agentSeconds": 420.5,
+    "source": {
+      "failures": [
+        ":global selector",
+        "class prop/directive on DryUI component",
+        "display in route style",
+        "@container in route style"
+      ],
+      "dryuiComponents": [
+        "Badge",
+        "Button",
+        "Input",
+        "Separator",
+        "Table",
+        "Tabs"
+      ],
+      "visibleWords": 89
+    },
+    "visual": [],
+    "assertionFailures": [],
+    "score": 52,
+    "auditOk": false,
+    "visualOk": true,
+    "ok": false
+  },
+  {
+    "variant": "v11b-recipes-first",
+    "case": "settings",
+    "formalOk": false,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-stage123-v11b-recipes-first-settings-stage123-pass1b-TTS49x",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/stage123-v11b-recipes-first-settings-stage123-pass1b-1778472320426",
+    "devServer": null,
+    "agentSeconds": 420.3,
+    "source": {
+      "failures": [
+        ":global selector",
+        "class prop/directive on DryUI component",
+        "broad descendant shell-area selector"
+      ],
+      "dryuiComponents": [
+        "Badge",
+        "Button",
+        "Input",
+        "Separator",
+        "Select",
+        "Table",
+        "Tabs"
+      ],
+      "visibleWords": 127
+    },
+    "visual": [],
+    "assertionFailures": [],
+    "score": 59,
+    "auditOk": false,
+    "visualOk": true,
+    "ok": false
+  },
+  {
+    "variant": "v11c-density-first",
+    "case": "analytics",
+    "formalOk": false,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-stage123-v11c-density-first-analytics-stage123-pass1b-Hmd6CN",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/stage123-v11c-density-first-analytics-stage123-pass1b-1778472743040",
+    "devServer": null,
+    "agentSeconds": 420.2,
+    "source": {
+      "failures": [
+        "display in route style",
+        "@container in route style",
+        "broad descendant shell-area selector"
+      ],
+      "dryuiComponents": [
+        "Badge",
+        "Button",
+        "Heading",
+        "Input",
+        "Table",
+        "Text"
+      ],
+      "visibleWords": 112
+    },
+    "visual": [],
+    "assertionFailures": [],
+    "score": 59,
+    "auditOk": false,
+    "visualOk": true,
+    "ok": false
+  },
+  {
+    "variant": "v11c-density-first",
+    "case": "settings",
+    "formalOk": false,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-stage123-v11c-density-first-settings-stage123-pass1b-MocqdN",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/stage123-v11c-density-first-settings-stage123-pass1b-1778472743041",
+    "devServer": null,
+    "agentSeconds": 420.4,
+    "source": {
+      "failures": [
+        "@container in route style",
+        "nested primitive data-layout-area"
+      ],
+      "dryuiComponents": [
+        "Badge",
+        "Avatar",
+        "Button",
+        "Heading",
+        "Input",
+        "Separator",
+        "Table",
+        "Text"
+      ],
+      "visibleWords": 138
+    },
+    "visual": [],
+    "assertionFailures": [],
+    "score": 66,
+    "auditOk": false,
+    "visualOk": true,
+    "ok": false
+  }
+]

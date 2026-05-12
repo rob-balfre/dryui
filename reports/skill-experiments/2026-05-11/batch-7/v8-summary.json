@@ -1,0 +1,57 @@
+[
+  {
+    "variant": "v8-shell-area-strict",
+    "case": "analytics",
+    "ok": true,
+    "formalOk": true,
+    "auditOk": true,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-strict-analytics-layout-tighten-v8-shell-area-strict-5eLXzn",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/strict-analytics-layout-tighten-v8-shell-area-strict-1778466651456",
+    "agentSeconds": 343,
+    "failures": []
+  },
+  {
+    "variant": "v8-shell-area-strict",
+    "case": "kanban",
+    "ok": true,
+    "formalOk": true,
+    "auditOk": true,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-strict-kanban-layout-tighten-v8-shell-area-strict-yHmisA",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/strict-kanban-layout-tighten-v8-shell-area-strict-1778466651458",
+    "agentSeconds": 263.6,
+    "failures": []
+  },
+  {
+    "variant": "v8-shell-area-strict",
+    "case": "crm",
+    "ok": true,
+    "formalOk": true,
+    "auditOk": true,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-strict-crm-layout-tighten-v8-shell-area-strict-ElVnly",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/strict-crm-layout-tighten-v8-shell-area-strict-1778466651458",
+    "agentSeconds": 347.9,
+    "failures": []
+  },
+  {
+    "variant": "v8-shell-area-strict",
+    "case": "settings",
+    "ok": true,
+    "formalOk": true,
+    "auditOk": true,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-strict-settings-layout-tighten-v8-shell-area-strict-2qsnCx",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/strict-settings-layout-tighten-v8-shell-area-strict-1778466651458",
+    "agentSeconds": 273.1,
+    "failures": []
+  },
+  {
+    "variant": "v8-shell-area-strict",
+    "case": "knowledge",
+    "ok": true,
+    "formalOk": true,
+    "auditOk": true,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-strict-knowledge-layout-tighten-v8-shell-area-strict-1trylO",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/strict-knowledge-layout-tighten-v8-shell-area-strict-1778466651458",
+    "agentSeconds": null,
+    "failures": []
+  }
+]

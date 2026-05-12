@@ -1,0 +1,149 @@
+[
+  {
+    "variant": "v14a-template-first",
+    "case": "settings",
+    "formalOk": false,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-stage123-v14a-template-first-settings-stage123-pass4-rL0zxR",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/stage123-v14a-template-first-settings-stage123-pass4-1778474550353",
+    "devServer": null,
+    "agentSeconds": 180.5,
+    "source": {
+      "failures": [
+        "width in layout.css"
+      ],
+      "dryuiComponents": [
+        "Badge",
+        "Button",
+        "Input",
+        "Separator",
+        "Table",
+        "Tabs"
+      ],
+      "visibleWords": 119
+    },
+    "visual": [],
+    "assertionFailures": [],
+    "score": 73,
+    "auditOk": false,
+    "visualOk": true,
+    "ok": false
+  },
+  {
+    "variant": "v14a-template-first",
+    "case": "kanban",
+    "formalOk": false,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-stage123-v14a-template-first-kanban-stage123-pass4-LMUPQ4",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/stage123-v14a-template-first-kanban-stage123-pass4-1778474732575",
+    "devServer": null,
+    "agentSeconds": 180.2,
+    "source": {
+      "failures": [
+        "width in layout.css"
+      ],
+      "dryuiComponents": [
+        "Badge",
+        "Button",
+        "Input",
+        "Separator",
+        "Table",
+        "Tabs"
+      ],
+      "visibleWords": 160
+    },
+    "visual": [],
+    "assertionFailures": [],
+    "score": 73,
+    "auditOk": false,
+    "visualOk": true,
+    "ok": false
+  },
+  {
+    "variant": "v14a-template-first",
+    "case": "knowledge",
+    "formalOk": false,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-stage123-v14a-template-first-knowledge-stage123-pass4-9REnCK",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/stage123-v14a-template-first-knowledge-stage123-pass4-1778474914312",
+    "devServer": null,
+    "agentSeconds": 180.2,
+    "source": {
+      "failures": [
+        "width in layout.css"
+      ],
+      "dryuiComponents": [
+        "Badge",
+        "Button",
+        "Input",
+        "Separator",
+        "Table",
+        "Tabs"
+      ],
+      "visibleWords": 168
+    },
+    "visual": [],
+    "assertionFailures": [],
+    "score": 73,
+    "auditOk": false,
+    "visualOk": true,
+    "ok": false
+  },
+  {
+    "variant": "v14a-template-first",
+    "case": "analytics",
+    "formalOk": false,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-stage123-v14a-template-first-analytics-stage123-pass4-FfNs5L",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/stage123-v14a-template-first-analytics-stage123-pass4-1778474550351",
+    "devServer": null,
+    "agentSeconds": 180.2,
+    "source": {
+      "failures": [
+        "inline style attribute",
+        "width in layout.css"
+      ],
+      "dryuiComponents": [
+        "Badge",
+        "Button",
+        "Input",
+        "Separator",
+        "Table",
+        "Tabs"
+      ],
+      "visibleWords": 89
+    },
+    "visual": [],
+    "assertionFailures": [],
+    "score": 66,
+    "auditOk": false,
+    "visualOk": true,
+    "ok": false
+  },
+  {
+    "variant": "v14a-template-first",
+    "case": "crm",
+    "formalOk": false,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-stage123-v14a-template-first-crm-stage123-pass4-PEFJS7",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/stage123-v14a-template-first-crm-stage123-pass4-1778474732575",
+    "devServer": null,
+    "agentSeconds": 180.4,
+    "source": {
+      "failures": [
+        "inline style attribute",
+        "width in layout.css"
+      ],
+      "dryuiComponents": [
+        "Badge",
+        "Button",
+        "Input",
+        "Separator",
+        "Table",
+        "Tabs"
+      ],
+      "visibleWords": 141
+    },
+    "visual": [],
+    "assertionFailures": [],
+    "score": 66,
+    "auditOk": false,
+    "visualOk": true,
+    "ok": false
+  }
+]

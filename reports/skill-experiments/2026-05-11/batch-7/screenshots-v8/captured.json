@@ -1,0 +1,82 @@
+[
+  {
+    "caseName": "analytics",
+    "variant": "v8-shell-area-strict",
+    "ok": true,
+    "formalOk": true,
+    "auditOk": true,
+    "failures": [],
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-strict-analytics-layout-tighten-v8-shell-area-strict-5eLXzn",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/strict-analytics-layout-tighten-v8-shell-area-strict-1778466651456",
+    "agentSeconds": 343,
+    "shots": {
+      "mobile": "v8-shell-area-strict-analytics-mobile.png",
+      "tablet": "v8-shell-area-strict-analytics-tablet.png",
+      "desktop": "v8-shell-area-strict-analytics-desktop.png"
+    }
+  },
+  {
+    "caseName": "kanban",
+    "variant": "v8-shell-area-strict",
+    "ok": true,
+    "formalOk": true,
+    "auditOk": true,
+    "failures": [],
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-strict-kanban-layout-tighten-v8-shell-area-strict-yHmisA",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/strict-kanban-layout-tighten-v8-shell-area-strict-1778466651458",
+    "agentSeconds": 263.6,
+    "shots": {
+      "mobile": "v8-shell-area-strict-kanban-mobile.png",
+      "tablet": "v8-shell-area-strict-kanban-tablet.png",
+      "desktop": "v8-shell-area-strict-kanban-desktop.png"
+    }
+  },
+  {
+    "caseName": "crm",
+    "variant": "v8-shell-area-strict",
+    "ok": true,
+    "formalOk": true,
+    "auditOk": true,
+    "failures": [],
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-strict-crm-layout-tighten-v8-shell-area-strict-ElVnly",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/strict-crm-layout-tighten-v8-shell-area-strict-1778466651458",
+    "agentSeconds": 347.9,
+    "shots": {
+      "mobile": "v8-shell-area-strict-crm-mobile.png",
+      "tablet": "v8-shell-area-strict-crm-tablet.png",
+      "desktop": "v8-shell-area-strict-crm-desktop.png"
+    }
+  },
+  {
+    "caseName": "settings",
+    "variant": "v8-shell-area-strict",
+    "ok": true,
+    "formalOk": true,
+    "auditOk": true,
+    "failures": [],
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-strict-settings-layout-tighten-v8-shell-area-strict-2qsnCx",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/strict-settings-layout-tighten-v8-shell-area-strict-1778466651458",
+    "agentSeconds": 273.1,
+    "shots": {
+      "mobile": "v8-shell-area-strict-settings-mobile.png",
+      "tablet": "v8-shell-area-strict-settings-tablet.png",
+      "desktop": "v8-shell-area-strict-settings-desktop.png"
+    }
+  },
+  {
+    "caseName": "knowledge",
+    "variant": "v8-shell-area-strict",
+    "ok": true,
+    "formalOk": true,
+    "auditOk": true,
+    "failures": [],
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-strict-knowledge-layout-tighten-v8-shell-area-strict-1trylO",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/strict-knowledge-layout-tighten-v8-shell-area-strict-1778466651458",
+    "agentSeconds": null,
+    "shots": {
+      "mobile": "v8-shell-area-strict-knowledge-mobile.png",
+      "tablet": "v8-shell-area-strict-knowledge-tablet.png",
+      "desktop": "v8-shell-area-strict-knowledge-desktop.png"
+    }
+  }
+]

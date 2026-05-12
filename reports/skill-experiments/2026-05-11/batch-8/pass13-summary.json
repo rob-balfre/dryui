@@ -1,0 +1,313 @@
+[
+  {
+    "variant": "v23a-density-css-gated",
+    "case": "analytics",
+    "formalOk": true,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-stage123-v23a-density-css-gated-analytics-stage123-pass13-Cu6bT6",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/stage123-v23a-density-css-gated-analytics-stage123-pass13-1778482132748",
+    "devServer": {
+      "url": "http://127.0.0.1:63050/",
+      "pid": 69340
+    },
+    "agentSeconds": 156.4,
+    "source": {
+      "failures": [],
+      "dryuiComponents": [
+        "Badge",
+        "Button",
+        "Heading",
+        "Input",
+        "Separator",
+        "Text"
+      ],
+      "visibleWords": 75
+    },
+    "visual": [
+      {
+        "viewport": "mobile",
+        "screenshot": "/Users/robertbalfre/dryui/reports/skill-experiments/2026-05-11/batch-8/screenshots-pass13/v23a-density-css-gated-analytics-mobile.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.047058823529411764,
+        "scrollHeight": 2152
+      },
+      {
+        "viewport": "tablet",
+        "screenshot": "/Users/robertbalfre/dryui/reports/skill-experiments/2026-05-11/batch-8/screenshots-pass13/v23a-density-css-gated-analytics-tablet.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.047058823529411764,
+        "scrollHeight": 1210
+      },
+      {
+        "viewport": "desktop",
+        "screenshot": "/Users/robertbalfre/dryui/reports/skill-experiments/2026-05-11/batch-8/screenshots-pass13/v23a-density-css-gated-analytics-desktop.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.047058823529411764,
+        "scrollHeight": 1000
+      }
+    ],
+    "assertionFailures": [],
+    "score": 100,
+    "auditOk": true,
+    "visualOk": true,
+    "ok": true
+  },
+  {
+    "variant": "v23a-density-css-gated",
+    "case": "kanban",
+    "formalOk": true,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-stage123-v23a-density-css-gated-kanban-stage123-pass13-A2QWj0",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/stage123-v23a-density-css-gated-kanban-stage123-pass13-1778482308817",
+    "devServer": {
+      "url": "http://127.0.0.1:64152/",
+      "pid": 75210
+    },
+    "agentSeconds": 160.8,
+    "source": {
+      "failures": [],
+      "dryuiComponents": [
+        "Badge",
+        "Button",
+        "Heading",
+        "Image",
+        "Input",
+        "Link",
+        "Separator",
+        "Text"
+      ],
+      "visibleWords": 103
+    },
+    "visual": [
+      {
+        "viewport": "mobile",
+        "screenshot": "/Users/robertbalfre/dryui/reports/skill-experiments/2026-05-11/batch-8/screenshots-pass13/v23a-density-css-gated-kanban-mobile.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.008333333333333333,
+        "scrollHeight": 2730
+      },
+      {
+        "viewport": "tablet",
+        "screenshot": "/Users/robertbalfre/dryui/reports/skill-experiments/2026-05-11/batch-8/screenshots-pass13/v23a-density-css-gated-kanban-tablet.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.008333333333333333,
+        "scrollHeight": 1331
+      },
+      {
+        "viewport": "desktop",
+        "screenshot": "/Users/robertbalfre/dryui/reports/skill-experiments/2026-05-11/batch-8/screenshots-pass13/v23a-density-css-gated-kanban-desktop.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.008333333333333333,
+        "scrollHeight": 1000
+      }
+    ],
+    "assertionFailures": [],
+    "score": 100,
+    "auditOk": true,
+    "visualOk": true,
+    "ok": true
+  },
+  {
+    "variant": "v23a-density-css-gated",
+    "case": "settings",
+    "formalOk": true,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-stage123-v23a-density-css-gated-settings-stage123-pass13-zQCZ0F",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/stage123-v23a-density-css-gated-settings-stage123-pass13-1778482132753",
+    "devServer": {
+      "url": "http://127.0.0.1:63052/",
+      "pid": 66148
+    },
+    "agentSeconds": 133.6,
+    "source": {
+      "failures": [],
+      "dryuiComponents": [
+        "Badge",
+        "Button",
+        "Heading",
+        "Input",
+        "Link",
+        "Separator",
+        "Text"
+      ],
+      "visibleWords": 94
+    },
+    "visual": [
+      {
+        "viewport": "mobile",
+        "screenshot": "/Users/robertbalfre/dryui/reports/skill-experiments/2026-05-11/batch-8/screenshots-pass13/v23a-density-css-gated-settings-mobile.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.018867924528301886,
+        "scrollHeight": 2814
+      },
+      {
+        "viewport": "tablet",
+        "screenshot": "/Users/robertbalfre/dryui/reports/skill-experiments/2026-05-11/batch-8/screenshots-pass13/v23a-density-css-gated-settings-tablet.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.018867924528301886,
+        "scrollHeight": 1298
+      },
+      {
+        "viewport": "desktop",
+        "screenshot": "/Users/robertbalfre/dryui/reports/skill-experiments/2026-05-11/batch-8/screenshots-pass13/v23a-density-css-gated-settings-desktop.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.018867924528301886,
+        "scrollHeight": 1232
+      }
+    ],
+    "assertionFailures": [],
+    "score": 95,
+    "auditOk": true,
+    "visualOk": false,
+    "ok": false
+  },
+  {
+    "variant": "v23a-density-css-gated",
+    "case": "knowledge",
+    "formalOk": true,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-stage123-v23a-density-css-gated-knowledge-stage123-pass13-zOIWaV",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/stage123-v23a-density-css-gated-knowledge-stage123-pass13-1778482500021",
+    "devServer": {
+      "url": "http://127.0.0.1:65067/",
+      "pid": 82781
+    },
+    "agentSeconds": 152.3,
+    "source": {
+      "failures": [],
+      "dryuiComponents": [
+        "Badge",
+        "Button",
+        "Heading",
+        "Image",
+        "Input",
+        "Link",
+        "Separator",
+        "Text"
+      ],
+      "visibleWords": 98
+    },
+    "visual": [
+      {
+        "viewport": "mobile",
+        "screenshot": "/Users/robertbalfre/dryui/reports/skill-experiments/2026-05-11/batch-8/screenshots-pass13/v23a-density-css-gated-knowledge-mobile.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.07058823529411765,
+        "scrollHeight": 5833
+      },
+      {
+        "viewport": "tablet",
+        "screenshot": "/Users/robertbalfre/dryui/reports/skill-experiments/2026-05-11/batch-8/screenshots-pass13/v23a-density-css-gated-knowledge-tablet.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.07058823529411765,
+        "scrollHeight": 4599
+      },
+      {
+        "viewport": "desktop",
+        "screenshot": "/Users/robertbalfre/dryui/reports/skill-experiments/2026-05-11/batch-8/screenshots-pass13/v23a-density-css-gated-knowledge-desktop.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.07058823529411765,
+        "scrollHeight": 4485
+      }
+    ],
+    "assertionFailures": [],
+    "score": 95,
+    "auditOk": true,
+    "visualOk": false,
+    "ok": false
+  },
+  {
+    "variant": "v23a-density-css-gated",
+    "case": "crm",
+    "formalOk": true,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-stage123-v23a-density-css-gated-crm-stage123-pass13-n5HR01",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/stage123-v23a-density-css-gated-crm-stage123-pass13-1778482308817",
+    "devServer": {
+      "url": "http://127.0.0.1:64150/",
+      "pid": 77637
+    },
+    "agentSeconds": 172.4,
+    "source": {
+      "failures": [],
+      "dryuiComponents": [
+        "Badge",
+        "Button",
+        "Heading",
+        "Input",
+        "Link",
+        "Separator",
+        "Text"
+      ],
+      "visibleWords": 86
+    },
+    "visual": [
+      {
+        "viewport": "mobile",
+        "screenshot": "/Users/robertbalfre/dryui/reports/skill-experiments/2026-05-11/batch-8/screenshots-pass13/v23a-density-css-gated-crm-mobile.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0,
+        "scrollHeight": 2644
+      },
+      {
+        "viewport": "tablet",
+        "screenshot": "/Users/robertbalfre/dryui/reports/skill-experiments/2026-05-11/batch-8/screenshots-pass13/v23a-density-css-gated-crm-tablet.png",
+        "horizontalOverflow": 17,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0,
+        "scrollHeight": 1134
+      },
+      {
+        "viewport": "desktop",
+        "screenshot": "/Users/robertbalfre/dryui/reports/skill-experiments/2026-05-11/batch-8/screenshots-pass13/v23a-density-css-gated-crm-desktop.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0,
+        "scrollHeight": 1000
+      }
+    ],
+    "assertionFailures": [],
+    "score": 90,
+    "auditOk": true,
+    "visualOk": false,
+    "ok": false
+  }
+]

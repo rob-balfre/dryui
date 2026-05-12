@@ -59,7 +59,9 @@ export function resolveFeedbackServerUrl(
 		return queryServerUrl;
 	}
 
-	return configured ?? readStoredFeedbackServerUrl(options);
+	const storedServerUrl = readStoredFeedbackServerUrl(options);
+	if (hasFeedbackLaunchParam(href) && storedServerUrl) return storedServerUrl;
+	return configured ?? storedServerUrl ?? undefined;
 }
 
 export function saveFeedbackDrawings(options: {

@@ -85,6 +85,7 @@ export interface BrowserCreateSubmissionPayload {
 export interface BrowserCaptureAddedDraft {
 	id: string;
 	kind: string;
+	label?: string;
 	element: HTMLElement;
 }
 
@@ -469,7 +470,7 @@ function snapshotAddedComponents(
 		out.push({
 			id: record.id,
 			kind: record.kind,
-			label: record.kind,
+			label: record.label ?? record.kind,
 			rect: { x: rect.left, y: rect.top, width: rect.width, height: rect.height }
 		});
 	}

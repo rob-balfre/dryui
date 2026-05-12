@@ -1,0 +1,600 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Variant D Dashboard Preview</title>
+		<style>
+			:root {
+				color-scheme: light;
+				--bg: #f5f6f8;
+				--surface: #ffffff;
+				--surface-soft: #f9fafb;
+				--text: #17181a;
+				--muted: #626a76;
+				--line: #d9dde4;
+				--accent: #1d6fd6;
+				--accent-soft: #e7f0fc;
+				--good: #177245;
+				--warn: #a05a00;
+				--bad: #b3261e;
+				font-family:
+					ui-sans-serif,
+					system-ui,
+					-apple-system,
+					BlinkMacSystemFont,
+					'Segoe UI',
+					sans-serif;
+			}
+
+			* {
+				box-sizing: border-box;
+			}
+
+			body {
+				margin: 0;
+				background: var(--bg);
+				color: var(--text);
+			}
+
+			.preview {
+				padding: 16px;
+			}
+
+			.preview-label {
+				display: grid;
+				gap: 6px;
+				max-width: 1240px;
+				margin: 0 auto 20px;
+			}
+
+			.preview-label h1 {
+				margin: 0;
+				font-size: 18px;
+			}
+
+			.preview-label p {
+				margin: 0;
+				color: var(--muted);
+				font-size: 13px;
+			}
+
+			[data-layout='analytics-dashboard-shell'] {
+				container: analytics-dashboard / inline-size;
+				max-width: 1240px;
+				margin: 0 auto;
+			}
+
+			[data-layout='analytics-dashboard-shell'] > [data-layout-area='page'] {
+				display: grid;
+				gap: 18px;
+				grid-template-areas:
+					'header'
+					'filters'
+					'metrics'
+					'chart'
+					'insights'
+					'table'
+					'status';
+			}
+
+			[data-layout-area='header'] {
+				grid-area: header;
+			}
+
+			[data-layout-area='filters'] {
+				grid-area: filters;
+			}
+
+			[data-layout-area='metrics'] {
+				grid-area: metrics;
+			}
+
+			[data-layout-area='chart'] {
+				grid-area: chart;
+			}
+
+			[data-layout-area='insights'] {
+				grid-area: insights;
+			}
+
+			[data-layout-area='table'] {
+				grid-area: table;
+			}
+
+			[data-layout-area='status'] {
+				grid-area: status;
+			}
+
+			[data-layout-area='header'],
+			[data-layout-area='filters'],
+			[data-layout-area='section-heading'] {
+				display: flex;
+				gap: 12px;
+				align-items: start;
+				justify-content: space-between;
+				flex-wrap: wrap;
+			}
+
+			[data-layout-area='metrics'],
+			[data-layout-area='chart'],
+			[data-layout-area='table'],
+			[data-layout-area='insights'],
+			[data-layout-area='status'] {
+				display: grid;
+				gap: 14px;
+				align-content: start;
+			}
+
+			[data-layout-area='metrics'] {
+				grid-template-columns: minmax(0, 1fr);
+			}
+
+			[data-layout-area='filter-controls'] {
+				display: grid;
+				gap: 12px;
+				flex: 1 1 28rem;
+				grid-template-columns: minmax(0, 1fr);
+			}
+
+			[data-layout-area='filter-actions'],
+			[data-layout-area='header-actions'] {
+				display: flex;
+				gap: 10px;
+				flex-wrap: wrap;
+			}
+
+			[data-layout-area='chart'],
+			[data-layout-area='state-panel'] {
+				min-block-size: 18rem;
+			}
+
+			[data-layout-area='table-scroll'] {
+				overflow-x: auto;
+			}
+
+			@container analytics-dashboard (min-width: 48rem) {
+				[data-layout='analytics-dashboard-shell'] > [data-layout-area='page'] {
+					grid-template-columns: repeat(2, minmax(0, 1fr));
+					grid-template-areas:
+						'header header'
+						'filters filters'
+						'metrics metrics'
+						'chart chart'
+						'insights insights'
+						'table table'
+						'status status';
+				}
+
+				[data-layout-area='filter-controls'] {
+					grid-template-columns: repeat(3, minmax(0, 1fr));
+				}
+
+				[data-layout-area='metrics'] {
+					grid-template-columns: repeat(2, minmax(0, 1fr));
+				}
+			}
+
+			@container analytics-dashboard (min-width: 72rem) {
+				[data-layout='analytics-dashboard-shell'] > [data-layout-area='page'] {
+					grid-template-columns: repeat(12, minmax(0, 1fr));
+					grid-template-areas:
+						'header header header header header header header header header header header header'
+						'filters filters filters filters filters filters filters filters filters filters filters filters'
+						'metrics metrics metrics metrics metrics metrics metrics metrics metrics metrics metrics metrics'
+						'chart chart chart chart chart chart chart chart insights insights insights insights'
+						'table table table table table table table table table table table table'
+						'status status status status status status status status status status status status';
+				}
+
+				[data-layout-area='metrics'] {
+					grid-template-columns: repeat(4, minmax(0, 1fr));
+				}
+			}
+
+			.panel,
+			.metric,
+			.filters {
+				background: var(--surface);
+				border: 1px solid var(--line);
+				border-radius: 8px;
+				box-shadow: 0 16px 40px rgba(23, 24, 26, 0.08);
+			}
+
+			.filters,
+			.panel,
+			.metric {
+				padding: 16px;
+			}
+
+			.kicker {
+				margin: 0 0 8px;
+				color: var(--muted);
+				font-size: 12px;
+				font-weight: 700;
+				letter-spacing: 0.08em;
+				text-transform: uppercase;
+			}
+
+			h2,
+			h3,
+			h4,
+			p {
+				margin-block-start: 0;
+			}
+
+			.title h2 {
+				margin: 0;
+				font-size: clamp(28px, 8vw, 36px);
+				line-height: 1.05;
+			}
+
+			.title p:last-child {
+				margin: 8px 0 0;
+				color: var(--muted);
+				font-size: 15px;
+			}
+
+			.button {
+				display: inline-flex;
+				min-height: 38px;
+				align-items: center;
+				justify-content: center;
+				border: 1px solid var(--line);
+				border-radius: 6px;
+				background: var(--surface);
+				padding: 0 14px;
+				font-size: 13px;
+				font-weight: 650;
+			}
+
+			.button.primary {
+				border-color: var(--accent);
+				background: var(--accent);
+				color: #fff;
+			}
+
+			.field {
+				display: grid;
+				gap: 6px;
+			}
+
+			.field label {
+				color: var(--muted);
+				font-size: 12px;
+				font-weight: 650;
+			}
+
+			.input {
+				min-height: 38px;
+				border: 1px solid var(--line);
+				border-radius: 6px;
+				background: var(--surface-soft);
+				padding: 8px 10px;
+				font-size: 13px;
+			}
+
+			.metric {
+				display: grid;
+				gap: 10px;
+			}
+
+			.metric span:first-child {
+				color: var(--muted);
+				font-size: 13px;
+			}
+
+			.metric strong {
+				font-size: 28px;
+				font-variant-numeric: tabular-nums;
+				line-height: 1;
+			}
+
+			.badge {
+				display: inline-flex;
+				width: fit-content;
+				border-radius: 999px;
+				background: var(--accent-soft);
+				color: #174b86;
+				padding: 4px 8px;
+				font-size: 12px;
+				font-weight: 650;
+			}
+
+			.badge.good {
+				background: #e7f5ee;
+				color: var(--good);
+			}
+
+			.badge.warn {
+				background: #fff3df;
+				color: var(--warn);
+			}
+
+			.badge.bad {
+				background: #fdecea;
+				color: var(--bad);
+			}
+
+			.sparkline {
+				height: 30px;
+				border-radius: 5px;
+				background:
+					linear-gradient(
+						145deg,
+						transparent 45%,
+						rgba(29, 111, 214, 0.16) 45% 58%,
+						transparent 58%
+					),
+					linear-gradient(90deg, #e9edf3, #f6f8fb);
+			}
+
+			.chart-visual {
+				min-height: 300px;
+				border: 1px solid var(--line);
+				border-radius: 6px;
+				background:
+					linear-gradient(180deg, rgba(29, 111, 214, 0.18), rgba(29, 111, 214, 0.02)),
+					linear-gradient(
+						90deg,
+						transparent 24%,
+						rgba(23, 24, 26, 0.05) 24% 25%,
+						transparent 25% 49%,
+						rgba(23, 24, 26, 0.05) 49% 50%,
+						transparent 50% 74%,
+						rgba(23, 24, 26, 0.05) 74% 75%,
+						transparent 75%
+					),
+					linear-gradient(
+						180deg,
+						transparent 24%,
+						rgba(23, 24, 26, 0.05) 24% 25%,
+						transparent 25% 49%,
+						rgba(23, 24, 26, 0.05) 49% 50%,
+						transparent 50% 74%,
+						rgba(23, 24, 26, 0.05) 74% 75%,
+						transparent 75%
+					);
+				position: relative;
+				overflow: hidden;
+			}
+
+			.chart-visual::after {
+				content: '';
+				position: absolute;
+				inset: 42px 28px 48px;
+				border-bottom: 4px solid var(--accent);
+				border-left: 4px solid transparent;
+				transform: skewY(-9deg);
+				filter: drop-shadow(0 10px 12px rgba(29, 111, 214, 0.22));
+			}
+
+			.insight-list {
+				display: grid;
+				gap: 12px;
+			}
+
+			.insight-item {
+				border: 1px solid var(--line);
+				border-radius: 6px;
+				background: var(--surface-soft);
+				padding: 12px;
+			}
+
+			.insight-item h4 {
+				margin-block-end: 6px;
+				font-size: 14px;
+			}
+
+			.insight-item p {
+				margin: 0;
+				color: var(--muted);
+				font-size: 13px;
+				line-height: 1.4;
+			}
+
+			table {
+				width: 100%;
+				min-width: 720px;
+				border-collapse: collapse;
+				font-size: 13px;
+			}
+
+			th,
+			td {
+				border-bottom: 1px solid var(--line);
+				padding: 10px 8px;
+				text-align: left;
+			}
+
+			th {
+				color: var(--muted);
+				font-size: 12px;
+			}
+
+			.state-grid {
+				display: grid;
+				gap: 12px;
+				grid-template-columns: minmax(0, 1fr);
+			}
+
+			@container analytics-dashboard (min-width: 48rem) {
+				.state-grid {
+					grid-template-columns: repeat(3, minmax(0, 1fr));
+				}
+			}
+
+			.state-card {
+				border: 1px dashed var(--line);
+				border-radius: 6px;
+				background: var(--surface-soft);
+				padding: 12px;
+			}
+		</style>
+	</head>
+	<body>
+		<main class="preview">
+			<div class="preview-label">
+				<h1>Variant D: Agentic Gated Merge</h1>
+				<p>Structure + state/resilience winner, with density guidance for table and KPIs.</p>
+			</div>
+
+			<section data-layout="analytics-dashboard-shell">
+				<div data-layout-area="page">
+					<header data-layout-area="header">
+						<div class="title" data-layout-area="title">
+							<p class="kicker">Workspace analytics</p>
+							<h2>Analytics Dashboard</h2>
+							<p>Monitor performance and drill into recent campaign rows.</p>
+						</div>
+						<div data-layout-area="header-actions">
+							<span class="button">Export</span>
+							<span class="button primary">Create report</span>
+						</div>
+					</header>
+
+					<section class="filters" data-layout-area="filters" aria-label="Dashboard filters">
+						<div data-layout-area="filter-controls">
+							<div class="field">
+								<label>Search</label>
+								<div class="input">Search campaigns</div>
+							</div>
+							<div class="field">
+								<label>Date range</label>
+								<div class="input">Last 30 days</div>
+							</div>
+							<div class="field">
+								<label>Channel</label>
+								<div class="input">All channels</div>
+							</div>
+						</div>
+						<div data-layout-area="filter-actions">
+							<span class="button primary">Apply</span>
+							<span class="button">Reset</span>
+						</div>
+					</section>
+
+					<section data-layout-area="metrics" aria-label="Summary metrics">
+						<article class="metric">
+							<span>Revenue</span>
+							<strong>$284.6k</strong>
+							<span class="badge good">+12.4%</span>
+							<div class="sparkline"></div>
+						</article>
+						<article class="metric">
+							<span>Conversion</span>
+							<strong>8.7%</strong>
+							<span class="badge good">+1.1%</span>
+							<div class="sparkline"></div>
+						</article>
+						<article class="metric">
+							<span>Active users</span>
+							<strong>42,918</strong>
+							<span class="badge">Stable</span>
+							<div class="sparkline"></div>
+						</article>
+						<article class="metric">
+							<span>Churn risk</span>
+							<strong>3.2%</strong>
+							<span class="badge warn">Watch</span>
+							<div class="sparkline"></div>
+						</article>
+					</section>
+
+					<section class="panel" data-layout-area="chart" aria-label="Performance trend">
+						<div data-layout-area="section-heading">
+							<h3>Performance trend</h3>
+							<span class="badge">Daily</span>
+						</div>
+						<div class="chart-visual"></div>
+					</section>
+
+					<aside class="panel" data-layout-area="insights" aria-label="Needs attention">
+						<div data-layout-area="section-heading">
+							<h3>Needs attention</h3>
+							<span class="badge warn">3 alerts</span>
+						</div>
+						<div class="insight-list">
+							<div class="insight-item">
+								<h4>Paid search spend increased</h4>
+								<p>CPA rose while conversion stayed flat across the last seven days.</p>
+							</div>
+							<div class="insight-item">
+								<h4>Enterprise webinar converting</h4>
+								<p>High intent leads are outpacing the account-owner follow-up queue.</p>
+							</div>
+						</div>
+					</aside>
+
+					<section class="panel" data-layout-area="table" aria-label="Campaign performance">
+						<div data-layout-area="section-heading">
+							<h3>Campaign performance</h3>
+							<span class="button">Download CSV</span>
+						</div>
+						<div data-layout-area="table-scroll">
+							<table>
+								<thead>
+									<tr>
+										<th>Campaign</th>
+										<th>Channel</th>
+										<th>Visitors</th>
+										<th>Conversion</th>
+										<th>Revenue</th>
+										<th>Status</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>Lifecycle email</td>
+										<td>Owned</td>
+										<td>18,420</td>
+										<td>8.9%</td>
+										<td>$44.2k</td>
+										<td><span class="badge good">Healthy</span></td>
+									</tr>
+									<tr>
+										<td>Paid search</td>
+										<td>Paid</td>
+										<td>24,180</td>
+										<td>5.6%</td>
+										<td>$38.7k</td>
+										<td><span class="badge warn">Watch</span></td>
+									</tr>
+									<tr>
+										<td>Partner webinar</td>
+										<td>Partner</td>
+										<td>6,120</td>
+										<td>12.4%</td>
+										<td>$31.5k</td>
+										<td><span class="badge good">Healthy</span></td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</section>
+
+					<section class="panel" data-layout-area="status" aria-label="State coverage">
+						<div data-layout-area="section-heading">
+							<h3>State coverage</h3>
+							<span class="badge">Loading / empty / error</span>
+						</div>
+						<div class="state-grid">
+							<div class="state-card">
+								<strong>Loading</strong>
+								<p>Skeletons preserve metric, chart, and table footprints.</p>
+							</div>
+							<div class="state-card">
+								<strong>Empty</strong>
+								<p>Empty panels stay inside chart and table regions.</p>
+							</div>
+							<div class="state-card">
+								<strong>Error</strong>
+								<p>Retry appears in the status region after filters.</p>
+							</div>
+						</div>
+					</section>
+				</div>
+			</section>
+		</main>
+	</body>
+</html>

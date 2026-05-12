@@ -1,0 +1,312 @@
+[
+  {
+    "variant": "v22a-mobile-density-safe",
+    "case": "analytics",
+    "formalOk": true,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-stage123-v22a-mobile-density-safe-analytics-stage123-pass12-9DMlZq",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/stage123-v22a-mobile-density-safe-analytics-stage123-pass12-1778481368141",
+    "devServer": {
+      "url": "http://127.0.0.1:59241/",
+      "pid": 45413
+    },
+    "agentSeconds": 166.7,
+    "source": {
+      "failures": [],
+      "dryuiComponents": [
+        "Badge",
+        "Button",
+        "Heading",
+        "Input",
+        "Separator",
+        "Text"
+      ],
+      "visibleWords": 74
+    },
+    "visual": [
+      {
+        "viewport": "mobile",
+        "screenshot": "v22a-mobile-density-safe-analytics-mobile.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.06382978723404255,
+        "scrollHeight": 2359
+      },
+      {
+        "viewport": "tablet",
+        "screenshot": "v22a-mobile-density-safe-analytics-tablet.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.06382978723404255,
+        "scrollHeight": 1435
+      },
+      {
+        "viewport": "desktop",
+        "screenshot": "v22a-mobile-density-safe-analytics-desktop.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.06382978723404255,
+        "scrollHeight": 1000
+      }
+    ],
+    "assertionFailures": [],
+    "score": 100,
+    "auditOk": true,
+    "visualOk": true,
+    "ok": true
+  },
+  {
+    "variant": "v22a-mobile-density-safe",
+    "case": "settings",
+    "formalOk": true,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-stage123-v22a-mobile-density-safe-settings-stage123-pass12-Tixg5s",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/stage123-v22a-mobile-density-safe-settings-stage123-pass12-1778481368144",
+    "devServer": {
+      "url": "http://127.0.0.1:59243/",
+      "pid": 42180
+    },
+    "agentSeconds": 142,
+    "source": {
+      "failures": [],
+      "dryuiComponents": [
+        "Badge",
+        "Button",
+        "Heading",
+        "Input",
+        "Link",
+        "Separator",
+        "Text"
+      ],
+      "visibleWords": 78
+    },
+    "visual": [
+      {
+        "viewport": "mobile",
+        "screenshot": "v22a-mobile-density-safe-settings-mobile.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.021739130434782608,
+        "scrollHeight": 2415
+      },
+      {
+        "viewport": "tablet",
+        "screenshot": "v22a-mobile-density-safe-settings-tablet.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.021739130434782608,
+        "scrollHeight": 1272
+      },
+      {
+        "viewport": "desktop",
+        "screenshot": "v22a-mobile-density-safe-settings-desktop.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.021739130434782608,
+        "scrollHeight": 1074
+      }
+    ],
+    "assertionFailures": [],
+    "score": 100,
+    "auditOk": true,
+    "visualOk": true,
+    "ok": true
+  },
+  {
+    "variant": "v22a-mobile-density-safe",
+    "case": "kanban",
+    "formalOk": true,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-stage123-v22a-mobile-density-safe-kanban-stage123-pass12-g4EVsS",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/stage123-v22a-mobile-density-safe-kanban-stage123-pass12-1778481554051",
+    "devServer": {
+      "url": "http://127.0.0.1:60298/",
+      "pid": 50820
+    },
+    "agentSeconds": 117.6,
+    "source": {
+      "failures": [],
+      "dryuiComponents": [
+        "Badge",
+        "Button",
+        "Heading",
+        "Input",
+        "Separator",
+        "Text"
+      ],
+      "visibleWords": 89
+    },
+    "visual": [
+      {
+        "viewport": "mobile",
+        "screenshot": "v22a-mobile-density-safe-kanban-mobile.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.02,
+        "scrollHeight": 2632
+      },
+      {
+        "viewport": "tablet",
+        "screenshot": "v22a-mobile-density-safe-kanban-tablet.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.02,
+        "scrollHeight": 1184
+      },
+      {
+        "viewport": "desktop",
+        "screenshot": "v22a-mobile-density-safe-kanban-desktop.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.02,
+        "scrollHeight": 1000
+      }
+    ],
+    "assertionFailures": [],
+    "score": 100,
+    "auditOk": true,
+    "visualOk": true,
+    "ok": true
+  },
+  {
+    "variant": "v22a-mobile-density-safe",
+    "case": "knowledge",
+    "formalOk": true,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-stage123-v22a-mobile-density-safe-knowledge-stage123-pass12-9HtlSs",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/stage123-v22a-mobile-density-safe-knowledge-stage123-pass12-1778481710215",
+    "devServer": {
+      "url": "http://127.0.0.1:61055/",
+      "pid": 58043
+    },
+    "agentSeconds": 147.2,
+    "source": {
+      "failures": [],
+      "dryuiComponents": [
+        "Badge",
+        "Button",
+        "Heading",
+        "Image",
+        "Input",
+        "Text",
+        "Separator"
+      ],
+      "visibleWords": 112
+    },
+    "visual": [
+      {
+        "viewport": "mobile",
+        "screenshot": "v22a-mobile-density-safe-knowledge-mobile.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.05263157894736842,
+        "scrollHeight": 2611
+      },
+      {
+        "viewport": "tablet",
+        "screenshot": "v22a-mobile-density-safe-knowledge-tablet.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.05263157894736842,
+        "scrollHeight": 1553
+      },
+      {
+        "viewport": "desktop",
+        "screenshot": "v22a-mobile-density-safe-knowledge-desktop.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.05263157894736842,
+        "scrollHeight": 1410
+      }
+    ],
+    "assertionFailures": [],
+    "score": 100,
+    "auditOk": true,
+    "visualOk": true,
+    "ok": true
+  },
+  {
+    "variant": "v22a-mobile-density-safe",
+    "case": "crm",
+    "formalOk": true,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-stage123-v22a-mobile-density-safe-crm-stage123-pass12-M7OGQ1",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/stage123-v22a-mobile-density-safe-crm-stage123-pass12-1778481554050",
+    "devServer": {
+      "url": "http://127.0.0.1:60296/",
+      "pid": 53303
+    },
+    "agentSeconds": 137,
+    "source": {
+      "failures": [
+        "size layout outside defensive wrapper group in app.css"
+      ],
+      "dryuiComponents": [
+        "Badge",
+        "Button",
+        "Heading",
+        "Input",
+        "Link",
+        "Separator",
+        "Text"
+      ],
+      "visibleWords": 72
+    },
+    "visual": [
+      {
+        "viewport": "mobile",
+        "screenshot": "v22a-mobile-density-safe-crm-mobile.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.03125,
+        "scrollHeight": 2243
+      },
+      {
+        "viewport": "tablet",
+        "screenshot": "v22a-mobile-density-safe-crm-tablet.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.03125,
+        "scrollHeight": 1219
+      },
+      {
+        "viewport": "desktop",
+        "screenshot": "v22a-mobile-density-safe-crm-desktop.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.03125,
+        "scrollHeight": 1000
+      }
+    ],
+    "assertionFailures": [],
+    "score": 93,
+    "auditOk": false,
+    "visualOk": true,
+    "ok": false
+  }
+]

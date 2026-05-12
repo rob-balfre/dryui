@@ -1,0 +1,139 @@
+[
+  {
+    "variant": "v1-blueprint",
+    "caseName": "kanban",
+    "ok": true,
+    "failures": [],
+    "shots": {
+      "mobile": "v1-blueprint-kanban-mobile.png",
+      "tablet": "v1-blueprint-kanban-tablet.png",
+      "desktop": "v1-blueprint-kanban-desktop.png"
+    }
+  },
+  {
+    "variant": "v1-blueprint",
+    "caseName": "settings",
+    "ok": true,
+    "failures": [],
+    "shots": {
+      "mobile": "v1-blueprint-settings-mobile.png",
+      "tablet": "v1-blueprint-settings-tablet.png",
+      "desktop": "v1-blueprint-settings-desktop.png"
+    }
+  },
+  {
+    "variant": "v1-blueprint",
+    "caseName": "knowledge",
+    "ok": true,
+    "failures": [],
+    "shots": {
+      "mobile": "v1-blueprint-knowledge-mobile.png",
+      "tablet": "v1-blueprint-knowledge-tablet.png",
+      "desktop": "v1-blueprint-knowledge-desktop.png"
+    }
+  },
+  {
+    "variant": "v2-chrome",
+    "caseName": "kanban",
+    "ok": true,
+    "failures": [],
+    "shots": {
+      "mobile": "v2-chrome-kanban-mobile.png",
+      "tablet": "v2-chrome-kanban-tablet.png",
+      "desktop": "v2-chrome-kanban-desktop.png"
+    }
+  },
+  {
+    "variant": "v2-chrome",
+    "caseName": "settings",
+    "ok": false,
+    "failures": [
+      "file-matches: src/layout.css failed /@container\\s+[a-z0-9-]+\\s+\\(min-width:\\s*48rem\\)/i",
+      "file-matches: src/layout.css failed /@container\\s+[a-z0-9-]+\\s+\\(min-width:\\s*72rem\\)/i"
+    ],
+    "shots": {
+      "mobile": "v2-chrome-settings-mobile.png",
+      "tablet": "v2-chrome-settings-tablet.png",
+      "desktop": "v2-chrome-settings-desktop.png"
+    }
+  },
+  {
+    "variant": "v2-chrome",
+    "caseName": "knowledge",
+    "ok": true,
+    "failures": [],
+    "shots": {
+      "mobile": "v2-chrome-knowledge-mobile.png",
+      "tablet": "v2-chrome-knowledge-tablet.png",
+      "desktop": "v2-chrome-knowledge-desktop.png"
+    }
+  },
+  {
+    "variant": "v3-proportion",
+    "caseName": "kanban",
+    "ok": true,
+    "failures": [],
+    "shots": {
+      "mobile": "v3-proportion-kanban-mobile.png",
+      "tablet": "v3-proportion-kanban-tablet.png",
+      "desktop": "v3-proportion-kanban-desktop.png"
+    }
+  },
+  {
+    "variant": "v3-proportion",
+    "caseName": "settings",
+    "ok": true,
+    "failures": [],
+    "shots": {
+      "mobile": "v3-proportion-settings-mobile.png",
+      "tablet": "v3-proportion-settings-tablet.png",
+      "desktop": "v3-proportion-settings-desktop.png"
+    }
+  },
+  {
+    "variant": "v4-recipes",
+    "caseName": "kanban",
+    "ok": true,
+    "failures": [],
+    "shots": {
+      "mobile": "v4-recipes-kanban-mobile.png",
+      "tablet": "v4-recipes-kanban-tablet.png",
+      "desktop": "v4-recipes-kanban-desktop.png"
+    }
+  },
+  {
+    "variant": "v4-recipes",
+    "caseName": "settings",
+    "ok": false,
+    "failures": [
+      "file-matches: src/routes/+page.svelte failed /data-layout-area=\"(primary|main|workspace|board|reader|settings|content)\"/i"
+    ],
+    "shots": {
+      "mobile": "v4-recipes-settings-mobile.png",
+      "tablet": "v4-recipes-settings-tablet.png",
+      "desktop": "v4-recipes-settings-desktop.png"
+    }
+  },
+  {
+    "variant": "v4-recipes",
+    "caseName": "knowledge",
+    "ok": true,
+    "failures": [],
+    "shots": {
+      "mobile": "v4-recipes-knowledge-mobile.png",
+      "tablet": "v4-recipes-knowledge-tablet.png",
+      "desktop": "v4-recipes-knowledge-desktop.png"
+    }
+  },
+  {
+    "variant": "v5-repair",
+    "caseName": "knowledge",
+    "ok": true,
+    "failures": [],
+    "shots": {
+      "mobile": "v5-repair-knowledge-mobile.png",
+      "tablet": "v5-repair-knowledge-tablet.png",
+      "desktop": "v5-repair-knowledge-desktop.png"
+    }
+  }
+]

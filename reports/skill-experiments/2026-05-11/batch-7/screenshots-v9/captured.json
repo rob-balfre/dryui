@@ -1,0 +1,109 @@
+[
+  {
+    "variant": "v9-abstract-blocks",
+    "case": "analytics",
+    "ok": true,
+    "formalOk": true,
+    "auditOk": true,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-abstract-analytics-layout-tighten-v9-abstract-blocks-OuwcqV",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/abstract-analytics-layout-tighten-v9-abstract-blocks-1778467646042",
+    "agentSeconds": 374.8,
+    "assertionFailures": [],
+    "auditFailures": [],
+    "caseName": "analytics",
+    "failures": [],
+    "shots": {
+      "mobile": "v9-abstract-blocks-analytics-mobile.png",
+      "tablet": "v9-abstract-blocks-analytics-tablet.png",
+      "desktop": "v9-abstract-blocks-analytics-desktop.png"
+    }
+  },
+  {
+    "variant": "v9-abstract-blocks",
+    "case": "kanban",
+    "ok": false,
+    "formalOk": true,
+    "auditOk": false,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-abstract-kanban-layout-tighten-v9-abstract-blocks-fIGlXN",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/abstract-kanban-layout-tighten-v9-abstract-blocks-1778467646044",
+    "agentSeconds": 319.8,
+    "assertionFailures": [],
+    "auditFailures": [
+      "copied UI/content label"
+    ],
+    "caseName": "kanban",
+    "failures": [
+      "copied UI/content label"
+    ],
+    "shots": {
+      "mobile": "v9-abstract-blocks-kanban-mobile.png",
+      "tablet": "v9-abstract-blocks-kanban-tablet.png",
+      "desktop": "v9-abstract-blocks-kanban-desktop.png"
+    }
+  },
+  {
+    "variant": "v9-abstract-blocks",
+    "case": "crm",
+    "ok": false,
+    "formalOk": true,
+    "auditOk": false,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-abstract-crm-layout-tighten-v9-abstract-blocks-HA6pyg",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/abstract-crm-layout-tighten-v9-abstract-blocks-1778467646044",
+    "agentSeconds": 319.5,
+    "assertionFailures": [],
+    "auditFailures": [
+      "copied UI/content label"
+    ],
+    "caseName": "crm",
+    "failures": [
+      "copied UI/content label"
+    ],
+    "shots": {
+      "mobile": "v9-abstract-blocks-crm-mobile.png",
+      "tablet": "v9-abstract-blocks-crm-tablet.png",
+      "desktop": "v9-abstract-blocks-crm-desktop.png"
+    }
+  },
+  {
+    "variant": "v9-abstract-blocks",
+    "case": "settings",
+    "ok": false,
+    "formalOk": true,
+    "auditOk": false,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-abstract-settings-layout-tighten-v9-abstract-blocks-uXw7rc",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/abstract-settings-layout-tighten-v9-abstract-blocks-1778467646044",
+    "agentSeconds": 320,
+    "assertionFailures": [],
+    "auditFailures": [
+      "copied UI/content label"
+    ],
+    "caseName": "settings",
+    "failures": [
+      "copied UI/content label"
+    ],
+    "shots": {
+      "mobile": "v9-abstract-blocks-settings-mobile.png",
+      "tablet": "v9-abstract-blocks-settings-tablet.png",
+      "desktop": "v9-abstract-blocks-settings-desktop.png"
+    }
+  },
+  {
+    "variant": "v9-abstract-blocks",
+    "case": "knowledge",
+    "ok": true,
+    "formalOk": true,
+    "auditOk": true,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-abstract-knowledge-layout-tighten-v9-abstract-blocks-aE200q",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/abstract-knowledge-layout-tighten-v9-abstract-blocks-1778467646044",
+    "agentSeconds": 366.6,
+    "assertionFailures": [],
+    "auditFailures": [],
+    "caseName": "knowledge",
+    "failures": [],
+    "shots": {
+      "mobile": "v9-abstract-blocks-knowledge-mobile.png",
+      "tablet": "v9-abstract-blocks-knowledge-tablet.png",
+      "desktop": "v9-abstract-blocks-knowledge-desktop.png"
+    }
+  }
+]

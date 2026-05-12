@@ -1,0 +1,247 @@
+[
+  {
+    "variant": "v17a-compact-evidence",
+    "case": "analytics",
+    "formalOk": true,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-stage123-v17a-compact-evidence-analytics-stage123-pass7-7E6ASA",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/stage123-v17a-compact-evidence-analytics-stage123-pass7-1778477209872",
+    "devServer": {
+      "url": "http://127.0.0.1:64297/",
+      "pid": 24117
+    },
+    "agentSeconds": 178.7,
+    "source": {
+      "failures": [],
+      "dryuiComponents": [
+        "Badge",
+        "Button",
+        "Heading",
+        "Input",
+        "Separator",
+        "Table",
+        "Text"
+      ],
+      "visibleWords": 89
+    },
+    "visual": [
+      {
+        "viewport": "mobile",
+        "screenshot": "/Users/robertbalfre/dryui/reports/skill-experiments/2026-05-11/batch-8/screenshots-pass7/v17a-compact-evidence-analytics-mobile.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.07766990291262135,
+        "scrollHeight": 2513
+      },
+      {
+        "viewport": "tablet",
+        "screenshot": "/Users/robertbalfre/dryui/reports/skill-experiments/2026-05-11/batch-8/screenshots-pass7/v17a-compact-evidence-analytics-tablet.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.07766990291262135,
+        "scrollHeight": 1226
+      },
+      {
+        "viewport": "desktop",
+        "screenshot": "/Users/robertbalfre/dryui/reports/skill-experiments/2026-05-11/batch-8/screenshots-pass7/v17a-compact-evidence-analytics-desktop.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.07766990291262135,
+        "scrollHeight": 1000
+      }
+    ],
+    "assertionFailures": [],
+    "score": 100,
+    "auditOk": true,
+    "visualOk": true,
+    "ok": true
+  },
+  {
+    "variant": "v17a-compact-evidence",
+    "case": "knowledge",
+    "formalOk": true,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-stage123-v17a-compact-evidence-knowledge-stage123-pass7-FKi3NY",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/stage123-v17a-compact-evidence-knowledge-stage123-pass7-1778477639841",
+    "devServer": {
+      "url": "http://127.0.0.1:64755/",
+      "pid": 36295
+    },
+    "agentSeconds": 150.1,
+    "source": {
+      "failures": [],
+      "dryuiComponents": [
+        "Badge",
+        "Button",
+        "Heading",
+        "Image",
+        "Input",
+        "Link",
+        "Separator",
+        "Text"
+      ],
+      "visibleWords": 120
+    },
+    "visual": [
+      {
+        "viewport": "mobile",
+        "screenshot": "/Users/robertbalfre/dryui/reports/skill-experiments/2026-05-11/batch-8/screenshots-pass7/v17a-compact-evidence-knowledge-mobile.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.022727272727272728,
+        "scrollHeight": 2700
+      },
+      {
+        "viewport": "tablet",
+        "screenshot": "/Users/robertbalfre/dryui/reports/skill-experiments/2026-05-11/batch-8/screenshots-pass7/v17a-compact-evidence-knowledge-tablet.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.022727272727272728,
+        "scrollHeight": 1474
+      },
+      {
+        "viewport": "desktop",
+        "screenshot": "/Users/robertbalfre/dryui/reports/skill-experiments/2026-05-11/batch-8/screenshots-pass7/v17a-compact-evidence-knowledge-desktop.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.022727272727272728,
+        "scrollHeight": 1000
+      }
+    ],
+    "assertionFailures": [],
+    "score": 100,
+    "auditOk": true,
+    "visualOk": true,
+    "ok": true
+  },
+  {
+    "variant": "v17a-compact-evidence",
+    "case": "kanban",
+    "formalOk": true,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-stage123-v17a-compact-evidence-kanban-stage123-pass7-Zikn2p",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/stage123-v17a-compact-evidence-kanban-stage123-pass7-1778477427921",
+    "devServer": {
+      "url": "http://127.0.0.1:64653/",
+      "pid": 30670
+    },
+    "agentSeconds": 163.2,
+    "source": {
+      "failures": [],
+      "dryuiComponents": [
+        "Badge",
+        "Button",
+        "Heading",
+        "Input",
+        "Link",
+        "Separator",
+        "Text"
+      ],
+      "visibleWords": 93
+    },
+    "visual": [
+      {
+        "viewport": "mobile",
+        "screenshot": "/Users/robertbalfre/dryui/reports/skill-experiments/2026-05-11/batch-8/screenshots-pass7/v17a-compact-evidence-kanban-mobile.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.05737704918032787,
+        "scrollHeight": 2939
+      },
+      {
+        "viewport": "tablet",
+        "screenshot": "/Users/robertbalfre/dryui/reports/skill-experiments/2026-05-11/batch-8/screenshots-pass7/v17a-compact-evidence-kanban-tablet.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.05737704918032787,
+        "scrollHeight": 1652
+      },
+      {
+        "viewport": "desktop",
+        "screenshot": "/Users/robertbalfre/dryui/reports/skill-experiments/2026-05-11/batch-8/screenshots-pass7/v17a-compact-evidence-kanban-desktop.png",
+        "horizontalOverflow": 0,
+        "shellWidthRatio": 1,
+        "shellTop": 0,
+        "primaryLargest": true,
+        "lowContrastRatio": 0.05737704918032787,
+        "scrollHeight": 1024
+      }
+    ],
+    "assertionFailures": [],
+    "score": 95,
+    "auditOk": true,
+    "visualOk": false,
+    "ok": false
+  },
+  {
+    "variant": "v17a-compact-evidence",
+    "case": "settings",
+    "formalOk": false,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-stage123-v17a-compact-evidence-settings-stage123-pass7-iTwWbj",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/stage123-v17a-compact-evidence-settings-stage123-pass7-1778477209873",
+    "devServer": null,
+    "agentSeconds": 179.8,
+    "source": {
+      "failures": [],
+      "dryuiComponents": [
+        "Badge",
+        "Button",
+        "Heading",
+        "Image",
+        "Input",
+        "Link",
+        "Separator",
+        "Table",
+        "Text"
+      ],
+      "visibleWords": 82
+    },
+    "visual": [],
+    "assertionFailures": [],
+    "score": 80,
+    "auditOk": true,
+    "visualOk": true,
+    "ok": false
+  },
+  {
+    "variant": "v17a-compact-evidence",
+    "case": "crm",
+    "formalOk": false,
+    "projectDir": "/var/folders/52/l8fk8j4n7f9ft1nt292mhdrw0000gn/T/dryui-e2e-stage123-v17a-compact-evidence-crm-stage123-pass7-CWSZj0",
+    "logDir": "/Users/robertbalfre/dryui/reports/e2e-runs/stage123-v17a-compact-evidence-crm-stage123-pass7-1778477427919",
+    "devServer": null,
+    "agentSeconds": 210.3,
+    "source": {
+      "failures": [],
+      "dryuiComponents": [
+        "Badge",
+        "Button",
+        "Heading",
+        "Input",
+        "Link",
+        "Separator",
+        "Text"
+      ],
+      "visibleWords": 103
+    },
+    "visual": [],
+    "assertionFailures": [],
+    "score": 80,
+    "auditOk": true,
+    "visualOk": true,
+    "ok": false
+  }
+]
