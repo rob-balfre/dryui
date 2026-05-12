@@ -7,6 +7,75 @@ description: Builds and edits Svelte 5 user interfaces with DryUI components, la
 
 Build real Svelte 5 UI with DryUI. This skill is only for UI implementation and polish. It does not install DryUI, scaffold projects, run live feedback, or resolve feedback submissions.
 
+## Lint Rules — Read First
+
+These are the rules `@dryui/lint` enforces. They are the contract — if lint, the Svelte compiler, or component metadata disagrees with a visual idea, restructure the markup or CSS instead of bypassing the rule. Bulk-silencing lint produces unstyled, broken pages because the rules and `src/layout.css` are coupled.
+
+### Banned in `.svelte` files
+
+- No `:global()`. Use scoped styles, `data-*` attributes, CSS custom properties, or component props.
+- No `!important`. Fix specificity at the source.
+- No `all: unset`. Reset only the specific properties you need.
+- No `<svelte:element this={x}>`. Use explicit `{#if}/{:else}` branches with concrete tags. The `<!-- dryui-allow svelte-element -->` escape hatch is for finite semantic tag sets only (`h1`-`h6`).
+- No `<!-- svelte-ignore css_unused_selector -->` or other ignore comments. Fix the underlying issue.
+- No inline `style=` attributes. Use scoped CSS with custom properties.
+- No `style:` directives. Use component props, `--dry-*` custom properties, or the `<style>` block.
+- No `{@attach ...}`. Use component props or CSS custom properties.
+- No `<a>` without `href`. Use `<button>` for non-navigation actions.
+- No `<hr>`. Use `<Separator />` so token overrides apply.
+- No raw `<button>`, `<input>`, `<select>`, etc. when a DryUI primitive exists. Allowed only inside the matching `packages/ui/<component>/` directory.
+- No `class=` on DryUI components. They do not forward `class` to the rendered element. Use `--dry-*` custom properties, `data-*` attributes, component props, or wrap in a `data-layout` element. (`<Button>` has a back-compat `className` alias; most components do not.)
+
+### Banned CSS values
+
+- No `width`, `inline-size`, or their `min-/max-` variants. Grid children are sized by the track — use `grid-template-columns`/`-rows`. Allowed only for typographic measure in `ch`/`em`/`ex` (e.g. `max-width: 55ch`). The `/* dryui-allow width */` escape hatch is for measured component-internal control geometry only — never for page constraints, cards, panels, columns, or responsive sizing.
+- No `display: flex` at page or section level. Use grid in `src/layout.css`. For chip rows use `<ChipGroup.Root>`. The `/* dryui-allow flex */` escape hatch is for isolated component internals that need one-dimensional intrinsic layout — never for wrappers, cards, forms, navigation shells, or page sections.
+- No raw `display: grid` in component or route `<style>` blocks. Move page-level grid declarations to `src/layout.css`, scoped under `[data-layout='<name>']`.
+- No `@media (min-width: …)` for sizing — never `@media` for layout breakpoints. Use `@container page (...)`. `@media (prefers-reduced-motion)` and `@media (prefers-color-scheme)` are still allowed.
+- No `outline: 2px solid var(--dry-color-focus-ring)`. Use `outline: var(--dry-focus-ring)` followed by `outline-offset: 2px` (outset) or `-1px` (inset).
+
+### `data-layout` discipline
+
+- DryUI does not ship a layout component. Use plain markup with `data-layout` and `data-layout-area`, then declare the matching grid in `src/layout.css`.
+- Every interior raw structural element needs `data-layout="<specific-name>"` or `data-layout-area="<area>"`.
+- Banned generic names: `ui`, `wrapper`, `box`, `container`, `div`, `block`, `el`, `elem`, `element`, `layout`, `inner`, `outer`. They produce unstyled output because no matching grid exists in `src/layout.css`.
+- Every `data-layout` name needs a matching grid declared in `src/layout.css`. If a wrapper has no real layout job, replace it with a DryUI component (`Heading`, `Text`, `Badge`, `Avatar`) or remove it.
+- Use `data-layout-area` only for children that participate in named grid areas inside a `data-layout` parent.
+
+### `src/layout.css` is structural-only
+
+- Only `@container` wrappers allowed at-rule. No `@media`, no `@supports`, no `@import`.
+- Selectors must target `[data-layout]` or `[data-layout-area]`. No tag, class, id, or descendant-combinator-only selectors.
+- Allowed properties: `display`, `grid-*`, `flex` (component-internal only), `container`/`container-type`/`container-name`, `gap`/`row-gap`/`column-gap`, `align-*`, `justify-*`, `place-*`, `block-size`/`min-block-size`/`max-block-size`, and tokenized spacing via `--dry-space-*`.
+- Allowed `display` values: `grid`, `inline-grid`, `flex`, `inline-flex`, `contents`. No `block`, `flow-root`, `inline`, or reset-style values.
+- Banned: color, background, border, shadow, opacity, transition, transform, font, text, position, z-index, `width`/`height`/`inline-size`, raw `px` spacing, hex/rgb colors.
+
+### `src/app.css` is visual paint
+
+- **Required**: `body { font-family: var(--dry-font-sans); }` so popovers, dialogs, and native top-layer content inherit the app font.
+- Allowed: color, border, radius, padding, margin, typography, shadows, custom properties, `overflow`.
+- Banned: `display`, `grid-*`, `flex-*`, `container`, `@container`, `@media`, `gap`, `justify-*`, `align-*`, `place-*`, `order`, `position`, `inset`, `top`/`right`/`bottom`/`left`, `float`, `width`, `height`, `inline-size`, `block-size`, `flex-shrink`/`flex-grow`/`flex-basis`.
+- Do not style generic tags: `html`, `body > div`, `button`, `svg`, `h1`-`h6`, `p`, `a`, `section`, `article`, `div`, `ul`, `li`. Style via `[data-layout]`, `[data-layout-area]`, `[data-tone]`, and other semantic data attributes.
+- `body` itself may only use `margin: 0`, background, color, font-family, and `overflow-x: clip`.
+
+### Components and accessibility
+
+- Compound components use `.Root` — parts must live inside the matching root. Common: `Accordion`, `AlertDialog`, `Breadcrumb`, `Collapsible`, `ColorPicker`, `Combobox`, `CommandPalette`, `ContextMenu`, `DataGrid`, `DatePicker`, `Dialog`, `Drawer`, `DropdownMenu`, `EmptyState`, `Field`, `FileUpload`, `FloatButton`, `Pagination`, `Popover`, `RadioGroup`, `RichTextEditor`, `Select`, `Splitter`, `Stepper`, `Table`, `Tabs`, `TagsInput`, `Toast`, `ToggleGroup`, `Toolbar`, `Tooltip`, `Tour`, `Transfer`.
+- Wrap every form control in `<Field.Root>` with `<Label>`.
+- `<Avatar>` requires `alt` and `fallback` props.
+- Icon-only `<Button>` requires `aria-label`.
+- Primary form submit `<Button>` requires `type="submit"`.
+- Use `<AlertDialog>` for destructive confirmation.
+
+### Theme tokens
+
+- Import `@dryui/ui/themes/default.css` (and `dark.css` if used) BEFORE local CSS. Local CSS imported first gets clobbered by theme defaults.
+- Full-theme files (`*.theme.css` or `/* @dryui-theme */` directive) must define every semantic token.
+- For 1-10 site-wide tweaks, scope token overrides under `.page`/`body`, not `:root`. For 1-5 per-route tweaks, put them in a scoped component `<style>`. Do not scatter `--dry-*` overrides on `:root`.
+- Do not invent `--dry-*` names. Non-existent: `--dry-color-surface`, `--dry-color-panel`, `--dry-color-background`. Real surface tokens: `--dry-color-bg-base`, `--dry-color-bg-raised`, `--dry-color-bg-overlay`.
+- Do not resize the whole UI via `html`/`body` `font-size`. Do not use raw hex, `rgb()`, or raw `px` spacing when a DryUI token exists.
+- `color-scheme: light dark` and `light-dark()` are not theme switches — DryUI dark tokens come from `data-theme="dark"` or `.theme-auto`.
+
 ## First Decision
 
 Classify the task before editing:
@@ -16,33 +85,6 @@ Classify the task before editing:
 - Component or form: use the component, theme, Svelte, and validation rules without creating a page shell.
 
 When the user provides a mockup or asks for a dashboard, admin page, settings page, CRM, kanban, knowledge base, inbox, calendar, finance, inventory, course, or other app page, treat it as full-page work unless they explicitly ask for a component.
-
-## Lint First
-
-DryUI lint rules are the contract. If lint, the compiler, or component metadata disagrees with a visual idea, restructure the markup or CSS instead of bypassing the rule.
-
-- Use `@dryui/ui` primitives when DryUI provides one. Do not recreate controls with raw HTML.
-- DryUI does not ship a layout component. Use plain markup with `data-layout` and `data-layout-area`.
-- Page and section layout lives in `src/layout.css`, scoped under `[data-layout='<name>']`.
-- All consumer `display: grid` and `display: flex` declarations live in `src/layout.css` or `@container` blocks inside it.
-- In `src/layout.css`, use only lint-safe `display` values such as `grid` or `flex`; never add `display: block`, `contents`, `flow-root`, or reset-style display values.
-- Route and component `<style>` blocks must not contain page-level layout. For full-page work, do not use route `<style>` blocks at all.
-- Responsive layout is mobile-first and uses `@container page (...)`; never `@media` for layout breakpoints.
-- `src/layout.css` is structural only: display, grid, flex, container, tokenized spacing, alignment, and block-size constraints. No color, background, border, shadow, opacity, transition, transform, font, text, position, z-index, width, height, or inline-size.
-- Visual CSS belongs in `src/app.css` or component CSS and uses real `--dry-*` tokens such as `--dry-color-bg-base`, `--dry-color-text`, and `--dry-color-border`, or app-owned custom properties.
-- Set `body { font-family: var(--dry-font-sans); }` in `src/app.css` so dialogs, popovers, and top-layer UI inherit the app font.
-
-Do not add these to get past lint or compiler pressure:
-
-- `:global()`
-- `!important`
-- `all: unset`
-- `<svelte:element>`
-- `<!-- svelte-ignore ... -->`
-- inline `style=`
-- `style:` directives
-- raw native controls when a DryUI component exists
-- width or inline-size hacks to force unrelated layout fit
 
 ## Workflow
 
@@ -54,254 +96,193 @@ Do not add these to get past lint or compiler pressure:
 6. Run deterministic validation for the changed files.
 7. For visual work, verify mobile, tablet, and desktop screenshots.
 
-## Page Shell
+## Building a page
 
-Use this workflow for new full pages and design-image-to-code tasks.
+For full pages and design-to-code work:
 
-1. Name the page type.
-2. Choose a short route-specific shell name ending in `-shell`, for example `dashboard-shell`, `support-shell`, or `inventory-shell`.
-3. Put `container: page / inline-size` on the shell itself.
-4. Use one top-level `[data-layout-area='page']` grid inside the shell.
-5. Use one each of `topbar`, `navigation`, `primary`, and optionally `secondary`.
-6. Keep mobile first; add at least two `@container page (min-width: ...)` breakpoints for tablet and desktop.
-7. Keep the mobile document under roughly `2800px` by reducing rows, cards, and duplicated panels.
-8. Run build plus visual checks at mobile, tablet, and desktop before finishing.
+- Shell name: route-specific, ending in `-shell` (e.g. `dashboard-shell`, `support-shell`).
+- Container query lives on the shell itself; one `[data-layout-area='page']` grid inside.
+- Areas: one each of `topbar`, `navigation`, `primary`, optionally `secondary`. Mobile first; promote to multi-column at `48rem` (tablet) and `72rem` (desktop).
+- After topbar and nav, use at most 5 top-level panels (a metric grid counts as one). Topbar title fits one mobile line; nav has 4-6 items. Light navigation by default — only go dark when the design verifies contrast.
 
-Default shell:
+### Shell markup
 
 ```svelte
 <main data-layout="dashboard-shell">
 	<div data-layout-area="page">
-		<header data-layout-area="topbar">...</header>
-		<nav data-layout-area="navigation">...</nav>
-		<section data-layout-area="primary">...</section>
-		<aside data-layout-area="secondary">...</aside>
+		<header data-layout-area="topbar">…</header>
+		<nav data-layout-area="navigation">…</nav>
+		<section data-layout-area="primary">…</section>
+		<aside data-layout-area="secondary">…</aside>
 	</div>
 </main>
 ```
 
-Rules:
+The shell wraps a single `page` grid; areas slot into named tracks. Reuse this skeleton for every full page; only the shell name changes.
 
-- Do not create duplicate shell areas.
-- Do not put `data-layout-area` on nested primitive text wrappers.
-- Do not create dark navigation by default. Use light navigation unless the reference clearly requires dark and you verify contrast.
-- Keep the topbar title to one readable mobile line. Shorten labels rather than allowing awkward mid-word wraps.
-- Navigation should have 4 to 6 items and appear immediately after the topbar on mobile.
-- After topbar and navigation, use no more than five top-level panels. A metric grid counts as one panel.
-- Prefer rows, compact metrics, and concise evidence panels over fake charts, oversized previews, SVG decoration, canvas, or tall media wells.
-- For tabular references, prefer `data-layout="list-stack"` rows unless you have verified the DryUI `Table` runtime path in this app.
-- For preview-heavy references, build compact text-and-badge previews inside `data-layout="preview-stack"`. Do not let image or document previews dominate mobile height.
-
-## Page Layout CSS
-
-For a new full page, add this structure to `src/layout.css`, replacing `dashboard-shell` consistently with the chosen shell name. Keep layout selectors direct and specific.
+### Shell grid (`src/layout.css`)
 
 ```css
 [data-layout='dashboard-shell'] {
 	container: page / inline-size;
 	min-block-size: 100dvh;
 }
-
 [data-layout='dashboard-shell'] > [data-layout-area='page'] {
 	display: grid;
-	min-block-size: 100dvh;
-	grid-template-areas:
-		'topbar'
-		'navigation'
-		'primary'
-		'secondary';
-	grid-template-columns: minmax(0, 1fr);
-	grid-template-rows: auto auto minmax(0, 1fr) auto;
-	gap: var(--dry-space-3);
-}
-
-[data-layout='dashboard-shell'] > [data-layout-area='page'] > [data-layout-area='topbar'] {
-	grid-area: topbar;
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: var(--dry-space-3);
-}
-
-[data-layout='dashboard-shell'] > [data-layout-area='page'] > [data-layout-area='navigation'] {
-	grid-area: navigation;
-	display: grid;
-	grid-template-columns: minmax(0, 1fr);
-	align-content: start;
-	gap: var(--dry-space-2);
-}
-
-[data-layout='dashboard-shell'] > [data-layout-area='page'] > [data-layout-area='primary'],
-[data-layout='dashboard-shell'] > [data-layout-area='page'] > [data-layout-area='secondary'] {
-	display: grid;
-	grid-template-columns: minmax(0, 1fr);
-	align-content: start;
-	gap: var(--dry-space-3);
-}
-
-[data-layout='dashboard-shell'] > [data-layout-area='page'] > [data-layout-area='primary'] {
-	grid-area: primary;
-}
-
-[data-layout='dashboard-shell'] > [data-layout-area='page'] > [data-layout-area='secondary'] {
-	grid-area: secondary;
-}
-
-[data-layout='brand-cluster'],
-[data-layout='toolbar-cluster'],
-[data-layout='row-cluster'],
-[data-layout='section-heading'] {
-	display: flex;
-	align-items: center;
-	gap: var(--dry-space-2);
-	flex-wrap: wrap;
-}
-
-[data-layout='toolbar-cluster'],
-[data-layout='row-cluster'] {
-	justify-content: flex-end;
-}
-
-[data-layout='app-stack'],
-[data-layout='panel-stack'],
-[data-layout='list-stack'],
-[data-layout='table-frame'],
-[data-layout='preview-stack'],
-[data-layout='metric-grid'],
-[data-layout='content-grid'],
-[data-layout='board-grid'],
-[data-layout='chart-grid'] {
-	display: grid;
+	grid-template-areas: 'topbar' 'navigation' 'primary' 'secondary';
 	grid-template-columns: minmax(0, 1fr);
 	gap: var(--dry-space-3);
 }
+```
 
-[data-layout='chart-bar'] {
-	display: grid;
-	align-items: end;
-	min-block-size: 8rem;
-}
+Container query on the shell, grid on `page`. Areas stack vertically on mobile — each child sits in its named row.
 
+### Container breakpoint
+
+```css
 @container page (min-width: 48rem) {
 	[data-layout='dashboard-shell'] > [data-layout-area='page'] {
 		grid-template-areas:
 			'topbar topbar topbar'
 			'navigation primary secondary';
 		grid-template-columns: 11rem minmax(0, 1fr) minmax(13rem, 0.4fr);
-		gap: var(--dry-space-4);
-	}
-
-	[data-layout='metric-grid'],
-	[data-layout='content-grid'],
-	[data-layout='board-grid'],
-	[data-layout='chart-grid'] {
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-	}
-}
-
-@container page (min-width: 72rem) {
-	[data-layout='dashboard-shell'] > [data-layout-area='page'] {
-		grid-template-areas:
-			'navigation topbar topbar'
-			'navigation primary secondary';
-		grid-template-columns: 13rem minmax(0, 1fr) minmax(17rem, 0.33fr);
-		grid-template-rows: auto minmax(0, 1fr);
-	}
-
-	[data-layout='metric-grid'] {
-		grid-template-columns: repeat(4, minmax(0, 1fr));
-	}
-
-	[data-layout='content-grid'],
-	[data-layout='board-grid'],
-	[data-layout='chart-grid'] {
-		grid-template-columns: repeat(3, minmax(0, 1fr));
 	}
 }
 ```
 
-When editing an existing full page, preserve its established shell name and area names if they already satisfy this contract.
+Use `@container page (...)`, never `@media`. Add a second breakpoint at `72rem` to tighten desktop columns.
 
-## Visual CSS
+## Layout primitives
 
-For full-page work, `src/app.css` is visual paint. It may set colors, borders, radius, padding, margin, typography, shadows, custom properties, and overflow. It must not contain `display`, `grid`, `flex`, `container`, `@container`, or `@media`.
+Reusable layout shapes keyed by a `data-layout` name. Declare once in `src/layout.css`, drop the markup anywhere.
 
-It also must not contain these layout-ish properties outside the defensive group below:
+### Cluster (horizontal row)
 
-- `justify-content`, `align-items`, `align-content`, `place-content`, `place-items`, `order`
-- `gap`, `row-gap`, `column-gap`
-- `position`, `inset`, `top`, `right`, `bottom`, `left`, `float`
-- `width`, `height`, `inline-size`, `block-size`, `flex-shrink`, `flex-grow`, `flex-basis`
+```css
+[data-layout='toolbar-cluster'] {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: var(--dry-space-2);
+	justify-content: flex-end;
+}
+```
 
-Add this defensive group once for full-page work. Do not write `min-inline-size`, `max-inline-size`, `inline-size`, `block-size`, `width`, or `height` elsewhere unless you are constraining replaced media and verify it does not become layout.
+Use for toolbars, brand+title rows, chip rows, action groups. Page-level `flex` is only allowed inside `src/layout.css`.
+
+### Stack (vertical grid)
+
+```css
+[data-layout='panel-stack'] {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	gap: var(--dry-space-3);
+}
+```
+
+Use for vertical lists of panels or list rows. `minmax(0, 1fr)` stops wide children from pushing the track open.
+
+### Responsive metric grid
+
+```css
+[data-layout='metric-grid'] {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	gap: var(--dry-space-3);
+}
+@container page (min-width: 48rem) {
+	[data-layout='metric-grid'] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@container page (min-width: 72rem) {
+	[data-layout='metric-grid'] { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+```
+
+For KPI tiles and repeating same-shape cards: 1-col mobile, 2-col tablet, 4-col desktop.
+
+### Defensive overflow guard (`src/app.css`)
 
 ```css
 [data-layout-area='primary'],
-[data-layout-area='secondary'],
 [data-layout='panel-stack'],
-[data-layout='table-frame'],
 [data-layout='metric-grid'],
-[data-layout='content-grid'],
-[data-layout='list-stack'],
-[data-layout='section-heading'],
-[data-layout='row-cluster'],
-[data-layout='brand-cluster'],
-[data-layout='toolbar-cluster'] {
+[data-layout='list-stack'] {
 	min-inline-size: 0;
 	max-inline-size: 100%;
 	overflow-wrap: anywhere;
 }
 ```
 
-Additional visual rules:
-
-- `body` may use only `margin: 0`, background, color, font-family, and `overflow-x: clip`.
-- Do not style `html`, `body > div`, or generic elements such as `button`, `svg`, `h1`, `p`, `a`, `section`, `article`, `div`, `ul`, or `li` in `src/app.css`.
-- Style via `[data-layout]`, `[data-layout-area]`, `[data-tone]`, and semantic data attributes.
-- Use readable high-contrast pairs. For light panels, use dark text near `#0f172a`; muted text should not be lighter than roughly `#475569`.
-- Do not put dark or muted text on dark surfaces. If dark surfaces are required, set explicit light foregrounds and verify them in browser screenshots.
-- Use restrained spacing on mobile: page padding around `12px` to `16px`, panel padding around `12px` to `16px`, and no oversized headings.
-- Prefer subtle borders and flat panels over large shadows.
-- For `[data-layout='preview-stack']`, use a compact frame with `overflow: clip`, `aspect-ratio: 4 / 3`, modest padding, and text content. Avoid tall portrait wells on mobile.
-
-## Markup
-
-- Every interior raw structural element needs `data-layout="<specific-name>"` or `data-layout-area="<area>"`.
-- Use `data-layout-area` only for children that participate in named grid areas.
-- Do not use generic layout names: `ui`, `wrapper`, `box`, `container`, `div`, `block`, `el`, `elem`, `element`, `layout`, `inner`, `outer`.
-- Do not pass `class=` to DryUI components. Use wrappers, component props, `data-*` attributes, or custom properties.
-- Prefer `Button`, `Input`, `Select`, `DatePicker`, `Dialog`, `AlertDialog`, `Separator`, `DataGrid`, and verified `Table` usage over native route-level controls.
-- Wrap each form control in `Field.Root` with `Label`.
-- Use `AlertDialog` for destructive confirmation.
-- Add `aria-label` to icon-only buttons and `type="submit"` to primary form submit buttons.
-- Keep repeated page content compact: up to 3 to 4 metrics, 3 to 5 list rows, 3 board columns, and 1 to 2 secondary panels unless the user explicitly asks for dense data.
+Add once per app. The narrow exception to "no width in `app.css`" — required so long text and tables don't blow out their grid track.
 
 ## Components
 
-Assume a DryUI component is compound until metadata or nearby usage proves otherwise. Compound components use `.Root`; parts stay inside the matching root.
+Check `packages/ui/src/<component>/<component>.meta.ts` before guessing APIs. Assume compound (`.Root` + parts) until metadata proves otherwise.
 
-Common compound families include Accordion, AlertDialog, Breadcrumb, Collapsible, ColorPicker, Combobox, CommandPalette, ContextMenu, DataGrid, DatePicker, Dialog, Drawer, DropdownMenu, EmptyState, Field, FileUpload, FloatButton, Pagination, Popover, RadioGroup, RichTextEditor, Select, Splitter, Stepper, Table, Tabs, TagsInput, Toast, ToggleGroup, Toolbar, Tooltip, Tour, and Transfer.
+### Form field
 
-## Theme
+```svelte
+<Field.Root>
+	<Label>Email</Label>
+	<Input type="email" name="email" required />
+</Field.Root>
+```
 
-- Import DryUI theme CSS before rendering components and choose one document theme mode: light imports `default.css` and leaves `<html>` bare; system imports both themes and sets `class="theme-auto"`; explicit imports both and sets `data-theme="light"` or `data-theme="dark"`.
-- `color-scheme` is not a theme switch. Do not set `color-scheme: light dark` or use `light-dark()` as the only dark-mode implementation; DryUI dark tokens come from `data-theme` or `.theme-auto`.
-- App-owned custom properties must resolve to readable foreground/background pairs in every enabled mode. If using `light-dark()`, verify both resolutions and keep it out of image-overlay contrast decisions.
-- For art-directed light surfaces with fixed custom ink/cream colors, keep nav, chips, cards, and panels on app-owned light backgrounds too. Do not place fixed dark text or icons on adaptive DryUI background tokens such as `--dry-color-bg-base`, `--dry-color-bg-raised`, or `--dry-color-bg-overlay`, because `.theme-auto` on a dark OS can turn those surfaces dark while custom text stays dark.
-- Text over photos, video, canvas, charts, or gradients needs an actual contrast layer above the media and below the content, or a fixed text color chosen for that surface.
-- Auto/system pages must be checked in light and dark. If both cannot be verified, keep the app light-only and leave `<html>` bare.
-- Override semantic tokens such as brand, danger, success, text, stroke, focus, spacing, and type aliases. Do not invent `--dry-*` names or nonexistent surface tokens such as `--dry-color-surface`, `--dry-color-panel`, or `--dry-color-background`.
-- Do not resize the whole UI by changing `html` or `body` font-size; avoid raw hex, `rgb()`, and raw px spacing when a DryUI token exists. App-owned fixed colors are allowed only when paired and verified for contrast.
+Wrap every input in `Field.Root` with `Label` — Field provides accessible association, error state, and spacing.
 
-## Svelte
+### Compound component
 
-- Use Svelte 5 runes: `$state`, `$derived`, `$props`, `$bindable`, and `$effect`.
-- Prefer `$derived` for computed values. Do not use `$effect` to maintain derived state.
-- Use typed, destructured `$props`; use `$bindable` only for props that support two-way binding.
-- Use snippets instead of slots.
-- Use event props such as `onclick`, `oninput`, and `onsubmit`; do not mix legacy `on:` handlers into new code.
-- Guard browser-only APIs from SSR. Do not read `window`, `document`, `localStorage`, or layout measurements at module evaluation time.
-- Treat `$effect` as an escape hatch for browser lifecycle work, observers, listeners, maps, canvas, timers, and cleanup.
+```svelte
+<Select.Root bind:value={role}>
+	<Select.Trigger>
+		<Select.Value placeholder="Pick a role" />
+	</Select.Trigger>
+	<Select.Content>
+		<Select.Item value="admin">Admin</Select.Item>
+		<Select.Item value="member">Member</Select.Item>
+	</Select.Content>
+</Select.Root>
+```
+
+All parts live inside the matching `.Root`. Same shape for `Dialog`, `Popover`, `Tabs`, `Combobox`, `DropdownMenu`, etc.
+
+### Visual override via custom properties
+
+```svelte
+<div data-layout="kpi-tile">
+	<Badge>Live</Badge>
+</div>
+
+<style>
+	[data-layout='kpi-tile'] {
+		--dry-color-badge-bg: var(--dry-color-success-soft);
+		padding: var(--dry-space-3);
+		background: var(--dry-color-bg-raised);
+		border-radius: var(--dry-radius-md);
+	}
+</style>
+```
+
+DryUI components do not accept `class=`. Override visuals by setting `--dry-*` custom properties on a `data-layout` wrapper, or via component props.
+
+## Svelte 5
+
+```svelte
+<script lang="ts">
+	type Props = { items: Item[]; onpick?: (item: Item) => void };
+	let { items, onpick }: Props = $props();
+
+	let query = $state('');
+	let filtered = $derived(items.filter((i) => i.name.includes(query)));
+</script>
+
+<Input bind:value={query} placeholder="Search" />
+{#each filtered as item}
+	<Button variant="ghost" onclick={() => onpick?.(item)}>{item.name}</Button>
+{/each}
+```
+
+Typed `$props`, `$state` for local UI state, `$derived` for computed values (never `$effect` to maintain state). Use `onclick`, not `on:click`. Snippets, not slots. Guard `window`/`document` access from SSR inside `$effect`.
 
 ## Motion
 
