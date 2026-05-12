@@ -123,6 +123,15 @@ describe('feedback skill path resolution', () => {
 		expect(resolveFeedbackSkillPath(workspace, 'codex', homeDir)).toBe(projectSkill);
 	});
 
+	test('uses project-local agent skill copies created by dryui-init', () => {
+		const workspace = tempDir();
+		const homeDir = tempDir();
+		const projectSkill = writeSkillFile(workspace, '.agents/skills/dryui-feedback/SKILL.md');
+
+		expect(resolveFeedbackSkillPath(workspace, 'codex', homeDir)).toBe(projectSkill);
+		expect(resolveFeedbackSkillPath(workspace, 'claude', homeDir)).toBe(projectSkill);
+	});
+
 	test('does not use the Codex global skill for non-Codex agents', () => {
 		const workspace = tempDir();
 		const homeDir = tempDir();

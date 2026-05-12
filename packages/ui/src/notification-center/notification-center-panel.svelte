@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
-	import { createAnchoredPopover } from '@dryui/primitives';
+	import { createAnchoredPopover, createDismiss } from '@dryui/primitives';
 	import { getNotificationCenterCtx } from './context.svelte.js';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
@@ -80,13 +80,22 @@
 			node.style.translate = '';
 		}
 	});
+
+	createDismiss({
+		enabled: () => ctx.open,
+		onDismiss: () => handleClose(false),
+		contentEl: () => panelEl ?? null,
+		triggerEl: () => triggerEl,
+		preventDefaultOnEscape: true,
+		returnFocusTo: () => triggerEl
+	});
 </script>
 
 <div
 	bind:this={panelEl}
 	use:popover.applyPosition={style}
 	id={ctx.panelId}
-	popover="auto"
+	popover="manual"
 	role="region"
 	aria-label="Notifications"
 	data-notification-center-panel

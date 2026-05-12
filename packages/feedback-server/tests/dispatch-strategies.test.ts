@@ -137,6 +137,14 @@ describe('terminal-cli probe', () => {
 		expect(probeAgent('copilot', '/ws', ctx)).toBe(true);
 	});
 
+	test('passes for Cursor when the project MCP config carries dryui-feedback', () => {
+		const ctx = fakeContext({
+			jsonEntries: new Map([['/ws/.cursor/mcp.json', new Set(['mcpServers/dryui-feedback'])]])
+		});
+
+		expect(probeAgent('cursor', '/ws', ctx)).toBe(true);
+	});
+
 	test('fails when nothing is configured', () => {
 		expect(probeAgent('gemini', '/ws', fakeContext())).toBe(false);
 	});

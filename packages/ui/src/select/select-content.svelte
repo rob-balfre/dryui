@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
-	import { createAnchoredPopover, type Placement } from '@dryui/primitives';
+	import { createAnchoredPopover, createDismiss, type Placement } from '@dryui/primitives';
 	import { getSelectCtx } from './context.svelte.js';
 
 	const OPTION_SELECTOR = '[role="option"]:not([data-disabled])';
@@ -44,6 +44,15 @@
 		onAfterShow: () => {
 			focusFirstSelectItem();
 		}
+	});
+
+	createDismiss({
+		enabled: () => ctx.open,
+		onDismiss: () => ctx.close(),
+		contentEl: () => el ?? null,
+		triggerEl: () => ctx.triggerEl,
+		preventDefaultOnEscape: true,
+		returnFocusTo: () => ctx.triggerEl
 	});
 
 	function focusFirstSelectItem() {
@@ -107,7 +116,7 @@
 <div
 	bind:this={el}
 	use:popover.applyPosition={style}
-	popover="auto"
+	popover="manual"
 	role="listbox"
 	id={ctx.contentId}
 	aria-labelledby={ctx.triggerId}

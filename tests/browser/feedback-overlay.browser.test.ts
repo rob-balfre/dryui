@@ -1,10 +1,11 @@
 import { flushSync } from 'svelte';
+import { page } from 'vitest/browser';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { Feedback } from '../../packages/feedback/src/index.js';
 import FeedbackOverlayHarness from './fixtures/feedback-overlay-harness.svelte';
 import { render } from './_harness';
 
-type HostKind = 'command-palette' | 'popover';
+type HostKind = 'command-palette' | 'date-picker' | 'popover';
 
 const WIDGET_STATE_STORAGE_KEY = 'dryui-feedback-widget-state:v1';
 const FEEDBACK_SERVER_STORAGE_KEY = 'dryui-feedback-server-url';
@@ -690,6 +691,23 @@ describe('feedback overlay hosting', () => {
 		} finally {
 			document.removeEventListener('pointerdown', handlePageDismiss);
 		}
+	});
+
+	it('keeps native picker popovers open when selecting a feedback tool', async () => {
+		document.documentElement.dataset.theme = 'dark';
+		render(FeedbackOverlayHarness, { kind: 'date-picker' });
+		flushSync();
+
+		const content = document.querySelector<HTMLDivElement>('[data-testid="date-picker-content"]');
+		if (!content) throw new Error('Expected date picker content');
+
+		expect(content.matches(':popover-open')).toBe(true);
+
+		await page.getByRole('button', { name: 'Arrow' }).click();
+		flushSync();
+
+		expect(content.matches(':popover-open')).toBe(true);
+		expect(document.querySelector<HTMLButtonElement>('[aria-label="Stop arrows"]')).not.toBeNull();
 	});
 
 	it('hides the toolbar before capture and shows a success toast after submission', async () => {

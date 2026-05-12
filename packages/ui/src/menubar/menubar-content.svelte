@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
-	import { createAnchoredPopover, createMenuNavigation } from '@dryui/primitives';
+	import { createAnchoredPopover, createDismiss, createMenuNavigation } from '@dryui/primitives';
 	import { getMenubarCtx, getMenubarMenuCtx } from './context.svelte.js';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
@@ -53,6 +53,15 @@
 		orientation: 'vertical'
 	});
 
+	createDismiss({
+		enabled: () => menuCtx.open,
+		onDismiss: () => ctx.closeMenu(),
+		contentEl: () => el ?? null,
+		triggerEl: () => triggerEl,
+		preventDefaultOnEscape: true,
+		returnFocusTo: () => triggerEl
+	});
+
 	function handleKeydown(e: KeyboardEvent) {
 		if (!el) return;
 		switch (e.key) {
@@ -83,7 +92,7 @@
 <div
 	bind:this={el}
 	use:popover.applyPosition={style}
-	popover="auto"
+	popover="manual"
 	role="menu"
 	tabindex="-1"
 	aria-labelledby={triggerEl?.id}

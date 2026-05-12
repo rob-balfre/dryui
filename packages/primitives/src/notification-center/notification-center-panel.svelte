@@ -3,6 +3,7 @@
 	import type { HTMLAttributes } from 'svelte/elements';
 	import { getNotificationCenterCtx } from './context.svelte.js';
 	import { createAnchoredPopover } from '../utils/anchored-popover.svelte.js';
+	import { createDismiss } from '../utils/dismiss.svelte.js';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
 		placement?:
@@ -35,12 +36,21 @@
 		placement: () => placement,
 		offset: () => offset
 	});
+
+	createDismiss({
+		enabled: () => ctx.open,
+		onDismiss: () => ctx.close(),
+		contentEl: () => panelEl ?? null,
+		triggerEl: () => ctx.triggerEl,
+		preventDefaultOnEscape: true,
+		returnFocusTo: () => ctx.triggerEl
+	});
 </script>
 
 <div
 	bind:this={panelEl}
 	id={ctx.panelId}
-	popover="auto"
+	popover="manual"
 	role="region"
 	aria-label="Notifications"
 	data-state={ctx.open ? 'open' : 'closed'}

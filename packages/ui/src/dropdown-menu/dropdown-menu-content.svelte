@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
-	import { createAnchoredPopover, createMenuNavigation } from '@dryui/primitives';
+	import { createAnchoredPopover, createDismiss, createMenuNavigation } from '@dryui/primitives';
 	import type { Placement } from '@dryui/primitives';
 	import { getDropdownMenuCtx } from './context.svelte.js';
 
@@ -36,12 +36,21 @@
 		container: () => el ?? null,
 		orientation: 'vertical'
 	});
+
+	createDismiss({
+		enabled: () => ctx.open,
+		onDismiss: () => ctx.close(),
+		contentEl: () => el ?? null,
+		triggerEl: () => ctx.triggerEl,
+		preventDefaultOnEscape: true,
+		returnFocusTo: () => ctx.triggerEl
+	});
 </script>
 
 <div
 	bind:this={el}
 	use:popover.applyPosition={style}
-	popover="auto"
+	popover="manual"
 	role="menu"
 	tabindex="-1"
 	id={ctx.contentId}

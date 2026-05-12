@@ -17,6 +17,7 @@ import {
 } from './dispatch.js';
 import { EventBus } from './events.js';
 import { startFeedbackHttpServer } from './http.js';
+import { readFeedbackDispatchDefaults } from './project-config.js';
 import { FeedbackStore } from './store.js';
 
 function readFlag(name: string): string | undefined {
@@ -104,13 +105,14 @@ function main(): void {
 	);
 	const dbPath = dbOverride ?? paths.dbPath;
 	const dispatchEnabled = !process.argv.includes('--no-dispatch');
+	const projectDispatchDefaults = readFeedbackDispatchDefaults(paths.root);
 	const defaultAgent = parseDispatchAgent(
 		readFlag('--default-agent') ?? process.env['DRYUI_DISPATCH_AGENT'],
-		'off'
+		projectDispatchDefaults.defaultAgent ?? 'off'
 	);
 	const terminalApp = parseTerminalApp(
 		readFlag('--terminal-app') ?? process.env['DRYUI_DISPATCH_TERMINAL_APP'],
-		'terminal'
+		projectDispatchDefaults.terminalApp ?? 'terminal'
 	);
 
 	const store = new FeedbackStore({ dbPath, screenshotsDir: paths.screenshotsDir });

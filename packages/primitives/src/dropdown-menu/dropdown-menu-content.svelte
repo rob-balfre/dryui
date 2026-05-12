@@ -4,6 +4,7 @@
 	import type { Placement } from '../utils/anchor-position.svelte.js';
 	import { getDropdownMenuCtx } from './context.svelte.js';
 	import { createAnchoredPopover } from '../utils/anchored-popover.svelte.js';
+	import { createDismiss } from '../utils/dismiss.svelte.js';
 	import { createMenuNavigation } from '../utils/menu-navigation.svelte.js';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
@@ -31,11 +32,20 @@
 		container: () => el ?? null,
 		orientation: 'vertical'
 	});
+
+	createDismiss({
+		enabled: () => ctx.open,
+		onDismiss: () => ctx.close(),
+		contentEl: () => el ?? null,
+		triggerEl: () => ctx.triggerEl,
+		preventDefaultOnEscape: true,
+		returnFocusTo: () => ctx.triggerEl
+	});
 </script>
 
 <div
 	bind:this={el}
-	popover="auto"
+	popover="manual"
 	role="menu"
 	tabindex="-1"
 	id={ctx.contentId}

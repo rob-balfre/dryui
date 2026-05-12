@@ -29,6 +29,8 @@ cd packages/feedback-server && bun run build
 
 The server binds port 4748 by default (`DEFAULT_FEEDBACK_PORT`) and walks up to the first free port if it's taken. State lives under `<project>/.dryui/feedback/` (store.db, screenshots, server.json), so each project keeps its own queue.
 
+If `dryui.config.json` has `feedback.defaultAgent`, the server uses it as the dispatch default. Users can edit that file directly or ask an agent to add one of the manual MCP paths listed under `feedback.manualAgentConfig`.
+
 ## 2. Confirm the Widget Is Wired and Find the Dev Server
 
 ### 2a. Verify `@dryui/feedback` and `@dryui/feedback-server` are installed and the widget is mounted

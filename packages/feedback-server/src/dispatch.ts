@@ -62,12 +62,15 @@ interface DispatchTargetsSnapshot {
 // ---------------------------------------------------------------------------
 //
 // `dryui-feedback` is the canonical skill the dispatched agent reads first.
-// Claude reads project-local skills (so auto permission mode stays inside the
-// workspace); Codex reads installed skills from `~/.agents/skills`, where
-// `dryui` links local source-mode skills. Other agents follow the project
-// path.
+// Prefer the agent's installed global skill when needed, then fall back through
+// the project-local skill copies created by dryui-init.
 
-const PROJECT_SKILL_RELATIVE = '.claude/skills/dryui-feedback/SKILL.md';
+const PROJECT_SKILL_RELATIVES = [
+	'.claude/skills/dryui-feedback/SKILL.md',
+	'.agents/skills/dryui-feedback/SKILL.md',
+	'.codex/skills/dryui-feedback/SKILL.md',
+	'skills/dryui-feedback/SKILL.md'
+] as const;
 const CODEX_SKILL_RELATIVE = '.agents/skills/dryui-feedback/SKILL.md';
 
 export const SKILL_MISSING_HINT =
@@ -76,11 +79,14 @@ export const SKILL_MISSING_HINT =
 
 export const CODEX_SKILL_MISSING_HINT =
 	'dryui-feedback skill not installed for Codex. ' +
-	'Run `DRYUI_DEV=1 dryui`, choose "Set up editor or agent", then choose Codex.';
+	'Run `npx skills add rob-balfre/dryui --agent codex`, or add a project-local dryui-feedback skill.';
 
 function findProjectSkill(workspace: string): string | null {
-	const candidate = join(workspace, PROJECT_SKILL_RELATIVE);
-	return existsSync(candidate) ? candidate : null;
+	for (const relative of PROJECT_SKILL_RELATIVES) {
+		const candidate = join(workspace, relative);
+		if (existsSync(candidate)) return candidate;
+	}
+	return null;
 }
 
 function findCodexSkill(homeDir: string): string | null {

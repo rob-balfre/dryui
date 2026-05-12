@@ -3,6 +3,7 @@
 	import type { HTMLAttributes } from 'svelte/elements';
 	import { getSelectCtx } from './context.svelte.js';
 	import { createAnchoredPopover } from '../utils/anchored-popover.svelte.js';
+	import { createDismiss } from '../utils/dismiss.svelte.js';
 	import { getOptionItems, handleMenuKeydown } from '../internal/menu-navigation.js';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
@@ -38,6 +39,15 @@
 		onAfterShow: (node) => focusFirstSelectItem(node)
 	});
 
+	createDismiss({
+		enabled: () => ctx.open,
+		onDismiss: () => ctx.close(),
+		contentEl: () => el ?? null,
+		triggerEl: () => ctx.triggerEl,
+		preventDefaultOnEscape: true,
+		returnFocusTo: () => ctx.triggerEl
+	});
+
 	function focusFirstSelectItem(container: HTMLElement) {
 		const items = getOptionItems(container);
 		const selected = items.find((item) => item.getAttribute('aria-selected') === 'true');
@@ -64,7 +74,7 @@
 
 <div
 	bind:this={el}
-	popover="auto"
+	popover="manual"
 	role="listbox"
 	id={ctx.contentId}
 	aria-labelledby={ctx.triggerId}

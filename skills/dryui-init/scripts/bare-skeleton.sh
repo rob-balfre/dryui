@@ -13,7 +13,8 @@
 #   6. Detects local dryui workspace; if found, registers each package via
 #      `bun link` and sets overrides with `link:@dryui/<pkg>`.
 #   7. Installs runtime + lint via bun.
-#   8. Runs `bun run check` to validate the contract.
+#   8. Sets up available feedback agent integrations.
+#   9. Runs `bun run check` to validate the contract.
 
 set -euo pipefail
 
@@ -135,5 +136,8 @@ else
   wait
 fi
 
-echo "[dryui-init] Step 8: bun run check"
+echo "[dryui-init] Step 8: set up feedback agent integrations"
+bash "$SCRIPT_DIR/setup-feedback-agents.sh" "$PWD"
+
+echo "[dryui-init] Step 9: bun run check"
 bun run check

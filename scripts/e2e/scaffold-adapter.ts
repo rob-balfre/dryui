@@ -23,6 +23,7 @@ export const DRYUI_INIT_SKILL_CONTRACT = {
 		'@dryui/feedback',
 		'@dryui/feedback-server',
 		'lucide-svelte',
+		'dryui.config.json',
 		'dryuiLint({ strict: true })',
 		'dryuiLayoutCss()',
 		'src/routes/+layout.svelte',
@@ -353,6 +354,28 @@ const HOME_PAGE = `<script lang="ts">
 </main>
 `;
 
+const DRYUI_CONFIG = `{
+  "$schema": "https://dryui.dev/config.schema.json",
+  "feedback": {
+    "defaultAgent": "off",
+    "terminalApp": "terminal",
+    "detectedAgents": [],
+    "configuredFiles": [],
+    "mcpServer": {
+      "command": "npx",
+      "args": ["-y", "-p", "@dryui/feedback-server", "dryui-feedback-mcp"]
+    },
+    "manualAgentConfig": {
+      "codex": "~/.codex/config.toml",
+      "gemini": "~/.gemini/settings.json",
+      "windsurf": "~/.codeium/windsurf/mcp_config.json",
+      "zed": "~/.config/zed/settings.json",
+      "copilot": "~/.copilot/mcp-config.json"
+    }
+  }
+}
+`;
+
 const AGENTS_MD = `# AGENTS.md
 
 Generated DryUI E2E consumer project.
@@ -396,6 +419,7 @@ export function scaffoldDryuiConsumerProject(
 	writeProjectFile(projectDir, 'src/layout.css', LAYOUT_CSS, filesWritten);
 	writeProjectFile(projectDir, 'src/routes/+layout.svelte', ROOT_LAYOUT, filesWritten);
 	writeProjectFile(projectDir, 'src/routes/+page.svelte', HOME_PAGE, filesWritten);
+	writeProjectFile(projectDir, 'dryui.config.json', DRYUI_CONFIG, filesWritten);
 
 	logLines.push(
 		`contract: ${DRYUI_INIT_SKILL_CONTRACT.sourcePath}#${DRYUI_INIT_SKILL_CONTRACT.anchor}`

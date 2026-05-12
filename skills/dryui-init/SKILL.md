@@ -42,7 +42,8 @@ Do not `Read` any file you just copied from `templates/` to verify it — those 
 4. Merges scripts, `lucide-svelte` into `dependencies`, devDependencies, and `type: "module"` into `package.json` via `jq`. Preserves existing `overrides` and any other dependency keys.
 5. Appends SvelteKit/Vite ignores to `.gitignore` (idempotent — checks for `/.svelte-kit` first).
 6. Detects a local dryui workspace at `$DRYUI_LOCAL`, `../dryui`, `~/dryui`, `~/src/dryui`, or `~/code/dryui`. If found, runs `bun link` in each `packages/{ui,lint,primitives,feedback,feedback-server}` and writes overrides with `link:@dryui/<pkg>` so the consumer pulls the local workspace. If not found, falls back to `bun add @dryui/ui` + `bun add -d @dryui/lint @dryui/feedback @dryui/feedback-server` against npm.
-7. Runs `bun run check` to validate the contract end-to-end.
+7. Runs `scripts/setup-feedback-agents.sh "$PWD"` to copy project-local DryUI skills, detect installed feedback agents, merge project-local MCP config files where possible, and write `dryui.config.json`.
+8. Runs `bun run check` to validate the contract end-to-end.
 
 The smoke-test `+page.svelte` is intentionally minimal: a single `<Heading level={1}>` inside `<main data-layout="home">` to prove `@dryui/ui` resolves and to satisfy `dryui/no-raw-element` (every raw `<main>` needs a `data-layout` hook). It carries no design — DryUI does not ship a default look, the user's first prompt fills the page in. `@dryui/feedback` is a dev-only dep; the live-feedback widget is opt-in (see "Live Feedback (Opt-In)" below).
 
@@ -71,6 +72,8 @@ A valid DryUI consumer setup has:
 - `src/routes/+layout.svelte` importing `@dryui/ui/themes/default.css`, `@dryui/ui/themes/dark.css`, `../app.css`, and `../layout.css` (last), then rendering `{@render children()}`. No `<Feedback>` mount by default — opt in per "Live Feedback (Opt-In)".
 - `src/app.css` present with `body { background: var(--dry-color-bg-base); color: var(--dry-color-text); container-type: inline-size; container-name: page; font-family: var(--dry-font-sans); }`.
 - `src/layout.css` present and minimal. Page/section grid and flex layout lands here, scoped under `[data-layout="<name>"]`, with `@container page (...)` for responsive shifts.
+- `dryui.config.json` present with `feedback.defaultAgent`, `feedback.detectedAgents`, the `dryui-feedback` MCP command, and `manualAgentConfig` paths for agents whose config is user-level. The feedback server reads `feedback.defaultAgent` and `feedback.terminalApp` at startup, so a detected agent can auto-launch when feedback is submitted.
+- Project-local DryUI skills copied to `skills/`, `.agents/skills/`, `.claude/skills/`, and `.codex/skills/` when the sibling skill bundle is available. This gives dispatched feedback agents a local `dryui-feedback` skill path even if the user's global agent install is missing.
 
 ## Apply Setup
 
@@ -91,6 +94,13 @@ For an existing SvelteKit app:
 5. In `src/routes/+layout.svelte`, import in this order: DryUI theme CSS, app CSS, then `../layout.css` last. Render `{@render children()}` and stop — no widget mounts by default.
 6. Create or update `src/app.css` so `body` owns the page surface, text color, container, and app font: `background: var(--dry-color-bg-base); color: var(--dry-color-text); container-type: inline-size; container-name: page; font-family: var(--dry-font-sans);`.
 7. Create `src/layout.css` if missing. Keep it minimal — page/section grid blocks land here as routes need them.
+8. Run the feedback agent setup helper:
+
+   ```bash
+   bash <skill-base-dir>/scripts/setup-feedback-agents.sh "$PWD"
+   ```
+
+   It is best-effort and idempotent. It detects installed agents (`codex`, `claude`, `gemini`, `opencode`, `copilot`, VS Code Copilot, `cursor`, `windsurf`, `zed`), picks the first detected agent as `feedback.defaultAgent` when no default is already configured (`DRYUI_DISPATCH_AGENT` forces the value for that run), merges project-local MCP config files it can safely own (`.mcp.json`, `.vscode/mcp.json`, `.cursor/mcp.json`, `opencode.json`), and writes `dryui.config.json` with manual config paths for user-level agents.
 
 ## UI Pipeline After Setup
 
@@ -115,4 +125,4 @@ DryUI does not mount the live-feedback widget by default. The `@dryui/feedback` 
 <Feedback serverUrl="http://localhost:4748" />
 ```
 
-The widget is dormant until toggled (Cmd+M / Ctrl+M) and respects `DRY_FEEDBACK_DISABLED=1` for CI. Then add the `dryui-feedback` MCP server in the editor and run `bunx dryui-feedback --no-open` (or `bunx dryui-feedback` for the local dashboard) when the user kicks off a feedback session. Remove the import + mount before shipping production.
+The widget is dormant until toggled (Cmd+M / Ctrl+M) and respects `DRY_FEEDBACK_DISABLED=1` for CI. Then run `bunx dryui-feedback --no-open` (or `bunx dryui-feedback` for the local dashboard) when the user kicks off a feedback session. The server reads `dryui.config.json`; users can edit `feedback.defaultAgent` manually or ask their agent to add the MCP entry listed under `feedback.manualAgentConfig`. Remove the import + mount before shipping production.

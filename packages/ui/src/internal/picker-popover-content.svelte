@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
-	import { createAnchoredPopover, type Placement } from '@dryui/primitives';
+	import { createAnchoredPopover, createDismiss, type Placement } from '@dryui/primitives';
 	import type { PickerPopoverController } from './date-family-controller.svelte.js';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
@@ -39,12 +39,21 @@
 		placement: () => placement,
 		offset: () => offset
 	});
+
+	createDismiss({
+		enabled: () => controller.open,
+		onDismiss: () => controller.close(),
+		contentEl: () => el ?? null,
+		triggerEl: () => controller.triggerEl,
+		preventDefaultOnEscape: true,
+		returnFocusTo: () => controller.triggerEl
+	});
 </script>
 
 <div
 	bind:this={el}
 	use:popover.applyPosition={contentStyle}
-	popover="auto"
+	popover="manual"
 	role="dialog"
 	id={controller.contentId}
 	aria-labelledby={controller.triggerId}

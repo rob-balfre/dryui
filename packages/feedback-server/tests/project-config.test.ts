@@ -8,6 +8,7 @@ import {
 	readFeedbackServerConfig,
 	writeFeedbackServerConfig
 } from '../src/config.ts';
+import { readFeedbackDispatchDefaults } from '../src/project-config.ts';
 
 describe('project feedback config', () => {
 	let projectRoot: string;
@@ -104,5 +105,42 @@ describe('project feedback config', () => {
 		const found = findProjectFeedbackConfig(corrupt);
 		expect(found?.projectRoot).toBe(resolve(projectRoot));
 		expect(found?.config.port).toBe(4750);
+	});
+
+	test('reads feedback dispatch defaults from dryui.config.json', () => {
+		writeFileSync(
+			join(projectRoot, 'dryui.config.json'),
+			JSON.stringify({ feedback: { defaultAgent: 'codex', terminalApp: 'ghostty' } })
+		);
+
+		expect(readFeedbackDispatchDefaults(projectRoot)).toEqual({
+			defaultAgent: 'codex',
+			terminalApp: 'ghostty'
+		});
+	});
+
+	test('ignores unknown dispatch defaults', () => {
+		writeFileSync(
+			join(projectRoot, 'dryui.config.json'),
+			JSON.stringify({ feedback: { defaultAgent: 'not-real', terminalApp: 'wezterm' } })
+		);
+
+		expect(readFeedbackDispatchDefaults(projectRoot)).toEqual({});
+	});
+
+	test('returns empty dispatch defaults when the project has no dryui.config.json', () => {
+		expect(readFeedbackDispatchDefaults(projectRoot)).toEqual({});
+	});
+
+	test('warns and ignores invalid dryui.config.json', () => {
+		writeFileSync(join(projectRoot, 'dryui.config.json'), '{ nope');
+		const spy = spyOn(console, 'error').mockImplementation(() => {});
+
+		try {
+			expect(readFeedbackDispatchDefaults(projectRoot)).toEqual({});
+			expect(spy.mock.calls[0]?.[0]).toContain('[feedback] failed to read');
+		} finally {
+			spy.mockRestore();
+		}
 	});
 });

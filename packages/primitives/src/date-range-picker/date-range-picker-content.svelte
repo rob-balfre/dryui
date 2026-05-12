@@ -21,8 +21,12 @@
 	{placement}
 	{offset}
 	{style}
-	popoverMode="auto"
+	popoverMode="manual"
 	role="dialog"
+	dismiss
+	onDismiss={() => ctx.close()}
+	preventDefaultOnEscape
+	returnFocusTo={() => ctx.triggerEl}
 	ontoggle={(e) => {
 		const newState = (e as ToggleEvent).newState === 'open';
 		if (newState && !ctx.open) {

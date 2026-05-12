@@ -3,6 +3,7 @@
 	import type { HTMLAttributes } from 'svelte/elements';
 	import { getMenubarCtx, getMenubarMenuCtx } from './context.svelte.js';
 	import { createAnchoredPopover } from '../utils/anchored-popover.svelte.js';
+	import { createDismiss } from '../utils/dismiss.svelte.js';
 	import { createMenuNavigation } from '../utils/menu-navigation.svelte.js';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
@@ -41,6 +42,15 @@
 		orientation: 'vertical'
 	});
 
+	createDismiss({
+		enabled: () => menuCtx.open,
+		onDismiss: () => ctx.closeMenu(),
+		contentEl: () => el ?? null,
+		triggerEl: () => triggerEl,
+		preventDefaultOnEscape: true,
+		returnFocusTo: () => triggerEl
+	});
+
 	function handleKeydown(e: KeyboardEvent) {
 		if (!el) return;
 		switch (e.key) {
@@ -70,7 +80,7 @@
 
 <div
 	bind:this={el}
-	popover="auto"
+	popover="manual"
 	role="menu"
 	tabindex="-1"
 	aria-labelledby={`menubar-trigger-${menuCtx.menuId}`}

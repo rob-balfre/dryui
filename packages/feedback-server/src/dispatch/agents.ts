@@ -246,6 +246,11 @@ export const AGENTS: Record<DispatchAgent, AgentConfig> = {
 			{
 				pathTemplate: '{workspace}/.cursor/mcp.json',
 				rootKey: 'mcpServers',
+				entryKey: 'dryui-feedback'
+			},
+			{
+				pathTemplate: '{workspace}/.cursor/mcp.json',
+				rootKey: 'mcpServers',
 				entryKey: 'dryui'
 			}
 		]
