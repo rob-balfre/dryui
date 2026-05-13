@@ -96,11 +96,11 @@
 <style>
 	.search-trigger {
 		container-type: inline-size;
+		--dry-btn-padding-x: 0;
 	}
 
-	.search-trigger-full {
-		display: grid;
-		grid-template-columns: minmax(0, 1fr);
+	.search-trigger :global([data-dry-button]) {
+		aspect-ratio: 1;
 	}
 
 	.search-inner {
@@ -108,10 +108,6 @@
 		grid-template-columns: auto;
 		gap: var(--dry-space-2);
 		align-items: center;
-	}
-
-	.search-trigger-full .search-inner {
-		justify-self: stretch;
 	}
 
 	.search-icon {
@@ -149,7 +145,21 @@
 	}
 
 	@media (min-width: 60rem) {
-		.search-inner {
+		.search-trigger {
+			--dry-btn-padding-x: var(--dry-space-4);
+		}
+
+		.search-trigger :global([data-dry-button]) {
+			aspect-ratio: auto;
+		}
+
+		.search-trigger-full {
+			display: grid;
+			grid-template-columns: minmax(0, 1fr);
+		}
+
+		.search-trigger-full .search-inner {
+			justify-self: stretch;
 			grid-template-columns: auto minmax(0, 1fr) auto;
 		}
 
