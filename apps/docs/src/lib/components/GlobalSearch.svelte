@@ -42,6 +42,21 @@
 		aria-label="Search docs"
 	>
 		<span class="search-inner">
+			<svg
+				class="search-icon"
+				width="16"
+				height="16"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				aria-hidden="true"
+			>
+				<circle cx="11" cy="11" r="8" />
+				<path d="m21 21-4.3-4.3" />
+			</svg>
 			<span class="search-label">Search docs</span>
 			<span class="search-shortcut" aria-hidden="true">
 				<Kbd keys={['⌘', 'K']} />
@@ -90,7 +105,7 @@
 
 	.search-inner {
 		display: grid;
-		grid-template-columns: minmax(0, 1fr) auto;
+		grid-template-columns: auto;
 		gap: var(--dry-space-2);
 		align-items: center;
 	}
@@ -99,7 +114,13 @@
 		justify-self: stretch;
 	}
 
+	.search-icon {
+		display: block;
+		flex-shrink: 0;
+	}
+
 	.search-label {
+		display: none;
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
@@ -107,7 +128,7 @@
 	}
 
 	.search-shortcut {
-		display: inline-grid;
+		display: none;
 		grid-auto-flow: column;
 	}
 
@@ -127,9 +148,17 @@
 		white-space: nowrap;
 	}
 
-	@container (max-width: 14rem) {
+	@media (min-width: 60rem) {
+		.search-inner {
+			grid-template-columns: auto minmax(0, 1fr) auto;
+		}
+
+		.search-label {
+			display: block;
+		}
+
 		.search-shortcut {
-			display: none;
+			display: inline-grid;
 		}
 	}
 </style>

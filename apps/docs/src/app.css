@@ -417,3 +417,10 @@ html [data-code-block][data-code-block] {
 	display: grid;
 	gap: var(--dry-space-2);
 }
+
+@media (max-width: 60rem) {
+	[data-dryui-feedback],
+	[data-dryui-feedback-toast-layer] {
+		display: none !important;
+	}
+}

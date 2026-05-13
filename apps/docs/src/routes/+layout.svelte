@@ -237,7 +237,7 @@
 	.docs-header-bar {
 		display: grid;
 		grid-template-areas: 'brand search actions';
-		grid-template-columns: max-content minmax(5.5rem, 12rem) max-content;
+		grid-template-columns: max-content max-content max-content;
 		align-items: center;
 		justify-content: space-between;
 		gap: var(--dry-space-2);
