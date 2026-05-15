@@ -58,7 +58,7 @@
     "check:publish-hygiene": "bun run check:publint && bun run check:attw"
   },
   "devDependencies": {
-    "svelte": "^5.55.5",
+    "svelte": "^5.55.7",
     "typescript": "^6.0.3"
   },
   "publishConfig": {

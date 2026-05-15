@@ -162,6 +162,7 @@
         "--dry-btn-border": "Border color",
         "--dry-btn-color": "Text color",
         "--dry-btn-font-size": "Font size",
+        "--dry-btn-min-height": "Minimum height",
         "--dry-btn-on-accent": "On Accent",
         "--dry-btn-padding-x": "Horizontal padding",
         "--dry-btn-padding-y": "Vertical padding",
@@ -540,6 +541,17 @@
         },
         "Trigger": {
           "props": {
+            "size": {
+              "type": "'sm' | 'md' | 'lg'",
+              "required": false,
+              "acceptedValues": [
+                "sm",
+                "md",
+                "lg"
+              ],
+              "description": "Size preset affecting density, spacing, or typography.",
+              "default": "'md'"
+            },
             "children": {
               "type": "Snippet",
               "required": true,
@@ -547,15 +559,18 @@
             }
           },
           "forwardedProps": {
-            "baseType": "HTMLAttributes<HTMLDivElement>",
+            "baseType": "Omit<HTMLButtonAttributes, 'children'>",
             "via": "rest",
-            "element": "div",
+            "element": "button",
             "examples": [
-              "id",
-              "style",
-              "role"
+              "type",
+              "disabled",
+              "aria-label"
             ],
-            "note": "Forwards <div> attributes via rest props."
+            "omitted": [
+              "children"
+            ],
+            "note": "Forwards <button> attributes via rest props."
           }
         },
         "Content": {
@@ -9781,10 +9796,24 @@
         "Provide native name, autocomplete, and value wiring when the component participates in form submission.",
         "Keep the opening control labeled, ensure focus moves predictably on open and close, and expose the popup type truthfully."
       ],
-      "cssVars": {},
+      "cssVars": {
+        "--dry-date-picker-trigger-bg": "Trigger background",
+        "--dry-date-picker-trigger-border": "Trigger border",
+        "--dry-date-picker-trigger-color": "Trigger text color",
+        "--dry-date-picker-trigger-font-size": "Trigger font size",
+        "--dry-date-picker-trigger-padding-x": "Trigger horizontal padding",
+        "--dry-date-picker-trigger-padding-y": "Trigger vertical padding",
+        "--dry-date-picker-trigger-radius": "Trigger radius"
+      },
       "dataAttributes": [
         {
           "name": "data-calendar-day"
+        },
+        {
+          "name": "data-content"
+        },
+        {
+          "name": "data-date-picker-trigger"
         },
         {
           "name": "data-disabled",
@@ -11164,7 +11193,7 @@
     "TimeInput": {
       "name": "TimeInput",
       "slug": "time-input",
-      "description": "Native time input with form control integration",
+      "description": "Segmented time input with select-based hour and minute controls",
       "category": "input",
       "sourcePackage": "@dryui/ui",
       "compound": false,
@@ -11202,23 +11231,23 @@
           "type": "string",
           "required": false,
           "description": "Field name used during native form submission."
-        },
-        "class": {
-          "type": "string",
-          "required": false
         }
       },
       "parts": null,
       "forwardedProps": {
-        "baseType": "HTMLInputAttributes",
+        "baseType": "Omit<HTMLAttributes<HTMLDivElement>, 'role' | 'aria-label'>",
         "via": "rest",
-        "element": "input",
+        "element": "div",
         "examples": [
-          "name",
-          "autocomplete",
-          "inputmode"
+          "id",
+          "data-testid",
+          "aria-describedby"
         ],
-        "note": "Forwards <input> attributes via rest props."
+        "omitted": [
+          "role",
+          "aria-label"
+        ],
+        "note": "Forwards <div> attributes to the time group wrapper while preserving built-in group semantics."
       },
       "groups": null,
       "a11y": [
@@ -11246,7 +11275,7 @@
       ],
       "rootImport": "import { TimeInput } from '@dryui/ui'",
       "subpathImport": "import { TimeInput } from '@dryui/ui/time-input'",
-      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { TimeInput } from '@dryui/ui';\n</script>\n\n<TimeInput>Content</TimeInput>"
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { TimeInput } from '@dryui/ui';\n\n  let time = $state('09:30');\n</script>\n\n<TimeInput bind:value={time} name=\"startTime\" />"
     },
     "TagsInput": {
       "name": "TagsInput",

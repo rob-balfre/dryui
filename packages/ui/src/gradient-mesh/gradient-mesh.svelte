@@ -6,8 +6,6 @@
 		observeInViewport,
 		observePageVisibility,
 		observeReducedMotionPreference,
-		registerPropertyOnce,
-		supportsPropertyRegistration,
 		supportsPointerTracking
 	} from '@dryui/primitives';
 
@@ -90,34 +88,9 @@
 	}
 
 	$effect(() => {
-		registerPropertyOnce({
-			name: '--dry-mesh-color-1',
-			syntax: '<color>',
-			inherits: false,
-			initialValue: '#7b68ee'
-		});
-		registerPropertyOnce({
-			name: '--dry-mesh-color-2',
-			syntax: '<color>',
-			inherits: false,
-			initialValue: '#38bdf8'
-		});
-		registerPropertyOnce({
-			name: '--dry-mesh-color-3',
-			syntax: '<color>',
-			inherits: false,
-			initialValue: '#f472b6'
-		});
-		registerPropertyOnce({
-			name: '--dry-mesh-color-4',
-			syntax: '<color>',
-			inherits: false,
-			initialValue: '#4ade80'
-		});
-
 		const updateAnimatedState = (matches: boolean) => {
 			prefersReducedMotion = matches;
-			animated = !matches && supportsPropertyRegistration();
+			animated = !matches;
 		};
 
 		const stopMotionObserver = observeReducedMotionPreference(updateAnimatedState);
@@ -135,11 +108,7 @@
 			);
 		}
 
-		if (!supportsPropertyRegistration() || getReducedMotionPreference()) {
-			animated = false;
-		} else {
-			animated = true;
-		}
+		animated = !getReducedMotionPreference();
 
 		return () => {
 			cancelQueuedPointerPosition();
@@ -190,6 +159,17 @@
 		--dry-mesh-duration: 12s;
 		--dry-mesh-pointer-x: 50%;
 		--dry-mesh-pointer-y: 50%;
+		--dry-mesh-origin-1: 18% 18%;
+		--dry-mesh-origin-2: 82% 18%;
+		--dry-mesh-origin-3: 72% 82%;
+		--dry-mesh-origin-4: 18% 78%;
+		--dry-mesh-base: linear-gradient(
+			135deg,
+			var(--dry-mesh-color-4, #4ade80) 0%,
+			var(--dry-mesh-color-1, #7b68ee) 34%,
+			var(--dry-mesh-color-2, #38bdf8) 68%,
+			var(--dry-mesh-color-3, #f472b6) 100%
+		);
 
 		position: relative;
 		isolation: isolate;
@@ -197,38 +177,68 @@
 		border-radius: inherit;
 		background:
 			radial-gradient(
-				ellipse 60% 50% at 20% 20%,
-				var(--dry-mesh-color-1, #7b68ee),
-				transparent 70%
-			),
-			radial-gradient(
-				ellipse 50% 60% at 80% 20%,
-				var(--dry-mesh-color-2, #38bdf8),
-				transparent 70%
-			),
-			radial-gradient(
-				ellipse 55% 55% at 70% 80%,
-				var(--dry-mesh-color-3, #f472b6),
-				transparent 70%
-			),
-			radial-gradient(ellipse 50% 50% at 25% 75%, var(--dry-mesh-color-4, #4ade80), transparent 70%);
-	}
-
-	/* Static fallback without @property */
-	@supports not (background: paint(id)) {
-		[data-gradient-mesh]:not([data-animated]) {
-			background: linear-gradient(
-				135deg,
+				ellipse 80% 70% at var(--dry-mesh-origin-1),
 				var(--dry-mesh-color-1, #7b68ee) 0%,
-				var(--dry-mesh-color-2, #38bdf8) 33%,
-				var(--dry-mesh-color-3, #f472b6) 66%,
-				var(--dry-mesh-color-4, #4ade80) 100%
-			);
-		}
+				transparent 68%
+			),
+			radial-gradient(
+				ellipse 70% 68% at var(--dry-mesh-origin-2),
+				var(--dry-mesh-color-2, #38bdf8) 0%,
+				transparent 70%
+			),
+			radial-gradient(
+				ellipse 78% 62% at var(--dry-mesh-origin-3),
+				var(--dry-mesh-color-3, #f472b6) 0%,
+				transparent 70%
+			),
+			radial-gradient(
+				ellipse 72% 66% at var(--dry-mesh-origin-4),
+				var(--dry-mesh-color-4, #4ade80) 0%,
+				transparent 72%
+			),
+			var(--dry-mesh-base);
+		background:
+			radial-gradient(
+				ellipse 80% 70% at var(--dry-mesh-origin-1),
+				color-mix(in srgb, var(--dry-mesh-color-1, #7b68ee) 86%, transparent) 0%,
+				transparent 68%
+			),
+			radial-gradient(
+				ellipse 70% 68% at var(--dry-mesh-origin-2),
+				color-mix(in srgb, var(--dry-mesh-color-2, #38bdf8) 82%, transparent) 0%,
+				transparent 70%
+			),
+			radial-gradient(
+				ellipse 78% 62% at var(--dry-mesh-origin-3),
+				color-mix(in srgb, var(--dry-mesh-color-3, #f472b6) 84%, transparent) 0%,
+				transparent 70%
+			),
+			radial-gradient(
+				ellipse 72% 66% at var(--dry-mesh-origin-4),
+				color-mix(in srgb, var(--dry-mesh-color-4, #4ade80) 84%, transparent) 0%,
+				transparent 72%
+			),
+			var(--dry-mesh-base);
+		background-size:
+			130% 130%,
+			125% 125%,
+			135% 130%,
+			125% 130%,
+			100% 100%;
+		background-position:
+			0% 8%,
+			100% 0%,
+			90% 100%,
+			0% 92%,
+			center;
 	}
 
 	[data-gradient-mesh][data-animated] {
 		animation: mesh-cycle var(--dry-mesh-duration) ease-in-out infinite alternate;
+	}
+
+	[data-gradient-mesh][data-animated]:not([data-paused]) {
+		will-change: background-position;
 	}
 
 	[data-gradient-mesh][data-animated][data-paused] {
@@ -236,23 +246,7 @@
 	}
 
 	[data-gradient-mesh][data-interactive] {
-		background:
-			radial-gradient(
-				ellipse 60% 50% at var(--dry-mesh-pointer-x) var(--dry-mesh-pointer-y),
-				var(--dry-mesh-color-1, #7b68ee),
-				transparent 70%
-			),
-			radial-gradient(
-				ellipse 50% 60% at 80% 20%,
-				var(--dry-mesh-color-2, #38bdf8),
-				transparent 70%
-			),
-			radial-gradient(
-				ellipse 55% 55% at 70% 80%,
-				var(--dry-mesh-color-3, #f472b6),
-				transparent 70%
-			),
-			radial-gradient(ellipse 50% 50% at 25% 75%, var(--dry-mesh-color-4, #4ade80), transparent 70%);
+		--dry-mesh-origin-1: var(--dry-mesh-pointer-x) var(--dry-mesh-pointer-y);
 	}
 
 	[data-gradient-mesh][data-reduced-motion] {
@@ -266,31 +260,30 @@
 
 	@keyframes mesh-cycle {
 		0% {
-			--dry-mesh-color-1: var(--dry-mesh-color-1);
-			--dry-mesh-color-2: var(--dry-mesh-color-2);
-			--dry-mesh-color-3: var(--dry-mesh-color-3);
-			--dry-mesh-color-4: var(--dry-mesh-color-4);
+			background-position:
+				0% 8%,
+				100% 0%,
+				90% 100%,
+				0% 92%,
+				center;
 		}
 
-		33% {
-			--dry-mesh-color-1: var(--dry-mesh-color-2);
-			--dry-mesh-color-2: var(--dry-mesh-color-3);
-			--dry-mesh-color-3: var(--dry-mesh-color-4);
-			--dry-mesh-color-4: var(--dry-mesh-color-1);
-		}
-
-		66% {
-			--dry-mesh-color-1: var(--dry-mesh-color-3);
-			--dry-mesh-color-2: var(--dry-mesh-color-4);
-			--dry-mesh-color-3: var(--dry-mesh-color-1);
-			--dry-mesh-color-4: var(--dry-mesh-color-2);
+		50% {
+			background-position:
+				12% 18%,
+				88% 14%,
+				100% 82%,
+				14% 100%,
+				center;
 		}
 
 		100% {
-			--dry-mesh-color-1: var(--dry-mesh-color-4);
-			--dry-mesh-color-2: var(--dry-mesh-color-1);
-			--dry-mesh-color-3: var(--dry-mesh-color-2);
-			--dry-mesh-color-4: var(--dry-mesh-color-3);
+			background-position:
+				8% 0%,
+				96% 18%,
+				82% 94%,
+				6% 84%,
+				center;
 		}
 	}
 

@@ -118,5 +118,6 @@
 
 	.displacement {
 		position: relative;
+		block-size: 100%;
 	}
 </style>

@@ -37,23 +37,39 @@
 			time: '09:08'
 		}
 	];
+
+	const startsGroup = (i: number) => i === 0 || messages[i - 1]?.role !== messages[i]?.role;
+	const endsGroup = (i: number) =>
+		i === messages.length - 1 || messages[i + 1]?.role !== messages[i]?.role;
 </script>
 
 <ChatThread messageCount={messages.length}>
 	{#snippet children({ index })}
 		{@const msg = messages[index]}
+		{@const first = startsGroup(index)}
+		{@const last = endsGroup(index)}
 		{#if msg}
-			<div class="msg" data-role={msg.role}>
-				<Avatar size="sm" fallback={msg.name[0]} />
-				<div class="body">
-					<div class="head">
-						<span class="name">{msg.name}</span>
-						{#if msg.role === 'support'}
-							<Badge variant="soft" color="blue" size="sm">Support</Badge>
-						{/if}
-						<span class="time">{msg.time}</span>
+			<div class="row" data-role={msg.role} data-first={first} data-last={last}>
+				<div class="gutter">
+					{#if msg.role === 'support' && first}
+						<Avatar size="sm" fallback={msg.name[0]} />
+					{/if}
+				</div>
+				<div class="stack">
+					{#if first}
+						<div class="head">
+							<span class="name">{msg.name}</span>
+							{#if msg.role === 'support'}
+								<Badge variant="soft" color="blue" size="sm">Support</Badge>
+							{/if}
+						</div>
+					{/if}
+					<div class="bubble">
+						<p class="text">{msg.body}</p>
 					</div>
-					<p class="text">{msg.body}</p>
+					{#if last}
+						<span class="time">{msg.time}</span>
+					{/if}
 				</div>
 			</div>
 		{/if}
@@ -61,16 +77,38 @@
 </ChatThread>
 
 <style>
-	.msg {
+	.row {
 		display: grid;
-		grid-template-columns: max-content 1fr;
+		grid-template-columns: 32px minmax(0, 1fr);
 		gap: var(--dry-space-3);
-		padding: var(--dry-space-3) 0;
+		align-items: end;
 	}
 
-	.body {
+	.row[data-role='customer'] {
+		grid-template-columns: minmax(0, 1fr) 32px;
+	}
+
+	.row[data-role='customer'] .gutter {
+		order: 2;
+	}
+
+	.row[data-role='customer'] .stack {
+		order: 1;
+		justify-items: end;
+	}
+
+	.gutter {
+		display: flex;
+		align-items: flex-end;
+		justify-content: center;
+		block-size: 100%;
+	}
+
+	.stack {
 		display: grid;
 		gap: var(--dry-space-1);
+		justify-items: start;
+		min-inline-size: 0;
 	}
 
 	.head {
@@ -79,6 +117,7 @@
 		grid-auto-columns: max-content;
 		align-items: center;
 		gap: var(--dry-space-2);
+		padding-inline: var(--dry-space-1);
 	}
 
 	.name {
@@ -91,6 +130,28 @@
 		font-family: var(--dry-font-mono);
 		font-size: var(--dry-text-xs-size);
 		color: var(--dry-color-text-weak);
+		padding-inline: var(--dry-space-1);
+	}
+
+	.bubble {
+		max-inline-size: 60ch;
+		padding: var(--dry-space-2) var(--dry-space-3);
+		background: var(--dry-color-fill);
+		border-radius: var(--dry-radius-3, 12px);
+		border-end-start-radius: var(--dry-radius-3, 12px);
+	}
+
+	.row[data-role='support'] .bubble {
+		border-end-start-radius: var(--dry-radius-1, 4px);
+	}
+
+	.row[data-role='customer'] .bubble {
+		background: var(--dry-color-fill-accent);
+		border-end-end-radius: var(--dry-radius-1, 4px);
+	}
+
+	.row[data-role='customer'] .text {
+		color: var(--dry-color-on-accent);
 	}
 
 	.text {
@@ -98,6 +159,10 @@
 		font-size: var(--dry-text-sm-size);
 		line-height: 1.55;
 		color: var(--dry-color-text-strong);
-		max-inline-size: 60ch;
+		word-wrap: break-word;
+	}
+
+	.row[data-first='false'] {
+		margin-block-start: calc(var(--dry-space-2) * -1);
 	}
 </style>

@@ -133,6 +133,7 @@
 
 	[data-displacement] {
 		position: relative;
+		block-size: 100%;
 		border-radius: inherit;
 		overflow: hidden;
 	}

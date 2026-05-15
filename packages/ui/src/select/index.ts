@@ -1,10 +1,16 @@
 export type {
 	SelectRootProps,
-	SelectTriggerProps,
 	SelectContentProps,
 	SelectItemProps,
 	SelectValueProps
 } from '@dryui/primitives';
+import type { Snippet } from 'svelte';
+import type { HTMLButtonAttributes } from 'svelte/elements';
+
+export interface SelectTriggerProps extends Omit<HTMLButtonAttributes, 'children'> {
+	size?: 'sm' | 'md' | 'lg';
+	children: Snippet;
+}
 
 import SelectRoot from './select-root-input.svelte';
 import SelectTrigger from './select-trigger-button.svelte';
