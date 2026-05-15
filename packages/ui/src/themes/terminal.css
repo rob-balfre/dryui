@@ -11,6 +11,8 @@
 
 [data-theme='terminal'],
 .theme-terminal {
+	color-scheme: dark;
+
 	/* ─── Public aliases (terminal) ───────────────────────────────── */
 	--dry-color-primary: hsl(145, 80%, 50%);
 	--dry-color-primary-hover: hsl(145, 80%, 42%);
@@ -24,6 +26,7 @@
 	--dry-color-border-hover: hsla(0, 0%, 100%, 0.4);
 
 	/* ─── Brand — terminal green ──────────────────────────────────── */
+	--dry-color-fill-brand: var(--dry-color-primary);
 	--dry-color-fill-brand-active: hsl(145, 80%, 36%);
 	--dry-color-fill-brand-weak: hsla(145, 80%, 50%, 0.08);
 	--dry-color-stroke-brand: hsla(145, 80%, 50%, 0.5);
@@ -36,6 +39,7 @@
 	--dry-color-fill-accent-weak: hsla(45, 90%, 55%, 0.08);
 	--dry-color-stroke-accent: hsla(45, 90%, 55%, 0.5);
 	--dry-color-stroke-accent-strong: hsla(45, 90%, 55%, 0.8);
+	--dry-color-on-accent: hsl(45, 30%, 5%);
 
 	/* ─── Backgrounds — pure black, minimal saturation ────────────── */
 	--dry-color-bg-base: hsl(0, 0%, 2%);
@@ -128,19 +132,22 @@
 
 	/* ─── Status overrides — more vivid for data-dense UIs ────────── */
 	--dry-color-text-error: hsl(0, 80%, 65%);
-	--dry-color-fill-error-hover: hsl(0, 80%, 47%);
+	--dry-color-fill-error: var(--dry-color-danger);
+	--dry-color-fill-error-hover: hsl(0, 80%, 58%);
 	--dry-color-fill-error-weak: hsla(0, 80%, 55%, 0.12);
 	--dry-color-stroke-error: hsl(0, 60%, 55%);
 	--dry-color-stroke-error-strong: hsla(0, 80%, 55%, 0.85);
 	--dry-color-on-error: hsl(0, 30%, 5%);
 
 	--dry-color-text-warning: hsl(45, 90%, 60%);
+	--dry-color-fill-warning: var(--dry-color-warning);
 	--dry-color-fill-warning-weak: hsla(45, 90%, 55%, 0.12);
 	--dry-color-stroke-warning: hsl(45, 70%, 55%);
 	--dry-color-stroke-warning-strong: hsla(45, 90%, 55%, 0.85);
 	--dry-color-on-warning: hsl(45, 30%, 5%);
 
 	--dry-color-text-success: hsl(145, 80%, 55%);
+	--dry-color-fill-success: var(--dry-color-success);
 	--dry-color-fill-success-weak: hsla(145, 80%, 50%, 0.12);
 	--dry-color-stroke-success: hsl(145, 60%, 50%);
 	--dry-color-stroke-success-strong: hsla(145, 80%, 50%, 0.85);
@@ -151,6 +158,7 @@
 	--dry-color-fill-info-weak: hsla(200, 80%, 55%, 0.12);
 	--dry-color-stroke-info: hsl(200, 60%, 55%);
 	--dry-color-stroke-info-strong: hsla(200, 80%, 55%, 0.85);
+	--dry-color-on-info: hsl(200, 30%, 5%);
 
 	/* ─── Purple semantic palette (badge / tag purple variants) ───── */
 	--dry-color-text-purple: hsl(285, 80%, 70%);
@@ -158,4 +166,26 @@
 	--dry-color-fill-purple-weak: hsla(285, 75%, 60%, 0.12);
 	--dry-color-stroke-purple: hsla(285, 75%, 60%, 0.5);
 	--dry-color-on-purple: hsl(285, 30%, 5%);
+
+	/* ─── Orange semantic palette (badge / tag orange variants) ───── */
+	--dry-color-fill-orange: color-mix(
+		in srgb,
+		var(--dry-color-fill-warning) 70%,
+		var(--dry-color-fill-error)
+	);
+	--dry-color-on-orange: hsl(30, 30%, 5%);
+}
+
+@supports (color: contrast-color(white)) {
+	[data-theme='terminal'],
+	.theme-terminal {
+		--dry-color-on-brand: contrast-color(var(--dry-color-fill-brand));
+		--dry-color-on-error: contrast-color(var(--dry-color-fill-error));
+		--dry-color-on-warning: contrast-color(var(--dry-color-fill-warning));
+		--dry-color-on-success: contrast-color(var(--dry-color-fill-success));
+		--dry-color-on-info: contrast-color(var(--dry-color-fill-info));
+		--dry-color-on-accent: contrast-color(var(--dry-color-fill-accent));
+		--dry-color-on-purple: contrast-color(var(--dry-color-fill-purple));
+		--dry-color-on-orange: contrast-color(var(--dry-color-fill-orange));
+	}
 }

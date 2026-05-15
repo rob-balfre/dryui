@@ -4,6 +4,7 @@ import { tmpdir } from 'node:os';
 import { resolve } from 'node:path';
 import { evaluateLayoutContract } from './layout-contract.js';
 import { checkAppCss, checkLayoutCss, dryuiLayoutCss } from './layout-css.js';
+import { checkStyle } from './rules.js';
 
 describe('checkLayoutCss', () => {
 	test('accepts valid layout.css page layout rules', () => {
@@ -132,6 +133,25 @@ describe('checkLayoutCss', () => {
 		expect(violations[0]!.rule).toBe('dryui/layout-css-at-rule');
 	});
 
+	test('rejects feature-detection and paint gates in consumer layout.css', () => {
+		const violations = checkLayoutCss(`
+@supports (background: paint(dryui-grid)) {
+  [data-layout='stack'] {
+    display: grid;
+  }
+}
+
+@supports (color: contrast-color(white)) {
+  [data-layout='stack'] {
+    display: grid;
+  }
+}`);
+		expect(violations.map((violation) => violation.rule)).toEqual([
+			'dryui/layout-css-at-rule',
+			'dryui/layout-css-at-rule'
+		]);
+	});
+
 	test('does not allow text-align as a box-alignment property', () => {
 		const violations = checkLayoutCss('[data-layout] { text-align: center; }');
 		expect(violations).toHaveLength(1);
@@ -211,6 +231,22 @@ body {
 				line: 1
 			})
 		]);
+	});
+});
+
+describe('component and theme CSS gates', () => {
+	test('allows component/theme CSS to gate contrast-color support', () => {
+		const violations = checkStyle(`
+.badge {
+  color: var(--dry-color-on-success);
+}
+
+@supports (color: contrast-color(white)) {
+  .badge {
+    color: contrast-color(var(--dry-color-fill-success));
+  }
+}`);
+		expect(violations).toHaveLength(0);
 	});
 });
 

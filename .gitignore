@@ -32,6 +32,7 @@ Terminal Saved Output*.txt
 opencode.json
 skills/.system/
 .dryui/
+.clawpatch/
 tmp-*.png
 [data-theme-switch].png
 tests/browser/__screenshots__/

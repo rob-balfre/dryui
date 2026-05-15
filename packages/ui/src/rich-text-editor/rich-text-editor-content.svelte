@@ -174,7 +174,7 @@
 	}
 
 	[data-part='content'] a {
-		color: var(--dry-color-fill-brand);
+		color: var(--dry-color-text-brand);
 		text-decoration: underline;
 	}
 

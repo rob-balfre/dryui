@@ -41,7 +41,7 @@
 		margin-inline-end: var(--dry-tags-input-gap, var(--dry-space-1_5));
 		margin-block: calc(var(--dry-tags-input-gap, var(--dry-space-1_5)) / 2);
 		background: color-mix(in srgb, var(--dry-color-fill-brand) 15%, transparent);
-		color: var(--dry-color-fill-brand);
+		color: var(--dry-color-text-brand);
 		border-radius: var(--dry-tags-input-tag-radius, var(--dry-radius-md));
 		overflow: hidden;
 		font-size: var(

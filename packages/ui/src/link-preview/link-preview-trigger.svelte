@@ -55,7 +55,7 @@
 	}
 
 	[data-link-preview-trigger]:hover {
-		color: var(--dry-color-fill-brand-hover);
+		color: var(--dry-color-text-brand);
 		text-decoration-color: currentColor;
 	}
 </style>

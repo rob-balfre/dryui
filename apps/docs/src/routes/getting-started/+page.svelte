@@ -55,6 +55,22 @@ bun add -d @dryui/lint`;
   import '@dryui/ui/themes/default.css';
   import '@dryui/ui/themes/dark.css';
 <\/script>`;
+
+	const themeModeCode = `<!-- Light-only: default tokens -->
+<html lang="en">
+
+<!-- System-aware auto: follows prefers-color-scheme -->
+<html lang="en" class="theme-auto">
+
+<!-- Explicit override -->
+<html lang="en" data-theme="dark">`;
+
+	const themeToggleSetupCode = `// Embed the returned script in the document head before theme CSS.
+import { themeFlashScript, ThemeToggle } from '@dryui/ui';
+
+const themeScript = themeFlashScript('my-app-theme');
+
+<ThemeToggle storageKey="my-app-theme" />`;
 </script>
 
 <svelte:head>
@@ -122,6 +138,21 @@ bun add -d @dryui/lint`;
 					</Tabs.Content>
 				{/each}
 			</Tabs.Root>
+		</section>
+
+		<section class="stack-md">
+			<Heading level={2}>Theme modes</Heading>
+			<Text size="lg" color="secondary" maxMeasure="default">
+				Import the default theme first and add the dark theme when the app supports explicit dark or
+				system-aware auto mode. The HTML attribute or class chooses the active DryUI token set.
+			</Text>
+			<CodeBlock code={themeImportCode} language="svelte" />
+			<CodeBlock code={themeModeCode} language="html" />
+			<Text size="md" color="secondary" maxMeasure="default">
+				For a persisted toggle, apply the stored mode in the document head before hydration, then
+				render <code>ThemeToggle</code> with the same storage key.
+			</Text>
+			<CodeBlock code={themeToggleSetupCode} language="svelte" />
 		</section>
 
 		<section class="learn-mode stack-sm">

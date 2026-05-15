@@ -70,11 +70,17 @@ These are the rules `@dryui/lint` enforces. They are the contract — if lint, t
 ### Theme tokens
 
 - Import `@dryui/ui/themes/default.css` (and `dark.css` if used) BEFORE local CSS. Local CSS imported first gets clobbered by theme defaults.
+- Choose theme support deliberately:
+  - Light-only: import `default.css` and leave `<html>` bare.
+  - Explicit light/dark: import `default.css` and `dark.css`, then set `data-theme="light"` or `data-theme="dark"` on `<html>`.
+  - System-aware auto: import `default.css` and `dark.css`, then set `class="theme-auto"` on `<html>`. Use `data-theme="light"` or `data-theme="dark"` only when the app needs to override auto.
 - Full-theme files (`*.theme.css` or `/* @dryui-theme */` directive) must define every semantic token.
 - For 1-10 site-wide tweaks, scope token overrides under `.page`/`body`, not `:root`. For 1-5 per-route tweaks, put them in a scoped component `<style>`. Do not scatter `--dry-*` overrides on `:root`.
 - Do not invent `--dry-*` names. Non-existent: `--dry-color-surface`, `--dry-color-panel`, `--dry-color-background`. Real surface tokens: `--dry-color-bg-base`, `--dry-color-bg-raised`, `--dry-color-bg-overlay`.
 - Do not resize the whole UI via `html`/`body` `font-size`. Do not use raw hex, `rgb()`, or raw `px` spacing when a DryUI token exists.
 - `color-scheme: light dark` and `light-dark()` are not theme switches — DryUI dark tokens come from `data-theme="dark"` or `.theme-auto`.
+- `contrast-color()` is Baseline 2026 newly available since April 2026, but progressive enhancement is still required. Keep static foreground/background fallback tokens first, then override with `contrast-color()` inside `@supports (color: contrast-color(red))`. It only returns `black` or `white`, so do not use it where the design needs a branded semantic foreground or where middle-tone backgrounds still need manual contrast verification.
+- App-owned custom properties must resolve to readable foreground/background pairs in every enabled mode. Verify light, explicit dark, and `.theme-auto` if the app supports them; do not assume `light-dark()` or `contrast-color()` proves the pair is accessible.
 
 ## First Decision
 
@@ -191,10 +197,14 @@ Use for vertical lists of panels or list rows. `minmax(0, 1fr)` stops wide child
 	gap: var(--dry-space-3);
 }
 @container page (min-width: 48rem) {
-	[data-layout='metric-grid'] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+	[data-layout='metric-grid'] {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
 }
 @container page (min-width: 72rem) {
-	[data-layout='metric-grid'] { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+	[data-layout='metric-grid'] {
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+	}
 }
 ```
 

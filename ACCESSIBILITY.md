@@ -14,7 +14,14 @@ A component is only considered AA-ready in this repository when:
 - focus order and focus return are predictable
 - the keyboard model matches the intended widget pattern
 - helper, error, and status text are programmatically associated where relevant
+- foreground and background color pairs meet WCAG 2.2 AA in every first-class theme mode the surface enables: light, explicit dark, and system-aware `.theme-auto`
 - motion, autoplay, and transient feedback do not create avoidable accessibility regressions
+
+## Color And Theme Contrast
+
+DryUI dark mode is token-driven. Components and docs should treat `[data-theme='dark']` and `.theme-auto` as the supported dark-mode mechanisms; `color-scheme` and `light-dark()` can influence browser UI or individual CSS values, but they are not DryUI theme switches.
+
+`contrast-color()` became Baseline 2026 newly available in April 2026. It is useful as progressive enhancement for app-owned dynamic color surfaces, but it does not replace accessible token pairs. Use static fallback foreground tokens first, guard `contrast-color()` with `@supports`, and verify the result because the function only returns black or white.
 
 ## Verification
 

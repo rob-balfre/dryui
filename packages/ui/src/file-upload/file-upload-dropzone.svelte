@@ -115,7 +115,7 @@
 	[data-fu-dropzone][data-dragging] {
 		--_fu-border-default: var(--dry-color-fill-brand);
 		--_fu-bg-default: color-mix(in srgb, var(--dry-color-fill-brand) 8%, transparent);
-		color: var(--dry-color-fill-brand);
+		color: var(--dry-color-text-brand);
 	}
 
 	[data-fu-dropzone][data-disabled] {

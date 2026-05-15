@@ -50,7 +50,10 @@
 			--dry-option-picker-preview-bg,
 			color-mix(in srgb, var(--dry-color-fill-weak) 72%, var(--dry-color-bg-base) 28%)
 		);
-		color: var(--dry-option-picker-preview-color, var(--dry-color-text-strong));
+		color: var(
+			--dry-option-picker-preview-color,
+			var(--_option-picker-preview-preset-color, var(--dry-color-text-strong))
+		);
 		box-shadow: var(--dry-option-picker-preview-shadow, none);
 		overflow: hidden;
 	}
@@ -74,7 +77,7 @@
 			--_preset-color,
 			var(--dry-option-picker-preview-bg, var(--dry-color-fill-selected))
 		);
-		--dry-option-picker-preview-color: var(--dry-option-picker-preview-tint-light, white);
+		--_option-picker-preview-preset-color: var(--dry-option-picker-preview-tint-light, white);
 		--dry-option-picker-preview-border: color-mix(
 			in srgb,
 			var(--_preset-color-resolved) 46%,
@@ -103,6 +106,12 @@
 			inset 0 -1px 0
 				color-mix(in srgb, var(--dry-option-picker-preview-tint-dark, black) 10%, transparent);
 		transition: border-radius var(--dry-duration-fast) var(--dry-ease-default);
+	}
+
+	@supports (color: contrast-color(white)) {
+		[data-option-picker-preview][data-variant='preset'] {
+			--_option-picker-preview-preset-color: contrast-color(var(--_preset-color-resolved));
+		}
 	}
 
 	[data-option-picker-preview][data-variant='font'] {

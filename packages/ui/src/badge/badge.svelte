@@ -152,12 +152,8 @@
 	}
 
 	[data-variant='solid'][data-color='orange'] {
-		--_badge-bg-default: color-mix(
-			in srgb,
-			var(--dry-color-fill-warning) 70%,
-			var(--dry-color-fill-error)
-		);
-		--_badge-color-default: var(--dry-color-on-warning);
+		--_badge-bg-default: var(--dry-color-fill-orange);
+		--_badge-color-default: var(--dry-color-on-orange);
 	}
 
 	/* ── Variant: outline ─────────────────────────────────────────────────────── */

@@ -53,7 +53,13 @@ Use it in Svelte:
 </section>
 ```
 
-Prefer `<html class="theme-auto">` so DryUI follows the system color scheme by default. Use `data-theme="light"` or `data-theme="dark"` only for explicit overrides.
+Choose the theme mode deliberately:
+
+- Light-only: leave `<html>` bare.
+- System-aware: add `class="theme-auto"` so DryUI follows `prefers-color-scheme`.
+- Explicit override: set `data-theme="light"` or `data-theme="dark"`.
+
+When you ship a `ThemeToggle`, embed `themeFlashScript(storageKey)` in the document head and pass the same `storageKey` to the toggle so the chosen mode applies before first paint.
 
 ## Human-Led Agent-Assisted Workflow
 

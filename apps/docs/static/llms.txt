@@ -46,11 +46,17 @@ bun add @dryui/ui
 ```
 
 ```html
-<!-- Preferred default: follow the browser/OS theme -->
+<!-- Light-only: default tokens -->
+<html />
+
+<!-- System-aware auto: follows prefers-color-scheme -->
 <html class="theme-auto" />
+
+<!-- Explicit override -->
+<html data-theme="dark" />
 ```
 
-Use `data-theme="light"` or `data-theme="dark"` only for explicit overrides. If you build a theme toggle, persist the explicit override and keep system mode as the fallback.
+If you build a theme toggle, persist the explicit override, keep system mode as the fallback, and embed `themeFlashScript(storageKey)` in the document head so the selected mode applies before first paint.
 
 ## Layout Rules
 

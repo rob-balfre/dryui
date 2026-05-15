@@ -8,9 +8,10 @@
 		<Accordion.Content>
 			<p>
 				Run <code>bun add @dryui/ui</code>, then import <code>@dryui/ui/themes/default.css</code>
-				and <code>@dryui/ui/themes/dark.css</code> in your root layout. Add
-				<code>class="theme-auto"</code> to the <code>&lt;html&gt;</code> element so components pick up
-				the user's system preference.
+				in your root layout. Add <code>@dryui/ui/themes/dark.css</code> when the app supports
+				explicit dark or system-aware auto mode. Leave <code>&lt;html&gt;</code> bare for
+				light-only, use <code>class="theme-auto"</code> for system mode, or set
+				<code>data-theme="dark"</code> for an explicit override.
 			</p>
 		</Accordion.Content>
 	</Accordion.Item>

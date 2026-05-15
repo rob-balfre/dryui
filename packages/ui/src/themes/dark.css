@@ -1,4 +1,6 @@
 [data-theme='dark'] {
+	color-scheme: dark;
+
 	/* ─── Public aliases (dark) ────────────────────────────────────── */
 	--dry-color-primary: hsl(230, 100%, 82%);
 	--dry-color-primary-hover: hsl(230, 100%, 75%);
@@ -18,6 +20,7 @@
 	--dry-color-fill-active: hsla(0, 0%, 100%, 0.14);
 
 	/* ─── Brand dark overrides ────────────────────────────────────── */
+	--dry-color-fill-brand: var(--dry-color-primary);
 	--dry-color-fill-brand-active: hsl(230, 100%, 70%);
 	--dry-color-fill-brand-weak: hsla(230, 100%, 82%, 0.06);
 	--dry-color-stroke-brand: hsla(230, 100%, 82%, 0.5);
@@ -66,14 +69,16 @@
 
 	/* ─── Status: Error ───────────────────────────────────────────── */
 	--dry-color-text-error: hsl(0, 60%, 70%);
-	--dry-color-fill-error-hover: hsl(0, 65%, 48%);
+	--dry-color-fill-error: var(--dry-color-danger);
+	--dry-color-fill-error-hover: hsl(0, 65%, 58%);
 	--dry-color-fill-error-weak: hsla(0, 60%, 60%, 0.15);
 	--dry-color-stroke-error: hsl(0, 45%, 55%);
 	--dry-color-stroke-error-strong: hsla(0, 65%, 55%, 0.8);
-	--dry-color-on-error: #ffffff;
+	--dry-color-on-error: hsl(0, 30%, 4%);
 
 	/* ─── Status: Warning ─────────────────────────────────────────── */
 	--dry-color-text-warning: hsl(40, 80%, 65%);
+	--dry-color-fill-warning: var(--dry-color-warning);
 	--dry-color-fill-warning-weak: hsla(40, 75%, 60%, 0.15);
 	--dry-color-stroke-warning: hsl(40, 55%, 55%);
 	--dry-color-stroke-warning-strong: hsla(40, 75%, 52%, 0.8);
@@ -81,10 +86,11 @@
 
 	/* ─── Status: Success ─────────────────────────────────────────── */
 	--dry-color-text-success: hsl(145, 55%, 65%);
+	--dry-color-fill-success: var(--dry-color-success);
 	--dry-color-fill-success-weak: hsla(145, 55%, 60%, 0.15);
 	--dry-color-stroke-success: hsl(145, 45%, 55%);
 	--dry-color-stroke-success-strong: hsla(145, 55%, 48%, 0.8);
-	--dry-color-on-success: #ffffff;
+	--dry-color-on-success: hsl(145, 30%, 8%);
 
 	/* ─── Status: Info ────────────────────────────────────────────── */
 	--dry-color-text-info: hsl(210, 65%, 70%);
@@ -92,12 +98,14 @@
 	--dry-color-fill-info-weak: hsla(210, 60%, 65%, 0.15);
 	--dry-color-stroke-info: hsl(210, 45%, 55%);
 	--dry-color-stroke-info-strong: hsla(210, 65%, 55%, 0.8);
+	--dry-color-on-info: hsl(210, 30%, 8%);
 
 	/* ─── Accent tone (warm counterpoint to brand) ───────────────── */
 	--dry-color-fill-accent: hsl(25, 85%, 68%);
 	--dry-color-fill-accent-weak: hsla(25, 85%, 68%, 0.1);
 	--dry-color-stroke-accent: hsla(25, 85%, 68%, 0.5);
 	--dry-color-stroke-accent-strong: hsla(25, 85%, 68%, 0.8);
+	--dry-color-on-accent: hsl(25, 30%, 8%);
 
 	/* ─── Purple semantic palette (badge / tag purple variants) ───── */
 	--dry-color-text-purple: hsl(280, 75%, 78%);
@@ -105,6 +113,14 @@
 	--dry-color-fill-purple-weak: hsla(280, 75%, 70%, 0.12);
 	--dry-color-stroke-purple: hsla(280, 75%, 70%, 0.5);
 	--dry-color-on-purple: hsl(233, 18%, 9%);
+
+	/* ─── Orange semantic palette (badge / tag orange variants) ───── */
+	--dry-color-fill-orange: color-mix(
+		in srgb,
+		var(--dry-color-fill-warning) 70%,
+		var(--dry-color-fill-error)
+	);
+	--dry-color-on-orange: hsl(25, 30%, 8%);
 
 	/* ─── Extended surface depth ──────────────────────────────────── */
 	--dry-color-bg-floating: hsl(234, 8%, 26%);
@@ -164,6 +180,8 @@
 .theme-auto:not([data-theme='light']) {
 	@media (prefers-color-scheme: dark) {
 		& {
+			color-scheme: dark;
+
 			/* ─── Public aliases (auto dark) ────────────────────────────── */
 			--dry-color-primary: hsl(230, 100%, 82%);
 			--dry-color-primary-hover: hsl(230, 100%, 75%);
@@ -183,6 +201,7 @@
 			--dry-color-fill-active: hsla(0, 0%, 100%, 0.14);
 
 			/* ─── Brand dark overrides ────────────────────────────────────── */
+			--dry-color-fill-brand: var(--dry-color-primary);
 			--dry-color-fill-brand-active: hsl(230, 100%, 70%);
 			--dry-color-fill-brand-weak: hsla(230, 100%, 82%, 0.06);
 			--dry-color-stroke-brand: hsla(230, 100%, 82%, 0.5);
@@ -227,14 +246,16 @@
 
 			/* ─── Status: Error ───────────────────────────────────────────── */
 			--dry-color-text-error: hsl(0, 60%, 70%);
-			--dry-color-fill-error-hover: hsl(0, 65%, 48%);
+			--dry-color-fill-error: var(--dry-color-danger);
+			--dry-color-fill-error-hover: hsl(0, 65%, 58%);
 			--dry-color-fill-error-weak: hsla(0, 60%, 60%, 0.15);
 			--dry-color-stroke-error: hsl(0, 45%, 55%);
 			--dry-color-stroke-error-strong: hsla(0, 65%, 55%, 0.8);
-			--dry-color-on-error: #ffffff;
+			--dry-color-on-error: hsl(0, 30%, 4%);
 
 			/* ─── Status: Warning ─────────────────────────────────────────── */
 			--dry-color-text-warning: hsl(40, 80%, 65%);
+			--dry-color-fill-warning: var(--dry-color-warning);
 			--dry-color-fill-warning-weak: hsla(40, 75%, 60%, 0.15);
 			--dry-color-stroke-warning: hsl(40, 55%, 55%);
 			--dry-color-stroke-warning-strong: hsla(40, 75%, 52%, 0.8);
@@ -242,10 +263,11 @@
 
 			/* ─── Status: Success ─────────────────────────────────────────── */
 			--dry-color-text-success: hsl(145, 55%, 65%);
+			--dry-color-fill-success: var(--dry-color-success);
 			--dry-color-fill-success-weak: hsla(145, 55%, 60%, 0.15);
 			--dry-color-stroke-success: hsl(145, 45%, 55%);
 			--dry-color-stroke-success-strong: hsla(145, 55%, 48%, 0.8);
-			--dry-color-on-success: #ffffff;
+			--dry-color-on-success: hsl(145, 30%, 8%);
 
 			/* ─── Status: Info ────────────────────────────────────────────── */
 			--dry-color-text-info: hsl(210, 65%, 70%);
@@ -253,12 +275,14 @@
 			--dry-color-fill-info-weak: hsla(210, 60%, 65%, 0.15);
 			--dry-color-stroke-info: hsl(210, 45%, 55%);
 			--dry-color-stroke-info-strong: hsla(210, 65%, 55%, 0.8);
+			--dry-color-on-info: hsl(210, 30%, 8%);
 
 			/* ─── Accent tone (warm counterpoint to brand) ───────────────── */
 			--dry-color-fill-accent: hsl(25, 85%, 68%);
 			--dry-color-fill-accent-weak: hsla(25, 85%, 68%, 0.1);
 			--dry-color-stroke-accent: hsla(25, 85%, 68%, 0.5);
 			--dry-color-stroke-accent-strong: hsla(25, 85%, 68%, 0.8);
+			--dry-color-on-accent: hsl(25, 30%, 8%);
 
 			/* ─── Purple semantic palette (badge / tag purple variants) ───── */
 			--dry-color-text-purple: hsl(280, 75%, 78%);
@@ -266,6 +290,14 @@
 			--dry-color-fill-purple-weak: hsla(280, 75%, 70%, 0.12);
 			--dry-color-stroke-purple: hsla(280, 75%, 70%, 0.5);
 			--dry-color-on-purple: hsl(233, 18%, 9%);
+
+			/* ─── Orange semantic palette (badge / tag orange variants) ───── */
+			--dry-color-fill-orange: color-mix(
+				in srgb,
+				var(--dry-color-fill-warning) 70%,
+				var(--dry-color-fill-error)
+			);
+			--dry-color-on-orange: hsl(25, 30%, 8%);
 
 			/* ─── Extended surface depth ──────────────────────────────────── */
 			--dry-color-bg-floating: hsl(234, 8%, 26%);
@@ -312,6 +344,34 @@
 
 			/* ─── Grain / noise texture ───────────────────────────────────── */
 			--dry-grain-opacity: 0.06;
+		}
+	}
+}
+
+@supports (color: contrast-color(white)) {
+	[data-theme='dark'] {
+		--dry-color-on-brand: contrast-color(var(--dry-color-fill-brand));
+		--dry-color-on-error: contrast-color(var(--dry-color-fill-error));
+		--dry-color-on-warning: contrast-color(var(--dry-color-fill-warning));
+		--dry-color-on-success: contrast-color(var(--dry-color-fill-success));
+		--dry-color-on-info: contrast-color(var(--dry-color-fill-info));
+		--dry-color-on-accent: contrast-color(var(--dry-color-fill-accent));
+		--dry-color-on-purple: contrast-color(var(--dry-color-fill-purple));
+		--dry-color-on-orange: contrast-color(var(--dry-color-fill-orange));
+	}
+
+	.theme-auto:not([data-theme='light']) {
+		@media (prefers-color-scheme: dark) {
+			& {
+				--dry-color-on-brand: contrast-color(var(--dry-color-fill-brand));
+				--dry-color-on-error: contrast-color(var(--dry-color-fill-error));
+				--dry-color-on-warning: contrast-color(var(--dry-color-fill-warning));
+				--dry-color-on-success: contrast-color(var(--dry-color-fill-success));
+				--dry-color-on-info: contrast-color(var(--dry-color-fill-info));
+				--dry-color-on-accent: contrast-color(var(--dry-color-fill-accent));
+				--dry-color-on-purple: contrast-color(var(--dry-color-fill-purple));
+				--dry-color-on-orange: contrast-color(var(--dry-color-fill-orange));
+			}
 		}
 	}
 }
