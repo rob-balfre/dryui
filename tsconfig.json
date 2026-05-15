@@ -18,11 +18,5 @@
       "@dryui/lint": ["./packages/lint/src/index.ts"]
     }
   },
-  "references": [
-    { "path": "./packages/feedback" },
-    { "path": "./packages/feedback-server" },
-    { "path": "./packages/primitives" },
-    { "path": "./packages/ui" },
-    { "path": "./packages/lint" }
-  ]
+  "include": ["apps/docs/src/app.d.ts"]
 }
