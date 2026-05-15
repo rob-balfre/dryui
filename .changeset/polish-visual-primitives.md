@@ -14,4 +14,5 @@ Polish visual primitives and rewrite date-picker trigger.
 - `DatePicker.Trigger`: rewritten as a self-styled button (no longer wraps `Button`); exposes `--dry-date-picker-trigger-*` CSS vars and `data-content`/`data-date-picker-trigger` hooks.
 - `Select.Trigger`: `size` prop added; type extends `HTMLButtonAttributes`.
 - `TimeInput`: type now extends `HTMLAttributes<HTMLDivElement>` to match the segmented group implementation.
+- `@dryui/lint`: `date-picker` joins the form-control-trigger carve-out for raw `<button>` (alongside `select` and `date-range-picker`).
 - Dep bumps across the workspace (svelte 5.55.7, svelte-check 4.4.8, vite 8.0.13, @sveltejs/kit 2.60.1, vite-plugin-svelte 7.1.2).

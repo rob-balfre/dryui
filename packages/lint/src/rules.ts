@@ -123,6 +123,7 @@ const NATIVE_ELEMENT_RULES: NativeElementRule[] = [
 			// --dry-form-control-* token family so they stay visually consistent
 			// with <Input>/<Textarea> (and immune to ambient --dry-btn-* nesting).
 			'select',
+			'date-picker',
 			'date-range-picker'
 		]),
 		re: /<button(\s|>|\/)/g
