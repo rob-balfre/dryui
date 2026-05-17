@@ -1,5 +1,18 @@
 # @dryui/ui
 
+## 4.0.2
+
+### Patch Changes
+
+- [`8f72c06`](https://github.com/rob-balfre/dryui/commit/8f72c06c8e258d71d49228ba56fa260f7a27b5f3) Thanks [@rob-balfre](https://github.com/rob-balfre)! - Add submission claiming, agent manifest generation, and skill restructure.
+  - `@dryui/feedback-server`: claim/release primitives so multiple agents can coordinate on the same submission queue without double-grabbing. New MCP tools `feedback_claim_submission` / `feedback_release_submission` and worker UI in the submission card.
+  - `@dryui/lint`: new `dryui/no-transcript-artifact` rule and `violation-report` module for structured violation output.
+  - `@dryui/primitives` / `@dryui/ui`: meta.ts doc comments updated to point at the docs-generation consumer instead of the deprecated `@dryui/mcp/load-component-meta` route. No runtime changes.
+  - `@dryui/feedback`: minor toolbar and accordion-default tweaks aligned with the new claim flow.
+
+- Updated dependencies [[`8f72c06`](https://github.com/rob-balfre/dryui/commit/8f72c06c8e258d71d49228ba56fa260f7a27b5f3)]:
+  - @dryui/primitives@4.0.2
+
 ## 4.0.1
 
 ### Patch Changes
