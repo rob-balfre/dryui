@@ -485,6 +485,121 @@ describe('feedback HTTP server', () => {
 		);
 	});
 
+	test('claims submissions, tracks worker identity, and computes duration on resolve', async () => {
+		const events: SSEEvent[] = [];
+		bus.subscribe((event) => events.push(event));
+
+		const createResponse = await fetch(`${baseUrl}/submissions`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				url: 'https://example.com/claim-flow',
+				image: imagePayload('claim-flow'),
+				drawings: []
+			})
+		});
+		expect(createResponse.status).toBe(201);
+		const created = (await createResponse.json()) as Submission;
+		screenshotPaths.push(created.screenshotPath.webp, created.screenshotPath.png);
+
+		const claimResponse = await fetch(`${baseUrl}/submissions/${created.id}/claim`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				agent: 'claude',
+				name: 'Claude Code',
+				model: 'claude-opus-4-7',
+				version: '1.4.0'
+			})
+		});
+		expect(claimResponse.status).toBe(200);
+		const claimed = (await claimResponse.json()) as SubmissionPresentation;
+		expect(claimed).toMatchObject({
+			id: created.id,
+			status: 'processing',
+			worker: {
+				agent: 'claude',
+				name: 'Claude Code',
+				model: 'claude-opus-4-7',
+				version: '1.4.0'
+			}
+		});
+		expect(claimed.processingStartedAt).toMatch(/^\d{4}-\d{2}-\d{2}T/);
+
+		await new Promise((resolve) => setTimeout(resolve, 20));
+
+		const resolveResponse = await fetch(`${baseUrl}/submissions/${created.id}`, {
+			method: 'PATCH',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ status: 'resolved' })
+		});
+		expect(resolveResponse.status).toBe(200);
+		const resolved = (await resolveResponse.json()) as SubmissionPresentation;
+		expect(resolved.status).toBe('resolved');
+		expect(resolved.resolvedAt).toMatch(/^\d{4}-\d{2}-\d{2}T/);
+		expect(resolved.durationMs).toBeGreaterThanOrEqual(0);
+		// Worker survives resolve so the completed history can name the AI.
+		expect(resolved.worker?.agent).toBe('claude');
+		expect(resolved.worker?.model).toBe('claude-opus-4-7');
+
+		// Both claim and resolve broadcast a `submission.updated` event.
+		expect(events.map((event) => event.type)).toEqual([
+			'submission.created',
+			'submission.updated',
+			'submission.updated'
+		]);
+	});
+
+	test('releases a processing submission back to pending and clears worker context', async () => {
+		const createResponse = await fetch(`${baseUrl}/submissions`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				url: 'https://example.com/release-flow',
+				image: imagePayload('release-flow'),
+				drawings: []
+			})
+		});
+		const created = (await createResponse.json()) as Submission;
+		screenshotPaths.push(created.screenshotPath.webp, created.screenshotPath.png);
+
+		await fetch(`${baseUrl}/submissions/${created.id}/claim`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ agent: 'codex', name: 'Codex' })
+		});
+
+		const releaseResponse = await fetch(`${baseUrl}/submissions/${created.id}/release`, {
+			method: 'POST'
+		});
+		expect(releaseResponse.status).toBe(200);
+		const released = (await releaseResponse.json()) as SubmissionPresentation;
+		expect(released.status).toBe('pending');
+		expect(released.worker).toBeUndefined();
+		expect(released.processingStartedAt).toBeUndefined();
+	});
+
+	test('rejects claims with an invalid worker descriptor', async () => {
+		const createResponse = await fetch(`${baseUrl}/submissions`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				url: 'https://example.com/bad-claim',
+				image: imagePayload('bad-claim'),
+				drawings: []
+			})
+		});
+		const created = (await createResponse.json()) as Submission;
+		screenshotPaths.push(created.screenshotPath.webp, created.screenshotPath.png);
+
+		const response = await fetch(`${baseUrl}/submissions/${created.id}/claim`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ agent: 'not-a-real-agent' })
+		});
+		expect(response.status).toBe(400);
+	});
+
 	test('rejects submissions missing paired image fields', async () => {
 		const response = await fetch(`${baseUrl}/submissions`, {
 			method: 'POST',

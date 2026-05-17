@@ -8,7 +8,8 @@ import type {
 	SubmissionMovedElement,
 	SubmissionRemovedElement,
 	SubmissionScrollOffset,
-	SubmissionStatus
+	SubmissionStatus,
+	SubmissionWorker
 } from './types.js';
 
 const VALID_AGENTS: ReadonlySet<SubmissionAgent> = new Set<SubmissionAgent>([
@@ -35,6 +36,10 @@ export interface SubmissionRow {
 	created_at: string;
 	agent: string | null;
 	workspace: string | null;
+	worker: string | null;
+	processing_started_at: string | null;
+	resolved_at: string | null;
+	duration_ms: number | null;
 }
 
 export interface SubmissionInsertSerializationInput {
@@ -125,6 +130,7 @@ export function toSubmission(row: SubmissionRow): Submission {
 	const removed = parseJson<SubmissionRemovedElement[]>(row.removed);
 	const moved = parseJson<SubmissionMovedElement[]>(row.moved);
 	const scroll = parseJson<SubmissionScrollOffset>(row.scroll);
+	const worker = parseJson<SubmissionWorker>(row.worker);
 	return {
 		id: row.id,
 		url: row.url,
@@ -144,6 +150,10 @@ export function toSubmission(row: SubmissionRow): Submission {
 		status: row.status as SubmissionStatus,
 		createdAt: row.created_at,
 		...(agent ? { agent } : {}),
-		...(row.workspace ? { workspace: row.workspace } : {})
+		...(row.workspace ? { workspace: row.workspace } : {}),
+		...(worker ? { worker } : {}),
+		...(row.processing_started_at ? { processingStartedAt: row.processing_started_at } : {}),
+		...(row.resolved_at ? { resolvedAt: row.resolved_at } : {}),
+		...(row.duration_ms !== null ? { durationMs: row.duration_ms } : {})
 	};
 }

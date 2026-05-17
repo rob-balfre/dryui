@@ -1,6 +1,6 @@
 # DryUI component reference
 
-> Machine-readable component import, props, styling hook, and example index for 164 DryUI components.
+> Machine-readable component import, props, styling hook, and example index for 152 DryUI components.
 
 Theme imports:
 - @dryui/ui/themes/default.css
@@ -213,7 +213,16 @@ Data attributes: data-disabled (Present when the component or part is disabled.)
 Accessibility: Pair Input with a visible Label or an aria-label so the field purpose is announced. | Use native type, autocomplete, and name attributes for expected keyboard and form behavior.
 Example:
 ```svelte
-<Input type="email" bind:value={email} placeholder="you@example.com" />
+<script lang="ts">
+  import '@dryui/ui/themes/default.css';
+  import '@dryui/ui/themes/dark.css';
+  import { Input, Field, Label } from '@dryui/ui';
+</script>
+
+<Field.Root required>
+  <Label>Email address</Label>
+  <Input type="email" bind:value={email} name="email" autocomplete="email" placeholder="you@example.com" />
+</Field.Root>
 ```
 
 ## Textarea
@@ -1069,15 +1078,25 @@ Data attributes: data-content | data-disabled (Present when the component or par
 Accessibility: Provide surrounding field context and a name when the selected value needs to submit with a form.
 Example:
 ```svelte
-<Select.Root bind:value={selected} bind:open={selectOpen} name="selection">
-  <Select.Trigger>
-    <Select.Value placeholder="Choose…" />
-  </Select.Trigger>
-  <Select.Content>
-    <Select.Item value="a">Alpha</Select.Item>
-    <Select.Item value="b">Beta</Select.Item>
-  </Select.Content>
-</Select.Root>
+<script lang="ts">
+  import '@dryui/ui/themes/default.css';
+  import '@dryui/ui/themes/dark.css';
+  import { Select, Field, Label } from '@dryui/ui';
+</script>
+
+<Field.Root required>
+  <Label>Billing country</Label>
+  <Select.Root bind:value={country} name="country">
+    <Select.Trigger>
+      <Select.Value placeholder="Select a country" />
+    </Select.Trigger>
+    <Select.Content>
+      <Select.Item value="us">United States</Select.Item>
+      <Select.Item value="ca">Canada</Select.Item>
+      <Select.Item value="gb">United Kingdom</Select.Item>
+    </Select.Content>
+  </Select.Root>
+</Field.Root>
 ```
 
 ## MultiSelectCombobox
@@ -1462,8 +1481,14 @@ Data attributes: data-padding | data-size
 Accessibility: This component does not add meaning by itself; ensure child content supplies the required headings, labels, and landmarks. | Only add landmark or region semantics when the section has a unique, meaningful label.
 Example:
 ```svelte
+<script lang="ts">
+  import '@dryui/ui/themes/default.css';
+  import '@dryui/ui/themes/dark.css';
+  import { Container, Text } from '@dryui/ui';
+</script>
+
 <Container>
-  <p>Centered content</p>
+  <Text>Centered content</Text>
 </Container>
 ```
 
@@ -1598,8 +1623,14 @@ Data attributes: data-animated | data-aurora | data-aurora-backdrop | data-auror
 Accessibility: This component does not add meaning by itself; ensure child content supplies the required headings, labels, and landmarks. | Only add landmark or region semantics when the section has a unique, meaningful label.
 Example:
 ```svelte
+<script lang="ts">
+  import '@dryui/ui/themes/default.css';
+  import '@dryui/ui/themes/dark.css';
+  import { Aurora, Text } from '@dryui/ui';
+</script>
+
 <Aurora palette="ocean">
-  <p>Ambient backgrounds stay native and no-dependency.</p>
+  <Text>Ambient backgrounds stay native and no-dependency.</Text>
 </Aurora>
 ```
 
@@ -1617,8 +1648,14 @@ Data attributes: data-animated | data-grain | data-noise | data-noise-content | 
 Accessibility: This component does not add meaning by itself; ensure child content supplies the required headings, labels, and landmarks. | Only add landmark or region semantics when the section has a unique, meaningful label.
 Example:
 ```svelte
+<script lang="ts">
+  import '@dryui/ui/themes/default.css';
+  import '@dryui/ui/themes/dark.css';
+  import { Noise, Text } from '@dryui/ui';
+</script>
+
 <Noise opacity={0.12} blend="soft-light">
-  <p>Grain adds atmosphere without loading an external texture.</p>
+  <Text>Grain adds atmosphere without loading an external texture.</Text>
 </Noise>
 ```
 
@@ -2312,13 +2349,19 @@ Data attributes: data-dialog-body | data-dialog-content | data-dialog-footer | d
 Accessibility: Always provide a clear heading so the dialog context is announced when it opens. | Ensure there is an obvious close path for both keyboard and pointer users.
 Example:
 ```svelte
+<script lang="ts">
+  import '@dryui/ui/themes/default.css';
+  import '@dryui/ui/themes/dark.css';
+  import { Dialog, Button, Text } from '@dryui/ui';
+</script>
+
 <Dialog.Root bind:open={showDialog}>
   <Dialog.Trigger>
     <Button>Open Dialog</Button>
   </Dialog.Trigger>
   <Dialog.Content>
     <Dialog.Header>Confirm</Dialog.Header>
-    <p>Are you sure?</p>
+    <Text>Are you sure?</Text>
     <Dialog.Footer>
       <Button variant="outline" onclick={() => showDialog = false}>Cancel</Button>
       <Button variant="solid" onclick={handleConfirm}>Confirm</Button>
@@ -2429,13 +2472,19 @@ Data attributes: data-drawer-body | data-drawer-content | data-drawer-footer | d
 Accessibility: Ensure the trigger, popup role, and focus return behavior all describe the same interaction model. | Provide an obvious keyboard dismissal path and avoid putting essential actions in hover-only content. | Keep the opening control labeled, ensure focus moves predictably on open and close, and expose the popup type truthfully.
 Example:
 ```svelte
+<script lang="ts">
+  import '@dryui/ui/themes/default.css';
+  import '@dryui/ui/themes/dark.css';
+  import { Drawer, Button, Text } from '@dryui/ui';
+</script>
+
 <Drawer.Root bind:open={drawerOpen}>
   <Drawer.Trigger>
     <Button>Open Drawer</Button>
   </Drawer.Trigger>
   <Drawer.Content side="right">
     <Drawer.Header>Settings</Drawer.Header>
-    <p>Drawer body content.</p>
+    <Text>Drawer body content.</Text>
   </Drawer.Content>
 </Drawer.Root>
 ```
@@ -2476,12 +2525,18 @@ Data attributes: data-popover-content | data-popover-trigger | data-state (Refle
 Accessibility: Avoid placing essential actions in hover-only or transient content; keyboard users must be able to reopen the popover.
 Example:
 ```svelte
+<script lang="ts">
+  import '@dryui/ui/themes/default.css';
+  import '@dryui/ui/themes/dark.css';
+  import { Popover, Button, Text } from '@dryui/ui';
+</script>
+
 <Popover.Root bind:open={popoverOpen}>
   <Popover.Trigger>
     <Button variant="outline">Info</Button>
   </Popover.Trigger>
   <Popover.Content>
-    <p>Popover details here.</p>
+    <Text>Popover details here.</Text>
   </Popover.Content>
 </Popover.Root>
 ```
@@ -3435,8 +3490,14 @@ Data attributes: data-reduced-motion | data-reveal | data-variant | data-visible
 Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example:
 ```svelte
+<script lang="ts">
+  import '@dryui/ui/themes/default.css';
+  import '@dryui/ui/themes/dark.css';
+  import { Reveal, Text } from '@dryui/ui';
+</script>
+
 <Reveal variant="slide-up" delay={120}>
-  <p>Stage content as it enters the viewport.</p>
+  <Text>Stage content as it enters the viewport.</Text>
 </Reveal>
 ```
 
@@ -3454,8 +3515,14 @@ Data attributes: data-active (Present on the active item or current target withi
 Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example:
 ```svelte
+<script lang="ts">
+  import '@dryui/ui/themes/default.css';
+  import '@dryui/ui/themes/dark.css';
+  import { Spotlight, Text } from '@dryui/ui';
+</script>
+
 <Spotlight intensity={32}>
-  <p>Hover to pull a radial highlight across the surface.</p>
+  <Text>Hover to pull a radial highlight across the surface.</Text>
 </Spotlight>
 ```
 
@@ -3490,7 +3557,13 @@ Data attributes: data-qr-canvas | data-qr-code | data-qr-wrapper | data-value
 Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example:
 ```svelte
-<QRCode>Content</QRCode>
+<script lang="ts">
+  import '@dryui/ui/themes/default.css';
+  import '@dryui/ui/themes/dark.css';
+  import { QRCode } from '@dryui/ui';
+</script>
+
+<QRCode value="https://dryui.dev" size={160} errorCorrection="M" />
 ```
 
 ## CodeBlock

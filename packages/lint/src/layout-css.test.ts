@@ -1,5 +1,5 @@
 import { describe, expect, spyOn, test } from 'bun:test';
-import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { resolve } from 'node:path';
 import { evaluateLayoutContract } from './layout-contract.js';
@@ -281,9 +281,49 @@ describe('dryuiLayoutCss Vite plugin', () => {
 		const root = mkdtempSync(resolve(tmpdir(), 'dryui-layout-css-invalid-'));
 		try {
 			mkdirSync(resolve(root, 'src'), { recursive: true });
-			writeFileSync(resolve(root, 'src/layout.css'), "[data-layout='stack'] { width: 100%; }");
+			writeFileSync(
+				resolve(root, 'src/layout.css'),
+				`[data-layout='stack'] {
+  display: grid;
+  width: 100%;
+}`
+			);
 			const plugin = dryuiLayoutCss({ root });
-			expect(() => plugin.buildStart!()).toThrow('dryui/layout-css-property');
+			let message = '';
+			try {
+				plugin.buildStart!();
+			} catch (error) {
+				message = error instanceof Error ? error.message : String(error);
+			}
+			expect(message).toContain('dryui/layout-css-property');
+			expect(message).toContain('> 3 |   width: 100%;');
+		} finally {
+			rmSync(root, { recursive: true, force: true });
+		}
+	});
+
+	test('writes layout.css violations to the configured log file', () => {
+		const root = mkdtempSync(resolve(tmpdir(), 'dryui-layout-css-log-'));
+		try {
+			mkdirSync(resolve(root, 'src'), { recursive: true });
+			writeFileSync(
+				resolve(root, 'src/layout.css'),
+				`[data-layout='stack'] {
+  display: grid;
+  width: 100%;
+}`
+			);
+			const plugin = dryuiLayoutCss({ root, logFile: true });
+			try {
+				plugin.buildStart!();
+			} catch {
+				// expected violation
+			}
+			const log = readFileSync(resolve(root, '.dryui/lint.log'), 'utf-8');
+			expect(log).toContain('DryUI lint layout-css');
+			expect(log).toContain('DryUI layout.css violations:');
+			expect(log).toContain('[dryui/layout-css-property] src/layout.css:3');
+			expect(log).toContain('> 3 |   width: 100%;');
 		} finally {
 			rmSync(root, { recursive: true, force: true });
 		}

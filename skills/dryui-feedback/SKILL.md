@@ -113,13 +113,15 @@ Default to "apply directly". Layout-shape edits live in `src/layout.css`; compon
 ## Workflow
 
 1. **Get the submission.** Use MCP `feedback_get_submissions` (preferred) or `curl http://127.0.0.1:4748/submissions/<id>`.
-2. **Read the screenshot.** Use the `Read` tool on `preferredScreenshotPath`. This is the ground truth.
-3. **Locate the page in source.** The submission's `url` maps to a route. For `http://localhost:5174/foo` that's `src/routes/foo/+page.svelte`. For the index, `src/routes/+page.svelte`.
-4. **Pair drawings with hints.** Prefer `drawingHints[]`; each pair has `{ drawing, hint }`. If you need the raw arrays, for each `drawings[i]`, look at `hints[i].element` to find the DOM target, and `hints[i].corner` + `hints[i].percentX/Y` for sub-element placement.
-5. **Apply intents.** In order: `drawings` (`textNotes[]` are instructions), `components` (additions), `removed` (deletions), `moved` (repositions — usually a `src/layout.css` edit). Make the smallest source edit that satisfies each.
-6. **Run checks.** Run the project’s focused check/build/test command for the changed file or package. Fix any violations the edit introduced — re-read this skill's lint section if confused.
-7. **Resolve.** Call MCP `feedback_resolve_submission` with the submission id, or `curl -X PATCH http://127.0.0.1:4748/submissions/<id> -H "Content-Type: application/json" -d '{"status":"resolved"}'`. The dashboard depends on this to clear the submission from the queue.
+2. **Claim it.** Call MCP `feedback_claim_submission` (or `curl -X POST http://127.0.0.1:4748/submissions/<id>/claim -H "Content-Type: application/json" -d '{"agent":"claude","name":"Claude Code","model":"claude-opus-4-7","version":"<cli-version>"}'`). This flips the dashboard status to **Processing** so the human knows you've picked it up, stamps the start time, and records which AI / model / version is working — the completed-tasks view uses that history. Pass the most specific `name`, `model`, and `version` you know. Skip this step only when reproducing the workflow in tests.
+3. **Read the screenshot.** Use the `Read` tool on `preferredScreenshotPath`. This is the ground truth.
+4. **Locate the page in source.** The submission's `url` maps to a route. For `http://localhost:5174/foo` that's `src/routes/foo/+page.svelte`. For the index, `src/routes/+page.svelte`.
+5. **Pair drawings with hints.** Prefer `drawingHints[]`; each pair has `{ drawing, hint }`. If you need the raw arrays, for each `drawings[i]`, look at `hints[i].element` to find the DOM target, and `hints[i].corner` + `hints[i].percentX/Y` for sub-element placement.
+6. **Apply intents.** In order: `drawings` (`textNotes[]` are instructions), `components` (additions), `removed` (deletions), `moved` (repositions — usually a `src/layout.css` edit). Make the smallest source edit that satisfies each.
+7. **Run checks.** Run the project’s focused check/build/test command for the changed file or package. Fix any violations the edit introduced — re-read this skill's lint section if confused.
+8. **Resolve.** Call MCP `feedback_resolve_submission` with the submission id, or `curl -X PATCH http://127.0.0.1:4748/submissions/<id> -H "Content-Type: application/json" -d '{"status":"resolved"}'`. The server stamps `resolvedAt` and computes `durationMs` from your claim so the dashboard can show how long the task took. Required to clear the submission from the queue.
+9. **If you bail out, release.** If you claimed a submission but decided not to apply it (out of scope, blocked, etc.), call MCP `feedback_release_submission` so the dashboard moves it back to **Pending** instead of leaving it stuck under your name.
 
 ## Tone
 
-Quiet. State the submission id and what intents it carries. Make the edit. Run the relevant project check. Resolve. The user already wrote the feedback — don't re-explain it back to them.
+Quiet. State the submission id and what intents it carries. Claim, make the edit, run the relevant project check, resolve. The user already wrote the feedback — don't re-explain it back to them.

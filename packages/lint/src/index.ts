@@ -17,6 +17,7 @@ export {
 	type LayoutCssCheckOptions,
 	type VitePluginLike
 } from './layout-css.js';
+export type { ViolationLogFile } from './violation-report.js';
 export {
 	RULE_CATALOG,
 	formatRuleText,

@@ -21,6 +21,7 @@ import type {
 	Submission,
 	SubmissionQueryStatus,
 	SubmissionStatus,
+	SubmissionWorker,
 	ThreadMessage,
 	UpdateAnnotationInput
 } from './types.js';
@@ -558,6 +559,22 @@ export class FeedbackStore {
 		status: SubmissionStatus
 	): SubmissionPresentation | null {
 		return this.submissionCapture.updateStatusPresentation(id, status);
+	}
+
+	claimSubmission(id: string, worker: SubmissionWorker): Submission | null {
+		return this.submissionCapture.claim(id, worker);
+	}
+
+	claimSubmissionPresentation(id: string, worker: SubmissionWorker): SubmissionPresentation | null {
+		return this.submissionCapture.claimPresentation(id, worker);
+	}
+
+	releaseSubmission(id: string): Submission | null {
+		return this.submissionCapture.release(id);
+	}
+
+	releaseSubmissionPresentation(id: string): SubmissionPresentation | null {
+		return this.submissionCapture.releasePresentation(id);
 	}
 
 	selectSubmissionScreenshotPath(

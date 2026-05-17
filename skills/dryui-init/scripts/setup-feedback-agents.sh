@@ -102,6 +102,20 @@ merge_json_entry() {
 	fi
 }
 
+canonical_existing_path() {
+	local path="$1"
+	if [ -d "$path" ]; then
+		(cd "$path" && pwd -P)
+	elif [ -e "$path" ]; then
+		local dir base
+		dir="$(dirname "$path")"
+		base="$(basename "$path")"
+		printf '%s/%s\n' "$(cd "$dir" && pwd -P)" "$base"
+	else
+		return 1
+	fi
+}
+
 copy_project_skills() {
 	if [ ! -d "$SKILLS_ROOT" ] || [ ! -f "$SKILLS_ROOT/dryui-feedback/SKILL.md" ]; then
 		echo "[dryui-init] warning: sibling DryUI skills not found; skipping project-local skill copies" >&2
@@ -112,11 +126,22 @@ copy_project_skills() {
 		mkdir -p "$target"
 		for skill_path in "$SKILLS_ROOT"/dryui-*; do
 			[ -f "$skill_path/SKILL.md" ] || continue
-			local skill_name
+			local skill_name source_resolved dest_resolved tmp_dir
 			skill_name="$(basename "$skill_path")"
-			mkdir -p "$target/$skill_name"
-			cp -R "$skill_path/." "$target/$skill_name/"
-			find "$target/$skill_name" -name .DS_Store -delete
+			source_resolved="$(canonical_existing_path "$skill_path")"
+			if [ -e "$target/$skill_name" ]; then
+				dest_resolved="$(canonical_existing_path "$target/$skill_name")"
+				if [ "$source_resolved" = "$dest_resolved" ]; then
+					continue
+				fi
+			fi
+			tmp_dir="$(mktemp -d)"
+			mkdir -p "$tmp_dir/$skill_name"
+			cp -R "$skill_path/." "$tmp_dir/$skill_name/"
+			find "$tmp_dir/$skill_name" -name .DS_Store -delete
+			rm -rf "$target/$skill_name"
+			mv "$tmp_dir/$skill_name" "$target/$skill_name"
+			rmdir "$tmp_dir"
 		done
 	done
 	echo "[dryui-init] copied project-local DryUI skills for agent discovery"

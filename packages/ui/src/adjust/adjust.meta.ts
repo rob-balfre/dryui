@@ -1,4 +1,4 @@
-/** DryUI agent metadata. Consumed by @dryui/mcp/load-component-meta. */
+/** DryUI agent metadata. Used by docs generation and skill manifests. */
 export default {
 	name: 'Adjust',
 	description: 'CSS filter adjustment wrapper for brightness, contrast, saturation, and hue shifts',

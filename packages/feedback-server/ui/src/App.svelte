@@ -25,6 +25,7 @@
 		Copy,
 		ExternalLink,
 		Inbox,
+		Loader2,
 		Rocket,
 		Search,
 		RefreshCw,
@@ -378,19 +379,29 @@
 	let pendingSubmissions = $derived.by(() =>
 		[...submissions].filter((submission) => submission.status === 'pending').sort(byCreatedAtDesc)
 	);
+	let processingSubmissions = $derived.by(() =>
+		[...submissions]
+			.filter((submission) => submission.status === 'processing')
+			.sort(byCreatedAtDesc)
+	);
 	let resolvedSubmissions = $derived.by(() =>
 		[...submissions].filter((submission) => submission.status === 'resolved').sort(byCreatedAtDesc)
 	);
 	let visiblePendingSubmissions = $derived.by(() =>
 		pendingSubmissions.filter((submission) => matchesSearch(submission, search))
 	);
+	let visibleProcessingSubmissions = $derived.by(() =>
+		processingSubmissions.filter((submission) => matchesSearch(submission, search))
+	);
 	let visibleResolvedSubmissions = $derived.by(() =>
 		resolvedSubmissions.filter((submission) => matchesSearch(submission, search))
 	);
 	let hasActiveSearch = $derived(search.trim().length > 0);
 	let pendingCount = $derived(pendingSubmissions.length);
+	let processingCount = $derived(processingSubmissions.length);
 	let resolvedCount = $derived(resolvedSubmissions.length);
 	let visiblePendingCount = $derived(visiblePendingSubmissions.length);
+	let visibleProcessingCount = $derived(visibleProcessingSubmissions.length);
 	let visibleResolvedCount = $derived(visibleResolvedSubmissions.length);
 	let showBulkLaunch = $derived(
 		activeTab === 'pending' && dispatchTargets.length > 0 && targetAgent !== null
@@ -495,6 +506,25 @@
 										<span data-layout-area="tab-label">Pending</span>
 										<Badge variant="outline" color="gray" size="sm">
 											{hasActiveSearch ? `${visiblePendingCount}/${pendingCount}` : pendingCount}
+										</Badge>
+									</span>
+								</Button>
+								<Button
+									variant="toggle"
+									size="sm"
+									aria-pressed={activeTab === 'processing'}
+									onclick={() => (activeTab = 'processing')}
+								>
+									<span class="tab-trigger" data-layout-area="tab-trigger">
+										<span data-layout-area="tab-label">Processing</span>
+										<Badge
+											variant="outline"
+											color={processingCount > 0 ? 'blue' : 'gray'}
+											size="sm"
+										>
+											{hasActiveSearch
+												? `${visibleProcessingCount}/${processingCount}`
+												: processingCount}
 										</Badge>
 									</span>
 								</Button>
@@ -674,6 +704,76 @@
 						{:else}
 							<div class="feed" data-layout-area="feed">
 								{#each visiblePendingSubmissions as submission (submission.id)}
+									<div
+										class="feed-item"
+										data-layout-area="feed-item"
+										data-submission-id={submission.id}
+									>
+										<SubmissionCard
+											{submission}
+											{dispatchTargets}
+											{targetAgent}
+											{refreshing}
+											skillPath={activeSkillPath}
+											onChooseAgent={chooseTargetAgent}
+											onSetStatus={setSubmissionStatus}
+											onDelete={deleteSubmission}
+											onLaunch={dispatchAgent}
+										/>
+									</div>
+								{/each}
+							</div>
+						{/if}
+					{:else if activeTab === 'processing'}
+						{#if loading && processingCount === 0}
+							<div
+								class="loading-feed"
+								data-layout-area="loading-feed"
+								aria-label="Loading processing submissions"
+							>
+								{#each [0, 1] as index (index)}
+									<div class="loading-surface" data-layout-area="loading-surface">
+										<div class="submission-skeleton" data-layout-area="submission-skeleton">
+											<div class="skeleton-head" data-layout-area="skeleton-head">
+												<Skeleton width="5rem" height="1.25rem" />
+												<Skeleton width="min(34rem, 100%)" height="1.25rem" />
+											</div>
+											<div class="skeleton-body" data-layout-area="skeleton-body">
+												<Skeleton variant="rectangular" height="9rem" />
+												<div class="skeleton-lines" data-layout-area="skeleton-lines">
+													<Skeleton width="70%" height="1rem" />
+													<Skeleton width="48%" height="1rem" />
+													<Skeleton width="88%" height="6rem" variant="rectangular" />
+												</div>
+											</div>
+										</div>
+									</div>
+								{/each}
+							</div>
+						{:else if visibleProcessingSubmissions.length === 0}
+							<div class="empty-state" data-layout-area="empty-state">
+								<EmptyState.Root>
+									<EmptyState.Icon>
+										<Loader2 size={18} aria-hidden="true" />
+									</EmptyState.Icon>
+									<EmptyState.Title>
+										{hasActiveSearch ? 'No processing matches' : 'Nothing being processed'}
+									</EmptyState.Title>
+									<EmptyState.Description>
+										{hasActiveSearch
+											? 'Try a URL, submission id, or note from the captured annotation.'
+											: 'When an AI claims a submission with feedback_claim_submission it moves here so the dashboard shows who is actively working on it.'}
+									</EmptyState.Description>
+									{#if hasActiveSearch}
+										<EmptyState.Action>
+											<Button variant="soft" size="sm" onclick={closeSearch}>Clear filter</Button>
+										</EmptyState.Action>
+									{/if}
+								</EmptyState.Root>
+							</div>
+						{:else}
+							<div class="feed" data-layout-area="feed">
+								{#each visibleProcessingSubmissions as submission (submission.id)}
 									<div
 										class="feed-item"
 										data-layout-area="feed-item"

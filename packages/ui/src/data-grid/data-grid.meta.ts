@@ -1,4 +1,4 @@
-/** DryUI agent metadata. Consumed by @dryui/mcp/load-component-meta. */
+/** DryUI agent metadata. Used by docs generation and skill manifests. */
 export default {
 	name: 'DataGrid',
 	description: 'Enhanced table with sorting, filtering, and pagination',

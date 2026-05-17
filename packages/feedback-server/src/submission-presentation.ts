@@ -4,7 +4,8 @@ import type {
 	SubmissionDrawing,
 	SubmissionDrawingHint,
 	SubmissionMovedElement,
-	SubmissionRemovedElement
+	SubmissionRemovedElement,
+	SubmissionWorker
 } from './types.js';
 
 export interface SubmissionDrawingHintPair {
@@ -19,6 +20,10 @@ export interface SubmissionPresentation {
 	createdAt: string;
 	agent?: Submission['agent'];
 	workspace?: string;
+	worker?: SubmissionWorker;
+	processingStartedAt?: string;
+	resolvedAt?: string;
+	durationMs?: number;
 	screenshotPath: Submission['screenshotPath'];
 	preferredScreenshotPath: string;
 	viewport: Submission['viewport'];
@@ -145,6 +150,12 @@ export function buildSubmissionPresentation(submission: Submission): SubmissionP
 		createdAt: submission.createdAt,
 		...(submission.agent ? { agent: submission.agent } : {}),
 		...(submission.workspace ? { workspace: submission.workspace } : {}),
+		...(submission.worker ? { worker: submission.worker } : {}),
+		...(submission.processingStartedAt
+			? { processingStartedAt: submission.processingStartedAt }
+			: {}),
+		...(submission.resolvedAt ? { resolvedAt: submission.resolvedAt } : {}),
+		...(submission.durationMs !== undefined ? { durationMs: submission.durationMs } : {}),
 		screenshotPath: submission.screenshotPath,
 		preferredScreenshotPath: submission.screenshotPath.png || submission.screenshotPath.webp,
 		viewport: submission.viewport,

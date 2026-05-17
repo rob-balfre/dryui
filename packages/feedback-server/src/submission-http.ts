@@ -1,11 +1,39 @@
 import { EventBus } from './events.js';
 import { FeedbackStore } from './store.js';
+import { DISPATCH_AGENTS } from './dispatch.js';
 import type {
 	CreateSubmissionInput,
 	SSEEvent,
+	SubmissionAgent,
 	SubmissionQueryStatus,
-	SubmissionStatus
+	SubmissionStatus,
+	SubmissionWorker
 } from './types.js';
+
+const VALID_WORKER_AGENTS: ReadonlySet<SubmissionAgent> = new Set<SubmissionAgent>([
+	...DISPATCH_AGENTS,
+	'off'
+]);
+
+function normalizeWorker(input: unknown): SubmissionWorker | null {
+	if (!input || typeof input !== 'object') return null;
+	const record = input as Record<string, unknown>;
+	const agentRaw = record['agent'];
+	if (typeof agentRaw !== 'string' || !VALID_WORKER_AGENTS.has(agentRaw as SubmissionAgent)) {
+		return null;
+	}
+	const worker: SubmissionWorker = { agent: agentRaw as SubmissionAgent };
+	if (typeof record['name'] === 'string' && record['name'].trim().length > 0) {
+		worker.name = record['name'].trim();
+	}
+	if (typeof record['model'] === 'string' && record['model'].trim().length > 0) {
+		worker.model = record['model'].trim();
+	}
+	if (typeof record['version'] === 'string' && record['version'].trim().length > 0) {
+		worker.version = record['version'].trim();
+	}
+	return worker;
+}
 
 type JsonResponse = (data: unknown, status?: number) => Response;
 type ErrorResponse = (status: number, error: string) => Response;
@@ -41,7 +69,13 @@ function emit<TPayload>(
 }
 
 function isSubmissionQueryStatus(value: string | null): value is SubmissionQueryStatus {
-	return value === null || value === 'pending' || value === 'resolved' || value === 'all';
+	return (
+		value === null ||
+		value === 'pending' ||
+		value === 'processing' ||
+		value === 'resolved' ||
+		value === 'all'
+	);
 }
 
 export async function handleSubmissionHttp(
@@ -117,6 +151,33 @@ export async function handleSubmissionHttp(
 		} catch {
 			return errorResponse(400, 'Invalid JSON');
 		}
+	}
+
+	const submissionClaimMatch = pathname.match(/^\/submissions\/([^/]+)\/claim$/);
+	if (submissionClaimMatch && request.method === 'POST') {
+		const submissionId = decodeURIComponent(submissionClaimMatch[1] ?? '');
+		let body: unknown;
+		try {
+			body = await readJson<unknown>(request);
+		} catch {
+			return errorResponse(400, 'Invalid JSON');
+		}
+		const worker = normalizeWorker(body);
+		if (!worker) return errorResponse(400, 'Invalid worker descriptor');
+
+		const submission = store.claimSubmissionPresentation(submissionId, worker);
+		if (!submission) return errorResponse(404, 'Not found or already resolved');
+		emit(bus, 'submission.updated', submission.url, submission);
+		return json(submission);
+	}
+
+	const submissionReleaseMatch = pathname.match(/^\/submissions\/([^/]+)\/release$/);
+	if (submissionReleaseMatch && request.method === 'POST') {
+		const submissionId = decodeURIComponent(submissionReleaseMatch[1] ?? '');
+		const submission = store.releaseSubmissionPresentation(submissionId);
+		if (!submission) return errorResponse(404, 'Not found');
+		emit(bus, 'submission.updated', submission.url, submission);
+		return json(submission);
 	}
 
 	if (submissionMatch && request.method === 'DELETE') {

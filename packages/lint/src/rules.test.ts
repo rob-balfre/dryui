@@ -420,6 +420,82 @@ describe('checkMarkup', () => {
 		expect(violations).toHaveLength(0);
 	});
 
+	test('flags generated transcript and tool artifacts in markup', () => {
+		const code = [
+			'<Text>ready</Text>',
+			'<Text>toolu_01A2B3C4D5E6</Text>',
+			'<tool_use id="x"></tool_use>',
+			'<tool_call name="shell"></tool_call>',
+			'<task-notification>running</task-notification>',
+			'<subagent_notification>done</subagent_notification>',
+			'<function_call name="functions.exec_command"></function_call>',
+			'<invoke name="TodoWrite"></invoke>',
+			'<parameter name="todos">[]</parameter>',
+			'<Text>TaskOutput</Text>',
+			'<Text>TodoWrite</Text>',
+			'<Text>mcp__github__get_issue</Text>',
+			'analysis to=functions.exec_command code'
+		].join('\n');
+		const artifacts = checkSvelteFile(code, 'src/routes/+page.svelte').filter(
+			(v) => v.rule === 'dryui/no-transcript-artifact'
+		);
+
+		expect(artifacts).toHaveLength(12);
+		expect(artifacts.map((v) => v.line)).toEqual([2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]);
+		expect(artifacts[0]!.message).toContain('toolu_*');
+		expect(artifacts[1]!.message).toContain('<tool_use>');
+		expect(artifacts[2]!.message).toContain('<tool_call>');
+		expect(artifacts[7]!.message).toContain('<parameter>');
+		expect(artifacts[10]!.message).toContain('mcp__*');
+		expect(artifacts[11]!.message).toContain('analysis to=...');
+	});
+
+	test('flags channel markers embedded in route text nodes', () => {
+		const code = `<main data-layout="agent-shell">
+  <section data-layout-area="primary">
+    <Text>analysis to=functions.exec_command code</Text>
+    <Text>assistant to=web.run code</Text>
+  </section>
+</main>`;
+		const artifacts = checkSvelteFile(code, 'src/routes/+page.svelte').filter(
+			(v) => v.rule === 'dryui/no-transcript-artifact'
+		);
+
+		expect(artifacts).toHaveLength(2);
+		expect(artifacts[0]!.message).toContain('analysis to=...');
+		expect(artifacts[1]!.message).toContain('assistant to=...');
+	});
+
+	test('does not flag normal task prose or non-template transcript text', () => {
+		const code = `<script>
+  const transcript = 'toolu_01A2B3C4D5E6';
+</script>
+<!-- <tool_use>ignore comments</tool_use> -->
+<Text>Task completion output is ready.</Text>
+<style>
+  .example::after { content: "TodoWrite"; }
+</style>`;
+		const artifacts = checkSvelteFile(code, 'src/routes/+page.svelte').filter(
+			(v) => v.rule === 'dryui/no-transcript-artifact'
+		);
+
+		expect(artifacts).toHaveLength(0);
+	});
+
+	test('allows assistant labels in chat UI copy', () => {
+		const code = `<main data-layout="chat-shell">
+  <section data-layout-area="primary">
+    Assistant: I will help with your booking.
+    <Text>Assistant: How can I help with your booking?</Text>
+  </section>
+</main>`;
+		const artifacts = checkSvelteFile(code, 'src/routes/+page.svelte').filter(
+			(v) => v.rule === 'dryui/no-transcript-artifact'
+		);
+
+		expect(artifacts).toHaveLength(0);
+	});
+
 	test('does not flag svelte-ignore css_unused_selector inside script block', () => {
 		const code = `<script>
   // <!-- svelte-ignore css_unused_selector -->

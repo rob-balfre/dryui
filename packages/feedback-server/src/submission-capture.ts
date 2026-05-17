@@ -25,7 +25,8 @@ import type {
 	SubmissionQueryStatus,
 	SubmissionRemovedElement,
 	SubmissionScrollOffset,
-	SubmissionStatus
+	SubmissionStatus,
+	SubmissionWorker
 } from './types.js';
 
 interface TableColumnRow {
@@ -182,10 +183,14 @@ export class SubmissionCapture {
 				layout_boxes TEXT,
 				viewport TEXT,
 				scroll TEXT,
-				status TEXT DEFAULT 'pending' CHECK(status IN ('pending', 'resolved')),
+				status TEXT DEFAULT 'pending' CHECK(status IN ('pending', 'processing', 'resolved')),
 				created_at TEXT NOT NULL,
 				agent TEXT,
-				workspace TEXT
+				workspace TEXT,
+				worker TEXT,
+				processing_started_at TEXT,
+				resolved_at TEXT,
+				duration_ms INTEGER
 			);
 			CREATE INDEX IF NOT EXISTS idx_submissions_status ON submissions(status);
 		`);
@@ -201,7 +206,58 @@ export class SubmissionCapture {
 		ensureColumn(this.db, 'submissions', 'layout_boxes', 'TEXT');
 		ensureColumn(this.db, 'submissions', 'scroll', 'TEXT');
 		ensureColumn(this.db, 'submissions', 'workspace', 'TEXT');
+		ensureColumn(this.db, 'submissions', 'worker', 'TEXT');
+		ensureColumn(this.db, 'submissions', 'processing_started_at', 'TEXT');
+		ensureColumn(this.db, 'submissions', 'resolved_at', 'TEXT');
+		ensureColumn(this.db, 'submissions', 'duration_ms', 'INTEGER');
+		// Older databases were created with a CHECK constraint that rejects
+		// 'processing'. SQLite cannot mutate a CHECK in place, so rebuild the
+		// table when the old constraint is detected. The rebuild only runs once
+		// per DB and preserves every column.
+		this.ensureStatusCheckIncludesProcessing();
 		ensureDirectory(this.screenshotsDir);
+	}
+
+	private ensureStatusCheckIncludesProcessing(): void {
+		const row = this.db
+			.query<{
+				sql: string | null;
+			}>("SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'submissions'")
+			.get();
+		if (!row?.sql) return;
+		if (row.sql.includes("'processing'")) return;
+		this.db.exec(`
+			CREATE TABLE submissions_migration_tmp (
+				id TEXT PRIMARY KEY,
+				url TEXT NOT NULL,
+				screenshot_path TEXT NOT NULL,
+				screenshot_png_path TEXT,
+				drawings TEXT NOT NULL DEFAULT '[]',
+				hints TEXT,
+				components TEXT,
+				removed TEXT,
+				moved TEXT,
+				layout_boxes TEXT,
+				viewport TEXT,
+				scroll TEXT,
+				status TEXT DEFAULT 'pending' CHECK(status IN ('pending', 'processing', 'resolved')),
+				created_at TEXT NOT NULL,
+				agent TEXT,
+				workspace TEXT,
+				worker TEXT,
+				processing_started_at TEXT,
+				resolved_at TEXT,
+				duration_ms INTEGER
+			);
+			INSERT INTO submissions_migration_tmp
+				SELECT id, url, screenshot_path, screenshot_png_path, drawings, hints, components,
+				       removed, moved, layout_boxes, viewport, scroll, status, created_at, agent,
+				       workspace, worker, processing_started_at, resolved_at, duration_ms
+				FROM submissions;
+			DROP TABLE submissions;
+			ALTER TABLE submissions_migration_tmp RENAME TO submissions;
+			CREATE INDEX IF NOT EXISTS idx_submissions_status ON submissions(status);
+		`);
 	}
 
 	create(input: CreateSubmissionInput, context: { workspace?: string } = {}): Submission | null {
@@ -316,12 +372,83 @@ export class SubmissionCapture {
 	updateStatus(id: string, status: SubmissionStatus): Submission | null {
 		const existing = this.get(id);
 		if (!existing) return null;
+
+		if (status === 'resolved') {
+			return this.finalizeAsResolved(existing);
+		}
+
+		if (status === 'pending') {
+			// Clearing back to pending releases any in-flight worker claim.
+			this.db
+				.query(
+					`UPDATE submissions
+					 SET status = ?, worker = NULL, processing_started_at = NULL,
+					     resolved_at = NULL, duration_ms = NULL
+					 WHERE id = ?`
+				)
+				.run(status, id);
+			const refreshed = this.get(id);
+			return refreshed ?? { ...existing, status };
+		}
+
+		// Generic status updates (currently only 'processing' lands here via
+		// claim(), which sets the worker context separately).
 		this.db.query('UPDATE submissions SET status = ? WHERE id = ?').run(status, id);
 		return { ...existing, status };
 	}
 
+	private finalizeAsResolved(existing: Submission): Submission | null {
+		const now = createTimestamp();
+		const startedAt = existing.processingStartedAt ?? null;
+		const durationMs = startedAt ? Math.max(0, Date.parse(now) - Date.parse(startedAt)) : null;
+
+		this.db
+			.query(
+				`UPDATE submissions
+				 SET status = 'resolved', resolved_at = ?, duration_ms = ?
+				 WHERE id = ?`
+			)
+			.run(now, durationMs, existing.id);
+
+		return this.get(existing.id);
+	}
+
 	updateStatusPresentation(id: string, status: SubmissionStatus): SubmissionPresentation | null {
 		const submission = this.updateStatus(id, status);
+		return submission ? this.getPresentation(id) : null;
+	}
+
+	claim(id: string, worker: SubmissionWorker): Submission | null {
+		const existing = this.get(id);
+		if (!existing) return null;
+		if (existing.status === 'resolved') return null;
+
+		const now = createTimestamp();
+		this.db
+			.query(
+				`UPDATE submissions
+				 SET status = 'processing', worker = ?, processing_started_at = ?
+				 WHERE id = ?`
+			)
+			.run(JSON.stringify(worker), now, id);
+
+		return this.get(id);
+	}
+
+	claimPresentation(id: string, worker: SubmissionWorker): SubmissionPresentation | null {
+		const submission = this.claim(id, worker);
+		return submission ? this.getPresentation(id) : null;
+	}
+
+	release(id: string): Submission | null {
+		const existing = this.get(id);
+		if (!existing) return null;
+		if (existing.status !== 'processing') return existing;
+		return this.updateStatus(id, 'pending');
+	}
+
+	releasePresentation(id: string): SubmissionPresentation | null {
+		const submission = this.release(id);
 		return submission ? this.getPresentation(id) : null;
 	}
 

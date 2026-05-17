@@ -1,0 +1,334 @@
+{
+  "schemaVersion": 1,
+  "source": "packages/lint/src/rule-catalog.ts",
+  "description": "Compact DryUI lint rule catalog for agent explanations and repair hints.",
+  "ruleCount": 55,
+  "rules": {
+    "bare-compound": {
+      "severity": "error",
+      "category": "correctness",
+      "message": "<{name}> is a {variant} component — use {target}",
+      "suggestedFix": "{target}"
+    },
+    "dark-scheme-no-overrides": {
+      "severity": "warning",
+      "category": "correctness",
+      "message": "Project uses a dark color scheme ({signals}) but has no --dry-color-* overrides. DryUI's default theme is light — components will have poor contrast on dark backgrounds. Either use theme: \"dark\" in the generate tool, or add --dry-color-* overrides to map DryUI tokens to your dark palette.",
+      "suggestedFix": "Use theme: \"dark\" in dryui.page(), or override the relevant DryUI semantic tokens with dark-appropriate values from your design system."
+    },
+    "dryui/layout-css-at-rule": {
+      "severity": "error",
+      "category": "correctness",
+      "message": "src/layout.css only allows @container wrappers. Remove {atRule}.",
+      "suggestedFix": "Move non-layout CSS out of src/layout.css, or use @container for layout variants."
+    },
+    "dryui/layout-css-property": {
+      "severity": "error",
+      "category": "correctness",
+      "message": "src/layout.css only supports page layout properties: display, grid, flex, container, spacing, block sizing, and box alignment. Invalid property: {property}",
+      "suggestedFix": "Move visual styling, positioning, typography, color, border, and effects out of src/layout.css."
+    },
+    "dryui/layout-css-selector": {
+      "severity": "error",
+      "category": "correctness",
+      "message": "src/layout.css selectors must target [data-layout] or [data-layout-area] hooks. Invalid selector: {selector}",
+      "suggestedFix": "Use a [data-layout] or [data-layout-area] selector."
+    },
+    "dryui/layout-css-value": {
+      "severity": "error",
+      "category": "correctness",
+      "message": "src/layout.css only accepts layout-safe values for grid, flex, containers, spacing, block sizing, and alignment. Invalid {property}: {value}",
+      "suggestedFix": "Use grid/flex/container syntax, DryUI spacing tokens for spacing, margin auto, block-size values, or standard box-alignment keywords."
+    },
+    "dryui/no-all-unset": {
+      "severity": "error",
+      "category": "correctness",
+      "message": "Do not use all: unset. Reset only the specific properties you need.",
+      "suggestedFix": "Replace all: unset with targeted property resets."
+    },
+    "dryui/no-anchor-without-href": {
+      "severity": "error",
+      "category": "correctness",
+      "message": "Do not use <a> without href. Use <button> for actions, or provide href for navigation.",
+      "suggestedFix": "Add href, or switch to <button> for non-navigation actions."
+    },
+    "dryui/no-attach": {
+      "severity": "error",
+      "category": "correctness",
+      "message": "Do not use {@attach ...}. Use component props, CSS custom properties, or explicit component APIs.",
+      "suggestedFix": "Remove the attachment and expose the needed behavior through a component prop or CSS custom property."
+    },
+    "dryui/no-component-class": {
+      "severity": "error",
+      "category": "correctness",
+      "message": "<{component}> does not forward class={...} to its rendered element. Prefer --dry-* CSS custom properties for visual overrides, or wrap <{component}> in a data-layout element for spacing and positioning. Note: <Button> exposes a back-compat `className` alias, but most components (<Badge>, <Heading>, <Text>, <Avatar>, <Input>) do not. Use tokens or wrappers instead of renaming class to className.",
+      "suggestedFix": "Use --dry-* CSS custom properties, or wrap <{component}> in a data-layout element for layout. Do not just rename class= to className=."
+    },
+    "dryui/no-css-ignore": {
+      "severity": "error",
+      "category": "correctness",
+      "message": "Do not use <!-- svelte-ignore css_unused_selector -->. Fix the underlying CSS issue instead of suppressing the warning.",
+      "suggestedFix": "Remove the ignore comment and fix the unused selector."
+    },
+    "dryui/no-flex": {
+      "severity": "error",
+      "category": "correctness",
+      "message": "Do not use {value}. Use {guidance}. For chip/tag wrapping, use ChipGroup.Root for the chip row. The preceding-line /* dryui-allow flex */ escape hatch is ONLY for isolated component internals that genuinely need one-dimensional intrinsic layout and cannot be expressed with grid or src/layout.css. Do NOT silence this rule on wrappers, cards, forms, navigation shells, page sections, or bulk layout.",
+      "suggestedFix": "Use CSS grid, ChipGroup.Root for chip rows, or move page-level flex to src/layout.css. Do not blanket-add dryui-allow flex."
+    },
+    "dryui/no-generic-layout-name": {
+      "severity": "error",
+      "category": "correctness",
+      "message": "data-layout=\"{value}\" is a generic name that defeats the layout contract. Banned values: ui, wrapper, box, container, div, block, el, elem, element, layout, inner, outer. Use a unique name that describes what the grid contains (data-layout=\"article\", data-layout=\"kpi-strip\", data-layout=\"traveler-row\") and declare a matching rule in src/layout.css. If the wrapper has no real layout job, replace it with a DryUI component (Heading, Text, Badge, Avatar) or remove it.",
+      "suggestedFix": "Rename to a meaningful data-layout value and declare the matching grid in src/layout.css, or replace the wrapper with a DryUI component."
+    },
+    "dryui/no-global": {
+      "severity": "error",
+      "category": "correctness",
+      "message": "Do not use :global(). Use scoped styles, data-* attributes, CSS variables, or component props instead.",
+      "suggestedFix": "Convert the selector to scoped CSS or use a component API."
+    },
+    "dryui/no-important": {
+      "severity": "error",
+      "category": "correctness",
+      "message": "Avoid !important — fix specificity at the source. Use component props, data-* attributes, or restructure the selector.",
+      "suggestedFix": "Remove !important and resolve the underlying specificity conflict."
+    },
+    "dryui/no-inline-style": {
+      "severity": "error",
+      "category": "correctness",
+      "message": "No inline style attributes. Use scoped CSS with custom properties.",
+      "suggestedFix": "Move the inline styles into the component <style> block."
+    },
+    "dryui/no-layout-component": {
+      "severity": "error",
+      "category": "correctness",
+      "message": "Do not {action} {target}. Use {guidance}.",
+      "suggestedFix": "Use data-layout hooks and src/layout.css instead."
+    },
+    "dryui/no-media-sizing": {
+      "severity": "error",
+      "category": "correctness",
+      "message": "Do not use @media for sizing. Use @container queries instead. @media is only allowed for prefers-reduced-motion and prefers-color-scheme.",
+      "suggestedFix": "Replace the sizing media query with a container query."
+    },
+    "dryui/no-partial-inset-shadow": {
+      "severity": "suggestion",
+      "category": "correctness",
+      "message": "Directional inset box-shadow (e.g. \"inset 2px 0 0 ...\") clips against border-radius and renders as a curved bracket on one side. Verify this is the visual you want; if not, use a uniform inset (inset 0 0 0 Npx) or a pseudo-element. Add /* dryui-allow inset-shadow */ on the preceding line to silence this on intentional cases.",
+      "suggestedFix": "If the bracket effect is unintentional, switch to a uniform inset or a positioned pseudo-element."
+    },
+    "dryui/no-raw-element": {
+      "severity": "error",
+      "category": "correctness",
+      "message": "Raw <{tag}> is not allowed. Replace with a DryUI component when one exists. If the element is page or section structure, use a unique data-layout name and declare the matching grid in src/layout.css. If it is reusable component anatomy, use a specific data-layout or data-layout-area hook styled inside that component and keep those part selectors out of src/layout.css. Do NOT silence this rule by bulk-adding data-layout=\"ui\" / \"wrapper\" / \"box\" / \"container\" / \"div\": those names defeat the lint and produce unstyled output because no matching layout contract exists.",
+      "suggestedFix": "Replace raw markup with a DryUI component, or add a specific layout hook. Page/section hooks need a matching src/layout.css grid; component-internal hooks should be styled inside the component."
+    },
+    "dryui/no-raw-grid": {
+      "severity": "error",
+      "category": "correctness",
+      "message": "Do not use raw CSS grid ({value}) here. Move page-level grid layout into src/layout.css, scoped by data-layout hooks.",
+      "suggestedFix": "Move page layout grid declarations to src/layout.css."
+    },
+    "dryui/no-raw-native-element": {
+      "severity": "error",
+      "category": "correctness",
+      "message": "Raw <{tag}> is only allowed inside its canonical component directory. Use <{component}{closing}> elsewhere.",
+      "suggestedFix": "Use the matching DryUI component instead of the raw element."
+    },
+    "dryui/no-style-directive": {
+      "severity": "error",
+      "category": "correctness",
+      "message": "No style: directives. Use scoped CSS with custom properties.",
+      "suggestedFix": "Move style directives into component props, --dry-* CSS custom properties, or the component <style> block."
+    },
+    "dryui/no-svelte-element": {
+      "severity": "error",
+      "category": "correctness",
+      "message": "Do not use <svelte:element this={x}>. Use explicit {#if}/{:else} branches with concrete tags so element-specific styles and semantics are visible in source. The preceding-line <!-- dryui-allow svelte-element --> escape hatch is ONLY for finite semantic tag sets where explicit branches would obscure the contract, such as h1-h6 heading levels. Do NOT silence this rule for generic wrappers, links, buttons, or elements whose styling or ARIA changes by tag.",
+      "suggestedFix": "Replace <svelte:element> with explicit markup branches; reserve the allow comment for finite semantic tag sets like heading levels."
+    },
+    "dryui/no-transcript-artifact": {
+      "severity": "error",
+      "category": "correctness",
+      "message": "Generated transcript artifact \"{artifact}\" found in Svelte markup. Remove leaked agent/tool output from the file.",
+      "suggestedFix": "Delete the transcript artifact and keep only valid Svelte source."
+    },
+    "dryui/no-width": {
+      "severity": "error",
+      "category": "correctness",
+      "message": "Do not use width/inline-size (including max-/min- variants). Grid children are sized by their track. Use grid-template-columns or grid-template-rows instead. Allowed units for typographic measure: ch, ex, em (e.g. max-width: 55ch is allowed, since it tracks text content, not viewport layout). The preceding-line /* dryui-allow width */ escape hatch is ONLY for component internals that need measured control geometry or external API compatibility after grid tracks and text measure units cannot express it. Do NOT silence this rule for page constraints, cards, panels, columns, fill-parent sizing, or responsive layout pressure.",
+      "suggestedFix": "Move sizing to the parent grid tracks, or use ch/ex/em for text measure. Do not blanket-add dryui-allow width."
+    },
+    "dryui/prefer-focus-ring-token": {
+      "severity": "error",
+      "category": "correctness",
+      "message": "Do not inline \"2px solid var(--dry-color-focus-ring)\". Use the shared token: outline: var(--dry-focus-ring); (followed by outline-offset: 2px for outset or -1px for inset).",
+      "suggestedFix": "Use outline: var(--dry-focus-ring) plus the correct outline-offset."
+    },
+    "dryui/require-body-font-family": {
+      "severity": "error",
+      "category": "correctness",
+      "message": "src/app.css must set body font-family so popovers, dialogs, and native top-layer content inherit app typography.",
+      "suggestedFix": "Add body { font-family: var(--dry-font-sans); } to src/app.css."
+    },
+    "hardcoded-color": {
+      "severity": "suggestion",
+      "category": "correctness",
+      "message": "Hardcoded color value — consider using `--dry-*` CSS custom properties for theming",
+      "suggestedFix": "var(--dry-*)"
+    },
+    "interactive-card-wrapper": {
+      "severity": "warning",
+      "category": "correctness",
+      "message": "Wrapper element around an interactive surface (raw <button> or <a>). Plain block wrappers can collapse the interactive child to 0px width inside grid/list layouts. Use display: grid on the wrapper or remove the wrapper.",
+      "suggestedFix": "display: grid"
+    },
+    "invalid-part": {
+      "severity": "error",
+      "category": "correctness",
+      "message": "<{root}.{part}> — \"{part}\" is not a valid part of {root}. Valid parts: {validParts}"
+    },
+    "invalid-prop": {
+      "severity": "error",
+      "category": "correctness",
+      "message": "<{name}> does not accept prop \"{prop}\""
+    },
+    "low-contrast-text": {
+      "severity": "warning",
+      "category": "correctness",
+      "message": "Low contrast between {variable} and --dry-color-bg-base (brightness difference: {difference})",
+      "suggestedFix": "Increase brightness difference between text and background to at least 125"
+    },
+    "missing-alt": {
+      "severity": "error",
+      "category": "correctness",
+      "message": "<Avatar> is missing \"alt\" and \"fallback\" props for accessibility",
+      "suggestedFix": "alt=\"...\""
+    },
+    "missing-label": {
+      "severity": "error",
+      "category": "correctness",
+      "message": "<{name}> may be missing an accessible label — add aria-label or wrap in <Field.Root> with <Label>",
+      "suggestedFix": "aria-label=\"...\""
+    },
+    "missing-pairing": {
+      "severity": "warning",
+      "category": "correctness",
+      "message": "{source} is defined but its pair {missing} is missing",
+      "suggestedFix": "Add {missing} to complete the color pairing"
+    },
+    "missing-required-prop": {
+      "severity": "error",
+      "category": "correctness",
+      "message": "<{name}> is missing required prop \"{prop}\"",
+      "suggestedFix": "{prop}={...}"
+    },
+    "missing-token": {
+      "severity": "error",
+      "category": "correctness",
+      "message": "Required semantic token {variable} is not defined. Full-theme files must define every semantic token. To customize tokens, use the theme recipe or mark the file with /* @dryui-theme */.",
+      "suggestedFix": "Add {variable} with a color that fits your theme"
+    },
+    "no-elevation": {
+      "severity": "warning",
+      "category": "correctness",
+      "message": "{left} and {right} have near-identical brightness (difference: {difference}) — {surfaceHint}",
+      "suggestedFix": "Make the later surface 1-2 steps lighter or darker than the earlier surface"
+    },
+    "orphaned-part": {
+      "severity": "error",
+      "category": "correctness",
+      "message": "<{name}> used without <{root}.Root> in the template",
+      "suggestedFix": "Wrap in <{root}.Root>"
+    },
+    "partial-override": {
+      "severity": "suggestion",
+      "category": "correctness",
+      "message": "{count} --dry-* token override(s) detected in a non-theme file. This is fine for scoped tweaks, but globally overriding a few tokens at :root/html/body often masks contrast problems. To customize tokens, use the theme recipe. For a full custom theme, rename to *.theme.css or add /* @dryui-theme */ at the top. For 1-10 site-wide tweaks, scope them under .page / body selectors. For 1-5 per-route tweaks, put them in a scoped component style.",
+      "suggestedFix": "Either (a) rename to *.theme.css for a full theme, (b) add /* @dryui-theme */ directive, (c) scope under .page / body, or (d) move to a per-route component <style>."
+    },
+    "prefer-container": {
+      "severity": "suggestion",
+      "category": "correctness",
+      "message": "Manual centering with max-width + margin auto — consider src/layout.css grid tracks instead",
+      "suggestedFix": "src/layout.css"
+    },
+    "prefer-grid-layout": {
+      "severity": "error",
+      "category": "correctness",
+      "message": "Move page layout into src/layout.css with [data-layout] hooks. Use grid for track-based structure and flex only for one-dimensional page layout there.",
+      "suggestedFix": "Move layout CSS to src/layout.css"
+    },
+    "prefer-separator": {
+      "severity": "error",
+      "category": "correctness",
+      "message": "Raw <hr> element — use <Separator /> so token overrides apply.",
+      "suggestedFix": "<Separator />"
+    },
+    "theme-import-order": {
+      "severity": "error",
+      "category": "correctness",
+      "message": "Import @dryui/ui theme CSS BEFORE local CSS when you customize tokens. Local CSS imported first has its overrides clobbered by the theme defaults, so the theme \"wins\" and overrides appear to have no effect.",
+      "suggestedFix": "Reorder: import \"@dryui/ui/themes/default.css\" and \"@dryui/ui/themes/dark.css\" BEFORE local \"../app.css\" (or similar)."
+    },
+    "theme-in-style": {
+      "severity": "suggestion",
+      "category": "correctness",
+      "message": "Custom --dry-* variable declarations detected in <style> — run the `diagnose` tool on your theme CSS for a full health check",
+      "suggestedFix": "Move custom --dry-* declarations to theme CSS"
+    },
+    "transparent-component-bg": {
+      "severity": "warning",
+      "category": "correctness",
+      "message": "{variable} {detail}",
+      "suggestedFix": "Use a solid color or reference a background token (e.g., var(--dry-color-bg-raised))"
+    },
+    "transparent-surface": {
+      "severity": "warning",
+      "category": "correctness",
+      "message": "Surface color {variable} has very low opacity ({alpha}) — surfaces using this token will be nearly invisible against the page background.",
+      "suggestedFix": "Use a solid color so the surface is visible against the page background."
+    },
+    "unknown-component": {
+      "severity": "error",
+      "category": "correctness",
+      "message": "<{name}> is not a known DryUI component"
+    },
+    "unknown-component-token": {
+      "severity": "warning",
+      "category": "correctness",
+      "message": "{variable} is not a recognized component token in the spec",
+      "suggestedFix": "Check spelling against the component's cssVars in the spec"
+    },
+    "unresolvable-var": {
+      "severity": "suggestion",
+      "category": "correctness",
+      "message": "{variable} references {reference} which is not defined in this CSS — type and contrast checks skipped"
+    },
+    "use-button-component": {
+      "severity": "error",
+      "category": "correctness",
+      "message": "Use DryUI's <Button> component instead of raw <button>. Button handles accessible focus, disabled and loading states, and exposes variant/size props.",
+      "suggestedFix": "<Button>"
+    },
+    "use-container-component": {
+      "severity": "error",
+      "category": "correctness",
+      "message": "Use src/layout.css grid tracks instead of custom max-width + margin centering.",
+      "suggestedFix": "src/layout.css"
+    },
+    "use-field-component": {
+      "severity": "error",
+      "category": "correctness",
+      "message": "Use <Field.Root> + <Label> instead of custom field markup. Field provides accessible labeling, error states, and consistent spacing.",
+      "suggestedFix": "<Field.Root> + <Label>"
+    },
+    "wrong-type": {
+      "severity": "error",
+      "category": "correctness",
+      "message": "{variable} expects a {expectedType} value but got \"{actual}\" (classified as {classified})",
+      "suggestedFix": "Replace with a {expectedTypeExample}"
+    }
+  }
+}

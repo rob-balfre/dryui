@@ -246,6 +246,98 @@ describe('FeedbackStore', () => {
 		expect(store.deleteSubmission(submission.id)).toBeNull();
 	});
 
+	test('claims a submission and records worker identity + start timestamp', () => {
+		const submission = createStoreSubmission(store, {
+			url: 'https://example.com/claim-me',
+			image: imagePayload('claim'),
+			drawings: []
+		});
+		screenshotPaths.push(submission.screenshotPath.webp, submission.screenshotPath.png);
+
+		const claimed = store.claimSubmission(submission.id, {
+			agent: 'claude',
+			name: 'Claude Code',
+			model: 'claude-opus-4-7',
+			version: '1.4.0'
+		});
+
+		expect(claimed?.status).toBe('processing');
+		expect(claimed?.worker).toEqual({
+			agent: 'claude',
+			name: 'Claude Code',
+			model: 'claude-opus-4-7',
+			version: '1.4.0'
+		});
+		expect(claimed?.processingStartedAt).toMatch(/^\d{4}-\d{2}-\d{2}T/);
+		expect(claimed?.resolvedAt).toBeUndefined();
+		expect(claimed?.durationMs).toBeUndefined();
+	});
+
+	test('release clears the worker context and returns to pending', () => {
+		const submission = createStoreSubmission(store, {
+			url: 'https://example.com/release-me',
+			image: imagePayload('release'),
+			drawings: []
+		});
+		screenshotPaths.push(submission.screenshotPath.webp, submission.screenshotPath.png);
+
+		store.claimSubmission(submission.id, { agent: 'codex', name: 'Codex' });
+		const released = store.releaseSubmission(submission.id);
+
+		expect(released?.status).toBe('pending');
+		expect(released?.worker).toBeUndefined();
+		expect(released?.processingStartedAt).toBeUndefined();
+	});
+
+	test('resolve captures resolvedAt and durationMs when previously claimed', async () => {
+		const submission = createStoreSubmission(store, {
+			url: 'https://example.com/resolve-me',
+			image: imagePayload('resolve'),
+			drawings: []
+		});
+		screenshotPaths.push(submission.screenshotPath.webp, submission.screenshotPath.png);
+
+		store.claimSubmission(submission.id, {
+			agent: 'claude',
+			name: 'Claude Code',
+			model: 'claude-opus-4-7',
+			version: '1.4.0'
+		});
+		await new Promise((resolve) => setTimeout(resolve, 20));
+		const resolved = store.updateSubmissionStatus(submission.id, 'resolved');
+
+		expect(resolved?.status).toBe('resolved');
+		expect(resolved?.resolvedAt).toMatch(/^\d{4}-\d{2}-\d{2}T/);
+		expect(resolved?.durationMs).toBeGreaterThanOrEqual(0);
+		// Worker identity is preserved through resolve so the history view can name the AI.
+		expect(resolved?.worker?.agent).toBe('claude');
+		expect(resolved?.worker?.model).toBe('claude-opus-4-7');
+	});
+
+	test('listSubmissions("processing") filters in-flight claims', () => {
+		const first = createStoreSubmission(store, {
+			url: 'https://example.com/process-1',
+			image: imagePayload('process-1'),
+			drawings: []
+		});
+		const second = createStoreSubmission(store, {
+			url: 'https://example.com/process-2',
+			image: imagePayload('process-2'),
+			drawings: []
+		});
+		screenshotPaths.push(
+			first.screenshotPath.webp,
+			first.screenshotPath.png,
+			second.screenshotPath.webp,
+			second.screenshotPath.png
+		);
+
+		store.claimSubmission(first.id, { agent: 'claude' });
+
+		expect(store.listSubmissions('processing').map((entry) => entry.id)).toEqual([first.id]);
+		expect(store.listSubmissions('pending').map((entry) => entry.id)).toEqual([second.id]);
+	});
+
 	test('persists dual screenshot paths, hints, and scroll offset', () => {
 		const submission = createStoreSubmission(store, {
 			url: 'https://example.com/hints',

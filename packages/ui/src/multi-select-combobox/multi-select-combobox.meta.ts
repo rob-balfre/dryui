@@ -1,4 +1,4 @@
-/** DryUI agent metadata. Consumed by @dryui/mcp/load-component-meta. */
+/** DryUI agent metadata. Used by docs generation and skill manifests. */
 export default {
 	name: 'MultiSelectCombobox',
 	description: 'Searchable multi-select combobox with removable selected tokens',

@@ -1,4 +1,4 @@
-/** DryUI agent metadata. Consumed by @dryui/mcp/load-component-meta. */
+/** DryUI agent metadata. Used by docs generation and skill manifests. */
 export default {
 	name: 'ShaderCanvas',
 	description: 'WebGL shader canvas with built-in presets and theme color integration',

@@ -70,6 +70,10 @@ const LINT_RULE_DEFINITIONS = {
 		catalogId: 'dryui/no-css-ignore',
 		targets: ['markup']
 	},
+	'dryui/no-transcript-artifact': {
+		catalogId: 'dryui/no-transcript-artifact',
+		targets: ['markup']
+	},
 	'dryui/no-svelte-element': {
 		catalogId: 'dryui/no-svelte-element',
 		targets: ['markup'],

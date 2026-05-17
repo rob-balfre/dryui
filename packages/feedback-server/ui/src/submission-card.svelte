@@ -19,13 +19,17 @@
 	import {
 		Check,
 		ChevronDown,
+		Clock,
 		Copy,
 		CornerLeftUp,
 		ExternalLink,
+		Loader2,
 		MessageSquare,
 		RotateCcw,
 		Rocket,
-		Trash2
+		Timer,
+		Trash2,
+		Undo2
 	} from 'lucide-svelte';
 	import { buildFeedbackDispatchPrompt } from '../../src/prompts.js';
 	import type { SubmissionPresentation } from '../../src/submission-presentation.js';
@@ -103,12 +107,35 @@
 		return value.slice(0, 8);
 	}
 
-	function statusColor(_status: SubmissionStatus): 'gray' {
+	function statusColor(status: SubmissionStatus): 'gray' | 'blue' | 'success' {
+		if (status === 'processing') return 'blue';
+		if (status === 'resolved') return 'success';
 		return 'gray';
 	}
 
 	function statusLabel(status: SubmissionStatus): string {
-		return status === 'resolved' ? 'Resolved' : 'Pending';
+		if (status === 'processing') return 'Processing';
+		if (status === 'resolved') return 'Resolved';
+		return 'Pending';
+	}
+
+	function formatDurationMs(value: number | undefined): string | null {
+		if (value === undefined || !Number.isFinite(value) || value < 0) return null;
+		if (value < 1_000) return `${value} ms`;
+		const seconds = value / 1_000;
+		if (seconds < 60) return `${seconds.toFixed(seconds >= 10 ? 0 : 1)}s`;
+		const minutes = Math.floor(seconds / 60);
+		const remainder = Math.round(seconds - minutes * 60);
+		if (minutes < 60) return remainder > 0 ? `${minutes}m ${remainder}s` : `${minutes}m`;
+		const hours = Math.floor(minutes / 60);
+		const minutesRemainder = minutes - hours * 60;
+		return minutesRemainder > 0 ? `${hours}h ${minutesRemainder}m` : `${hours}h`;
+	}
+
+	function workerHeadline(worker: SubmissionPresentation['worker']): string {
+		if (!worker) return 'Unknown agent';
+		if (worker.name) return worker.name;
+		return AGENT_INFO[worker.agent as DispatchAgent]?.label ?? worker.agent;
 	}
 
 	function formatViewport(viewport: SubmissionPresentation['viewport']): string {
@@ -181,6 +208,62 @@
 						<span class="dot" aria-hidden="true">·</span>
 						<span>{formatViewport(submission.viewport)}</span>
 					</div>
+					{#if submission.worker || submission.processingStartedAt || submission.resolvedAt}
+						{@const workerAgent = (submission.worker?.agent ??
+							submission.agent ??
+							'off') as DispatchAgent}
+						{@const startedAt = submission.processingStartedAt}
+						{@const resolvedAt = submission.resolvedAt}
+						{@const duration = formatDurationMs(submission.durationMs)}
+						<div class="worker-strip" data-status={submission.status}>
+							<span class="worker-pill">
+								{#if submission.status === 'processing'}
+									<span class="worker-spinner" aria-hidden="true">
+										<Loader2 size={14} />
+									</span>
+								{:else}
+									<AgentIcon agent={workerAgent} size={14} />
+								{/if}
+								<span class="worker-label">
+									{#if submission.status === 'processing'}
+										Being processed by {workerHeadline(submission.worker)}
+									{:else if submission.status === 'resolved'}
+										Resolved by {workerHeadline(submission.worker)}
+									{:else}
+										{workerHeadline(submission.worker)}
+									{/if}
+								</span>
+							</span>
+							{#if submission.worker?.model || submission.worker?.version}
+								<span class="worker-versions">
+									{#if submission.worker?.model}
+										<span class="worker-version">{submission.worker.model}</span>
+									{/if}
+									{#if submission.worker?.version}
+										<span class="worker-version">v{submission.worker.version}</span>
+									{/if}
+								</span>
+							{/if}
+							{#if startedAt}
+								<span class="worker-meta">
+									<Clock size={12} aria-hidden="true" />
+									Started <FormatDate date={startedAt} dateStyle="medium" timeStyle="short" />
+								</span>
+							{/if}
+							{#if resolvedAt}
+								<span class="worker-meta">
+									<Check size={12} aria-hidden="true" />
+									Resolved <FormatDate date={resolvedAt} dateStyle="medium" timeStyle="short" />
+								</span>
+							{/if}
+							{#if duration}
+								<span class="worker-meta">
+									<Timer size={12} aria-hidden="true" />
+									{duration}
+								</span>
+							{/if}
+						</div>
+					{/if}
 				</div>
 				<div class="header-actions" role="group" aria-label="Submission actions">
 					<Button href={submission.url} target="_blank" rel="noreferrer" variant="ghost" size="sm">
@@ -197,6 +280,25 @@
 						>
 							<Check size={14} aria-hidden="true" />
 							Mark resolved
+						</Button>
+					{:else if submission.status === 'processing'}
+						<Button
+							variant="outline"
+							size="sm"
+							onclick={() => void onSetStatus(submission.id, 'resolved')}
+							disabled={refreshing}
+						>
+							<Check size={14} aria-hidden="true" />
+							Mark resolved
+						</Button>
+						<Button
+							variant="outline"
+							size="sm"
+							onclick={() => void onSetStatus(submission.id, 'pending')}
+							disabled={refreshing}
+						>
+							<Undo2 size={14} aria-hidden="true" />
+							Release
 						</Button>
 					{:else}
 						<Button
@@ -514,6 +616,89 @@
 		opacity: 0.5;
 	}
 
+	.worker-strip {
+		display: grid;
+		gap: var(--dry-space-1_5);
+		align-items: center;
+		padding: var(--dry-space-1_5) var(--dry-space-2);
+		margin-block-start: var(--dry-space-1);
+		border: 1px solid var(--dry-color-stroke-weak);
+		border-radius: var(--dry-radius-sm);
+		background: var(--dry-color-bg-sunken);
+		font-size: var(--dry-text-xs-size);
+		line-height: var(--dry-text-xs-leading);
+		color: var(--dry-color-text-weak);
+	}
+
+	.worker-strip[data-status='processing'] {
+		border-color: var(--dry-color-stroke-brand, var(--dry-color-fill-brand));
+		background: color-mix(in oklch, var(--dry-color-fill-brand) 7%, var(--dry-color-bg-sunken));
+		color: var(--dry-color-text-strong);
+	}
+
+	.worker-pill {
+		display: grid;
+		grid-auto-flow: column;
+		grid-auto-columns: max-content;
+		gap: var(--dry-space-1_5);
+		align-items: center;
+		font-weight: 500;
+		color: var(--dry-color-text-strong);
+	}
+
+	.worker-label {
+		font-size: var(--dry-text-xs-size);
+	}
+
+	.worker-versions {
+		display: grid;
+		grid-auto-flow: column;
+		grid-auto-columns: max-content;
+		gap: var(--dry-space-1);
+		align-items: center;
+	}
+
+	.worker-version {
+		display: inline-grid;
+		place-items: center;
+		padding-inline: var(--dry-space-1);
+		padding-block: var(--dry-space-0_5);
+		border-radius: var(--dry-radius-xs, var(--dry-radius-sm));
+		background: var(--dry-color-bg-raised);
+		border: 1px solid var(--dry-color-stroke-weak);
+		font-family: var(--dry-font-mono, ui-monospace, SFMono-Regular, monospace);
+		font-size: var(--dry-text-2xs-size, 0.65rem);
+		color: var(--dry-color-text-weak);
+	}
+
+	.worker-meta {
+		display: grid;
+		grid-auto-flow: column;
+		grid-auto-columns: max-content;
+		gap: var(--dry-space-1);
+		align-items: center;
+		font-variant-numeric: tabular-nums;
+	}
+
+	.worker-spinner {
+		display: inline-grid;
+		place-items: center;
+		color: var(--dry-color-fill-brand);
+		animation: worker-strip-spin 1.4s linear infinite;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.worker-spinner {
+			animation: none;
+		}
+	}
+
+	@keyframes worker-strip-spin {
+		to {
+			transform: rotate(360deg);
+		}
+	}
+
 	.header-actions {
 		--dry-btn-radius: var(--dry-radius-md);
 
@@ -660,6 +845,12 @@
 
 		.dot {
 			display: inline;
+		}
+
+		.worker-strip {
+			grid-auto-flow: column;
+			grid-auto-columns: max-content;
+			gap: var(--dry-space-3);
 		}
 
 		.prompt-actions {

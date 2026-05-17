@@ -715,6 +715,9 @@ describe('feedback overlay hosting', () => {
 			onCapture() {
 				const toolbar = document.querySelector<HTMLElement>('[role="toolbar"]');
 				expect(toolbar?.hasAttribute('data-hidden')).toBe(true);
+				expect(toolbar?.hasAttribute('inert')).toBe(true);
+				expect(toolbar?.hasAttribute('aria-hidden')).toBe(false);
+				expect(toolbar?.contains(document.activeElement)).toBe(false);
 			}
 		});
 
@@ -740,6 +743,9 @@ describe('feedback overlay hosting', () => {
 				'[aria-label="Send feedback"]'
 			);
 			if (!submitButton) throw new Error('Expected feedback submit button');
+
+			submitButton.focus();
+			expect(document.activeElement).toBe(submitButton);
 
 			submitButton.click();
 			await waitForAsyncWork(50);

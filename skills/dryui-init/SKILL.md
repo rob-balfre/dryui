@@ -38,14 +38,14 @@ Do not `Read` any file you just copied from `templates/` to verify it — those 
 
 1. **Triage** — exits 2 with `route=existing-sveltekit` if `svelte.config.*` is present, or `route=ambiguous` if `src/` exists without a config.
 2. Removes `index.ts` / `index.js` from the `bun init` skeleton.
-3. Copies every file in `templates/` into the project root.
+3. Copies every file in `templates/` into the project root, including local `AGENTS.md` / `CLAUDE.md` instructions that force UI agents through `dryui-build`.
 4. Merges scripts, `lucide-svelte` into `dependencies`, devDependencies, and `type: "module"` into `package.json` via `jq`. Preserves existing `overrides` and any other dependency keys.
 5. Appends SvelteKit/Vite ignores to `.gitignore` (idempotent — checks for `/.svelte-kit` first).
 6. Detects a local dryui workspace at `$DRYUI_LOCAL`, `../dryui`, `~/dryui`, `~/src/dryui`, or `~/code/dryui`. If found, runs `bun link` in each `packages/{ui,lint,primitives,feedback,feedback-server}` and writes overrides with `link:@dryui/<pkg>` so the consumer pulls the local workspace. If not found, falls back to `bun add @dryui/ui` + `bun add -d @dryui/lint @dryui/feedback @dryui/feedback-server` against npm.
 7. Runs `scripts/setup-feedback-agents.sh "$PWD"` to copy project-local DryUI skills, detect installed feedback agents, merge project-local MCP config files where possible, and write `dryui.config.json`.
 8. Runs `bun run check` to validate the contract end-to-end.
 
-The smoke-test `+page.svelte` is intentionally minimal: a single `<Heading level={1}>` inside `<main data-layout="home">` to prove `@dryui/ui` resolves and to satisfy `dryui/no-raw-element` (every raw `<main>` needs a `data-layout` hook). It carries no design — DryUI does not ship a default look, the user's first prompt fills the page in. `@dryui/feedback` is a dev-only dep; the live-feedback widget is opt-in (see "Live Feedback (Opt-In)" below).
+The smoke-test `+page.svelte` is intentionally minimal: a single `<Heading level={1}>` inside `<main data-layout="home">` to prove `@dryui/ui` resolves and to satisfy `dryui/no-raw-element` (every raw `<main>` needs a `data-layout` hook). `templates/src/layout.css` declares the matching starter `[data-layout='home']` rule and owns the `container: page / inline-size` query context. It carries no design — DryUI does not ship a default look, the user's first prompt fills the page in. `@dryui/feedback` is a dev-only dep; the live-feedback widget is opt-in (see "Live Feedback (Opt-In)" below).
 
 For non-bun package managers (`npm`, `pnpm`, `yarn`), open `scripts/bare-skeleton.sh` and translate the install commands. The contract and templates are package-manager-agnostic.
 
@@ -59,9 +59,13 @@ Read the project shape before changing files:
 4. Check whether root layout imports DryUI themes, app CSS, and layout CSS in the right cascade order.
 5. Check whether `dryuiLint()` and `dryuiLayoutCss()` are wired.
 
+## Svelte MCP Handoff
+
+When the harness has the official Svelte MCP available, the server is normally named `svelte`. Local setup uses `npx -y @sveltejs/mcp`; remote setup uses `https://mcp.svelte.dev/mcp`. Use the MCP tools by name: `list-sections` first, `get-documentation` for every relevant Svelte/SvelteKit section, and `svelte-autofixer` on any changed `.svelte`, `.svelte.ts`, or `.svelte.js` file before final validation. `playground-link` is only for throwaway snippets, not code written into the user's project.
+
 ## Golden Consumer Setup Contract
 
-This section is the Interface for a DryUI consumer setup. `scripts/e2e/scaffold-adapter.ts` is the concrete Adapter at this Seam for fresh E2E projects: it may write deterministic files and local tarball overrides, but it must satisfy this contract instead of carrying an independent setup recipe. That keeps setup Locality in this skill while giving tests Leverage through a repeatable Adapter.
+This section is the source of truth for a DryUI consumer setup. Fresh E2E scaffolds may write deterministic files and local tarball overrides, but they should satisfy this contract instead of carrying a separate setup recipe.
 
 A valid DryUI consumer setup has:
 
@@ -70,10 +74,11 @@ A valid DryUI consumer setup has:
 - `dryuiLayoutCss()` before `sveltekit()` in Vite plugins.
 - `src/app.html` ships bare `<html lang="en">` — no `class="theme-auto"`, no `data-theme`. Light tokens apply by default. Apps opt into dark or system mode by adding `class="theme-auto"` and/or `data-theme="…"` themselves.
 - `src/routes/+layout.svelte` importing `@dryui/ui/themes/default.css`, `@dryui/ui/themes/dark.css`, `../app.css`, and `../layout.css` (last), then rendering `{@render children()}`. No `<Feedback>` mount by default — opt in per "Live Feedback (Opt-In)".
-- `src/app.css` present with `body { background: var(--dry-color-bg-base); color: var(--dry-color-text); container-type: inline-size; container-name: page; font-family: var(--dry-font-sans); }`.
-- `src/layout.css` present and minimal. Page/section grid and flex layout lands here, scoped under `[data-layout="<name>"]`, with `@container page (...)` for responsive shifts.
+- `src/app.css` present with `body { margin: 0; background: var(--dry-color-bg-base); color: var(--dry-color-text-strong); font-family: var(--dry-font-sans); overflow-x: clip; }`. It owns visual page paint and the required body font only; no container or grid/flex layout belongs here.
+- `src/layout.css` present with a matching starter `[data-layout='home']` rule that owns `container: page / inline-size`, `display: grid`, and the minimal structural track for the smoke-test page. Page/section grid and flex layout lands here, scoped under `[data-layout="<name>"]`, with `@container page (...)` for responsive shifts.
+- `AGENTS.md` and `CLAUDE.md` present from `templates/`. They instruct Codex/Claude to load `skills/dryui-build/SKILL.md` before UI work, treat `@dryui/ui`, `@dryui/lint`, `src/layout.css`, and DryUI theme imports as hard DryUI signals, check component metadata before inventing local primitives, and use screenshots for visual validation.
 - `dryui.config.json` present with `feedback.defaultAgent`, `feedback.detectedAgents`, the `dryui-feedback` MCP command, and `manualAgentConfig` paths for agents whose config is user-level. The feedback server reads `feedback.defaultAgent` and `feedback.terminalApp` at startup, so a detected agent can auto-launch when feedback is submitted.
-- Project-local DryUI skills copied to `skills/`, `.agents/skills/`, `.claude/skills/`, and `.codex/skills/` when the sibling skill bundle is available. This gives dispatched feedback agents a local `dryui-feedback` skill path even if the user's global agent install is missing.
+- Project-local DryUI skills copied to `skills/`, `.agents/skills/`, `.claude/skills/`, and `.codex/skills/` when the sibling skill bundle is available. These are consumer install targets, not canonical source; they give dispatched feedback agents a local `dryui-feedback` skill path even if the user's global agent install is missing.
 
 ## Apply Setup
 
@@ -92,8 +97,8 @@ For an existing SvelteKit app:
 3. In `vite.config.*`, add `dryuiLayoutCss()` before `sveltekit()`.
 4. In `src/app.html`, leave `<html>` bare. Don't add `class="theme-auto"` or `data-theme` unless the app explicitly wants system-aware or forced dark mode — see `dryui-build` for the opt-in recipes.
 5. In `src/routes/+layout.svelte`, import in this order: DryUI theme CSS, app CSS, then `../layout.css` last. Render `{@render children()}` and stop — no widget mounts by default.
-6. Create or update `src/app.css` so `body` owns the page surface, text color, container, and app font: `background: var(--dry-color-bg-base); color: var(--dry-color-text); container-type: inline-size; container-name: page; font-family: var(--dry-font-sans);`.
-7. Create `src/layout.css` if missing. Keep it minimal — page/section grid blocks land here as routes need them.
+6. Create or update `src/app.css` so `body` owns the page surface, text color, and app font: `margin: 0; background: var(--dry-color-bg-base); color: var(--dry-color-text-strong); font-family: var(--dry-font-sans); overflow-x: clip;`.
+7. Create `src/layout.css` if missing. Keep it minimal, but make sure every starter `data-layout` hook has a matching rule. The starter page uses `[data-layout='home'] { container: page / inline-size; display: grid; grid-template-columns: minmax(0, 1fr); min-block-size: 100dvh; gap: var(--dry-space-4); align-content: start; }`. Future page/section grid blocks land here as routes need them.
 8. Run the feedback agent setup helper:
 
    ```bash
@@ -108,8 +113,10 @@ Use this order for the first real interface:
 
 1. Capture the user's brief in one line: what you are building, and for whom.
 2. Use the `dryui-build` skill, component metadata, docs pages, and existing repo usage to confirm components, recipes, contracts, accessibility, and tokens.
-3. Build with DryUI + Svelte 5 runes, grid layout, and `--dry-*` tokens.
-4. Run the project's check/build/test command to validate contracts, a11y, tokens, and CSS discipline.
+3. For Svelte/SvelteKit uncertainty, use the Svelte MCP sequence: `list-sections`, `get-documentation`, then `svelte-autofixer` on changed Svelte files.
+4. Build with DryUI + Svelte 5 runes, grid layout, and `--dry-*` tokens.
+5. Run the project's check/build/test command to validate contracts, a11y, tokens, and CSS discipline.
+6. For visual work, inspect mobile, tablet, and desktop screenshots. Route status and text matches are smoke signals only, not acceptance.
 
 ## Live Feedback (Opt-In)
 

@@ -50,6 +50,15 @@ const CSS_IGNORE_RE = /<!--\s*svelte-ignore\s+css_unused_selector\s*-->/g;
 
 const SVELTE_ELEMENT_RE = /<svelte:element(\s|>|\/)/g;
 
+const TRANSCRIPT_ARTIFACT_TAG_RE =
+	/<\/?\s*(tool_use|tool_result|tool_calls?|task-notification|task_notification|subagent-notification|subagent_notification|function_calls?|invoke|parameter)\b[^>]*>/gi;
+
+const TRANSCRIPT_ARTIFACT_TOKEN_RE =
+	/\b(toolu_[A-Za-z0-9_-]+|mcp__[A-Za-z0-9_]+__[A-Za-z0-9_]+|TaskOutput|TodoWrite)\b/g;
+
+const TRANSCRIPT_CHANNEL_MARKER_RE =
+	/(^|[\n>])[ \t]*(assistant|analysis|commentary|final)\s+to=[A-Za-z0-9_.-]+/g;
+
 const WIDTH_RE = /(?:^|[;\s{])(?:(?:max|min)-)?(?:width|inline-size)\s*:\s*([^;}]+)/gm;
 
 // Typographic measure units (ch, ex, em) track text content, not viewport layout.
@@ -722,6 +731,44 @@ function nativeElementViolationValues(rule: NativeElementRule): LintMessageValue
 	};
 }
 
+interface TranscriptArtifactMatch {
+	readonly index: number;
+	readonly artifact: string;
+}
+
+function collectTranscriptArtifactMatches(content: string): TranscriptArtifactMatch[] {
+	const matches: TranscriptArtifactMatch[] = [];
+
+	for (const match of content.matchAll(TRANSCRIPT_ARTIFACT_TAG_RE)) {
+		const tagName = match[1] ?? 'transcript tag';
+		matches.push({
+			index: match.index ?? 0,
+			artifact: `<${tagName.toLowerCase()}>`
+		});
+	}
+
+	for (const match of content.matchAll(TRANSCRIPT_ARTIFACT_TOKEN_RE)) {
+		const token = match[1] ?? 'transcript token';
+		matches.push({
+			index: match.index ?? 0,
+			artifact: token.startsWith('toolu_')
+				? 'toolu_*'
+				: token.startsWith('mcp__')
+					? 'mcp__*'
+					: token
+		});
+	}
+
+	for (const match of content.matchAll(TRANSCRIPT_CHANNEL_MARKER_RE)) {
+		matches.push({
+			index: (match.index ?? 0) + (match[1]?.length ?? 0),
+			artifact: `${match[2] ?? 'assistant'} to=...`
+		});
+	}
+
+	return matches.sort((left, right) => left.index - right.index);
+}
+
 export function checkMarkup(content: string, filename?: string): Violation[] {
 	const violations: Violation[] = [];
 	const markup = stripBlocks(content);
@@ -798,6 +845,18 @@ export function checkMarkup(content: string, filename?: string): Violation[] {
 	if (policy.isRuleEnabled('dryui/no-css-ignore')) {
 		for (const match of markup.matchAll(CSS_IGNORE_RE)) {
 			addPolicyViolation(policy, violations, 'dryui/no-css-ignore', lineOf(match.index));
+		}
+	}
+
+	if (policy.isRuleEnabled('dryui/no-transcript-artifact')) {
+		const reportedLines = new Set<number>();
+		for (const match of collectTranscriptArtifactMatches(executableMarkup)) {
+			const line = lineOf(match.index);
+			if (reportedLines.has(line)) continue;
+			reportedLines.add(line);
+			addPolicyViolation(policy, violations, 'dryui/no-transcript-artifact', line, {
+				artifact: match.artifact
+			});
 		}
 	}
 

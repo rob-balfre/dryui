@@ -231,6 +231,14 @@
 
 	let toolbarEl = $state<HTMLDivElement | null>(null);
 
+	$effect.pre(() => {
+		if (!hidden || !toolbarEl) return;
+		const activeElement = document.activeElement;
+		if (activeElement instanceof HTMLElement && toolbarEl.contains(activeElement)) {
+			activeElement.blur();
+		}
+	});
+
 	function repairToolbarLayout(node: HTMLDivElement): boolean {
 		if (!node.isConnected) return false;
 		const rect = node.getBoundingClientRect();
@@ -430,7 +438,7 @@
 	data-coarse-pointer={coarsePointer || undefined}
 	role="toolbar"
 	tabindex="-1"
-	aria-hidden={hidden}
+	inert={hidden || undefined}
 	aria-label="Feedback toolbar"
 >
 	{#if hint}

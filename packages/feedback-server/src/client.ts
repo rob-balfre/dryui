@@ -13,9 +13,13 @@ import type {
 	SessionWithAnnotations,
 	Submission,
 	SubmissionQueryStatus,
-	SubmissionStatus
+	SubmissionStatus,
+	SubmissionWorker
 } from './types.js';
-import type { SubmissionPresentationListResponse } from './submission-presentation.js';
+import type {
+	SubmissionPresentation,
+	SubmissionPresentationListResponse
+} from './submission-presentation.js';
 
 function trimTrailingSlash(value: string): string {
 	return value.replace(/\/$/, '');
@@ -182,6 +186,24 @@ export class FeedbackHttpClient {
 
 	async resolveSubmission(id: string): Promise<void> {
 		await this.updateSubmissionStatus(id, 'resolved');
+	}
+
+	async claimSubmission(id: string, worker: SubmissionWorker): Promise<SubmissionPresentation> {
+		return parseJson<SubmissionPresentation>(
+			await fetch(`${this.baseUrl}/submissions/${encodeURIComponent(id)}/claim`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(worker)
+			})
+		);
+	}
+
+	async releaseSubmission(id: string): Promise<SubmissionPresentation> {
+		return parseJson<SubmissionPresentation>(
+			await fetch(`${this.baseUrl}/submissions/${encodeURIComponent(id)}/release`, {
+				method: 'POST'
+			})
+		);
 	}
 
 	async health(): Promise<{ status: string }> {

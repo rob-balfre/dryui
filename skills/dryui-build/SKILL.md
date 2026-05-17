@@ -7,6 +7,10 @@ description: Builds and edits Svelte 5 user interfaces with DryUI components, la
 
 Build real Svelte 5 UI with DryUI. This skill is only for UI implementation and polish. It does not install DryUI, scaffold projects, run live feedback, or resolve feedback submissions.
 
+## DryUI Contract Detection
+
+If a project imports `@dryui/ui`, has `src/layout.css`, or enables `@dryui/lint`, this skill dominates UI decisions for that scope. Keep DryUI primitives, `data-layout` hooks, theme tokens, and lint boundaries in charge even if another framework pattern or generic Svelte habit seems faster.
+
 ## Lint Rules — Read First
 
 These are the rules `@dryui/lint` enforces. They are the contract — if lint, the Svelte compiler, or component metadata disagrees with a visual idea, restructure the markup or CSS instead of bypassing the rule. Bulk-silencing lint produces unstyled, broken pages because the rules and `src/layout.css` are coupled.
@@ -21,6 +25,7 @@ These are the rules `@dryui/lint` enforces. They are the contract — if lint, t
 - No inline `style=` attributes. Use scoped CSS with custom properties.
 - No `style:` directives. Use component props, `--dry-*` custom properties, or the `<style>` block.
 - No `{@attach ...}`. Use component props or CSS custom properties.
+- No leaked transcript or tool artifacts such as `toolu_*`, `<tool_use>`, `<task-notification>`, `<subagent_notification>`, `TaskOutput`, or `TodoWrite`.
 - No `<a>` without `href`. Use `<button>` for non-navigation actions.
 - No `<hr>`. Use `<Separator />` so token overrides apply.
 - No raw `<button>`, `<input>`, `<select>`, etc. when a DryUI primitive exists. Allowed only inside the matching `packages/ui/<component>/` directory.
@@ -39,14 +44,15 @@ These are the rules `@dryui/lint` enforces. They are the contract — if lint, t
 - DryUI does not ship a layout component. Use plain markup with `data-layout` and `data-layout-area`, then declare the matching grid in `src/layout.css`.
 - Every interior raw structural element needs `data-layout="<specific-name>"` or `data-layout-area="<area>"`.
 - Banned generic names: `ui`, `wrapper`, `box`, `container`, `div`, `block`, `el`, `elem`, `element`, `layout`, `inner`, `outer`. They produce unstyled output because no matching grid exists in `src/layout.css`.
-- Every `data-layout` name needs a matching grid declared in `src/layout.css`. If a wrapper has no real layout job, replace it with a DryUI component (`Heading`, `Text`, `Badge`, `Avatar`) or remove it.
+- Every page or section `data-layout` name needs a matching grid declared in `src/layout.css`. If a wrapper has no real layout job, replace it with a DryUI component (`Heading`, `Text`, `Badge`, `Avatar`) or remove it.
+- Reusable component internals may use specific `data-layout` and `data-layout-area` hooks styled by that component only when the hook describes intrinsic widget anatomy, such as a window titlebar/body or chip icon/label/remove row. Do not move those part selectors into `src/layout.css`.
 - Use `data-layout-area` only for children that participate in named grid areas inside a `data-layout` parent.
 
 ### `src/layout.css` is structural-only
 
 - Only `@container` wrappers allowed at-rule. No `@media`, no `@supports`, no `@import`.
 - Selectors must target `[data-layout]` or `[data-layout-area]`. No tag, class, id, or descendant-combinator-only selectors.
-- Allowed properties: `display`, `grid-*`, `flex` (component-internal only), `container`/`container-type`/`container-name`, `gap`/`row-gap`/`column-gap`, `align-*`, `justify-*`, `place-*`, `block-size`/`min-block-size`/`max-block-size`, and tokenized spacing via `--dry-space-*`.
+- Allowed properties: `display`, `grid-*`, `flex` (component-internal only), `container`/`container-type`/`container-name`, `gap`/`row-gap`/`column-gap`, tokenized `margin-*`/`padding-*`, `align-*`, `justify-*`, `place-*`, and `block-size`/`min-block-size`/`max-block-size`.
 - Allowed `display` values: `grid`, `inline-grid`, `flex`, `inline-flex`, `contents`. No `block`, `flow-root`, `inline`, or reset-style values.
 - Banned: color, background, border, shadow, opacity, transition, transform, font, text, position, z-index, `width`/`height`/`inline-size`, raw `px` spacing, hex/rgb colors.
 
@@ -57,15 +63,43 @@ These are the rules `@dryui/lint` enforces. They are the contract — if lint, t
 - Banned: `display`, `grid-*`, `flex-*`, `container`, `@container`, `@media`, `gap`, `justify-*`, `align-*`, `place-*`, `order`, `position`, `inset`, `top`/`right`/`bottom`/`left`, `float`, `width`, `height`, `inline-size`, `block-size`, `flex-shrink`/`flex-grow`/`flex-basis`.
 - Do not style generic tags: `html`, `body > div`, `button`, `svg`, `h1`-`h6`, `p`, `a`, `section`, `article`, `div`, `ul`, `li`. Style via `[data-layout]`, `[data-layout-area]`, `[data-tone]`, and other semantic data attributes.
 - `body` itself may only use `margin: 0`, background, color, font-family, and `overflow-x: clip`.
+- Named container query roots live on `[data-layout]` selectors in `src/layout.css`, for example `container: page / inline-size;` on the route shell. Do not put `container-type` or `container-name` on `body` in `src/app.css`.
 
 ### Components and accessibility
 
+- This skill ships `data/component-manifest.json` and `data/lint-rules.json` for deterministic agent lookup without MCP or CLI tools.
+- Use `node <skill-base-dir>/scripts/check-component.mjs --search dialog` to find components, `node <skill-base-dir>/scripts/check-component.mjs Button` to inspect imports/props/parts/a11y/CSS vars/quick start, and `node <skill-base-dir>/scripts/check-component.mjs Button variant=solid size=icon` to validate prop names and enum-like values.
+- Use `node <skill-base-dir>/scripts/check-component.mjs --lint dryui/no-width` or `node <skill-base-dir>/scripts/check-component.mjs --lint-search label` to explain lint failures before guessing at fixes.
+- Compound prop checks must target the part, for example `node <skill-base-dir>/scripts/check-component.mjs Select.Root open=true` or `node <skill-base-dir>/scripts/check-component.mjs Accordion.Item value=a`.
 - Compound components use `.Root` — parts must live inside the matching root. Common: `Accordion`, `AlertDialog`, `Breadcrumb`, `Collapsible`, `ColorPicker`, `Combobox`, `CommandPalette`, `ContextMenu`, `DataGrid`, `DatePicker`, `Dialog`, `Drawer`, `DropdownMenu`, `EmptyState`, `Field`, `FileUpload`, `FloatButton`, `Pagination`, `Popover`, `RadioGroup`, `RichTextEditor`, `Select`, `Splitter`, `Stepper`, `Table`, `Tabs`, `TagsInput`, `Toast`, `ToggleGroup`, `Toolbar`, `Tooltip`, `Tour`, `Transfer`.
 - Wrap every form control in `<Field.Root>` with `<Label>`.
 - `<Avatar>` requires `alt` and `fallback` props.
 - Icon-only `<Button>` requires `aria-label`.
 - Primary form submit `<Button>` requires `type="submit"`.
 - Use `<AlertDialog>` for destructive confirmation.
+
+### Before inventing primitives
+
+Search component metadata before creating app chrome, card, chip, badge, avatar, callout, or navigation lookalikes:
+
+- App chrome/navigation: check `Sidebar`, `NavigationMenu`, `MegaMenu`, `Menubar`, `Breadcrumb`, `Toolbar`, `ButtonGroup`, `Tabs`, and `Link`.
+- Cards/surfaces: search `card`; use existing display primitives when they fit, otherwise use semantic `data-layout` wrappers plus `src/app.css` paint rather than inventing a fake DryUI component.
+- Chips/badges: check `Chip`, `ChipGroup.Root`, and `Badge`.
+- Avatars/identity: check `Avatar` and `LogoMark`; `<Avatar>` needs `alt` and `fallback`.
+- Callouts/feedback: check `Alert`, `Toast`, `Tooltip`, and `AlertDialog`; if it is only an annotation note, compose `Text`/`Badge` inside a `data-layout` surface.
+- Forms/search: check `Field`, `Label`, `Input`, `Select`, `Combobox`, `CommandPalette`, `TagsInput`, and `Textarea`.
+
+Use `check-component.mjs --search <term>` first, then inspect the exact component before using props or parts. If metadata does not contain the primitive you expected, document the fallback instead of guessing an API.
+
+### When lint feels inconvenient
+
+Do not disable lint. Recover in this order:
+
+1. Run `check-component.mjs --lint <rule>` or read the failing rule message.
+2. Move page/section layout to `src/layout.css`; move visual paint to `src/app.css`; keep only true primitive anatomy in component styles.
+3. Replace raw native controls with DryUI primitives, or add specific `data-layout`/`data-layout-area` hooks only when the element has a real layout role.
+4. For component-internal `display: flex`, `flex-*`, or measured `width`, use a `dryui-allow` comment only directly above the single declaration it suppresses.
+5. Rerun validation. If it still fails, report the rule, file, desired UI, and the smallest shared change needed.
 
 ### Theme tokens
 
@@ -89,18 +123,30 @@ Classify the task before editing:
 - Full page or design image to page: use the **Page Shell** workflow below.
 - Section of a page: keep the existing page shell and add only the section areas needed.
 - Component or form: use the component, theme, Svelte, and validation rules without creating a page shell.
+- Prototype/workbench: use the **Prototype Workbench** reference for browser mockups, fixed-aspect canvases, sticky notes, callouts, lasso overlays, and visual exploration pages.
 
 When the user provides a mockup or asks for a dashboard, admin page, settings page, CRM, kanban, knowledge base, inbox, calendar, finance, inventory, course, or other app page, treat it as full-page work unless they explicitly ask for a component.
+
+Workbench mode is first-class. If the deliverable is a review canvas rather than the product page itself, do not start from the `100dvh` page shell; load `references/prototype-workbench.md` before writing markup or CSS.
+
+## Extra References
+
+Load only the reference that matches the problem:
+
+- `references/layout-boundaries.md`: when moving CSS between route files, `src/layout.css`, `src/app.css`, and custom reusable primitives. Use this before deleting `display`, `gap`, `padding`, or alignment from primitives such as Window, Card, TopNav, Chip, or app chrome.
+- `references/prototype-workbench.md`: when implementing fixed-aspect canvases, browser-window mockups, annotation layers, sticky notes, callouts, lasso overlays, or visual exploration pages. Use this instead of the default `100dvh` page shell.
+- `references/design-to-code-agent-team.md`: when coordinating subagents for design-to-code. The parent must accept foundation work before page workers start and must run a final visual QA pass.
 
 ## Workflow
 
 1. Restate the target UI in one line: user, screen, primary task, density.
-2. Inspect nearby app patterns and existing DryUI usage.
-3. Check component metadata before guessing APIs: `packages/ui/src/<component>/<component>.meta.ts`, then `index.ts`, then source.
-4. Classify full page, section, or component and choose the smallest layout surface.
-5. Implement with `@dryui/ui`, Svelte 5 runes, `data-layout` hooks, `src/layout.css`, and DryUI tokens.
-6. Run deterministic validation for the changed files.
-7. For visual work, verify mobile, tablet, and desktop screenshots.
+2. Inspect nearby app patterns and existing DryUI usage. If the project has `@dryui/ui`, `@dryui/lint`, or `src/layout.css`, keep this skill's rules in charge.
+3. Check component metadata before guessing APIs or inventing primitives. In an installed skill, run `node <skill-base-dir>/scripts/check-component.mjs Button`, `node <skill-base-dir>/scripts/check-component.mjs --search navigation`, or `node <skill-base-dir>/scripts/check-component.mjs --lint dryui/no-width`; in this repo, also inspect `packages/ui/src/<component>/<component>.meta.ts`, then `index.ts`, then source.
+4. Classify full page, section, component, prototype workbench, or multi-agent design-to-code task. Load the matching reference above when applicable.
+5. For Svelte/SvelteKit uncertainty, use the Svelte MCP tools: `list-sections`, `get-documentation`, then `svelte-autofixer`.
+6. Implement with `@dryui/ui`, Svelte 5 runes, `data-layout` hooks, `src/layout.css`, and DryUI tokens.
+7. Run deterministic validation for the changed files.
+8. For visual work, verify mobile, tablet, and desktop screenshots. Text presence or HTTP 200 is not enough.
 
 ## Building a page
 
@@ -210,20 +256,18 @@ Use for vertical lists of panels or list rows. `minmax(0, 1fr)` stops wide child
 
 For KPI tiles and repeating same-shape cards: 1-col mobile, 2-col tablet, 4-col desktop.
 
-### Defensive overflow guard (`src/app.css`)
+### Defensive text wrapping (`src/app.css`)
 
 ```css
 [data-layout-area='primary'],
 [data-layout='panel-stack'],
 [data-layout='metric-grid'],
 [data-layout='list-stack'] {
-	min-inline-size: 0;
-	max-inline-size: 100%;
 	overflow-wrap: anywhere;
 }
 ```
 
-Add once per app. The narrow exception to "no width in `app.css`" — required so long text and tables don't blow out their grid track.
+Add when long labels, URLs, or table-like content can spill out of a grid track. Keep track sizing in `src/layout.css` with `minmax(0, 1fr)`; do not add width or inline-size rules to `src/app.css`.
 
 ## Components
 
@@ -265,7 +309,8 @@ All parts live inside the matching `.Root`. Same shape for `Dialog`, `Popover`, 
 
 <style>
 	[data-layout='kpi-tile'] {
-		--dry-color-badge-bg: var(--dry-color-success-soft);
+		--dry-badge-bg: var(--dry-color-fill-success-weak);
+		--dry-badge-color: var(--dry-color-text-success);
 		padding: var(--dry-space-3);
 		background: var(--dry-color-bg-raised);
 		border-radius: var(--dry-radius-md);
@@ -273,7 +318,16 @@ All parts live inside the matching `.Root`. Same shape for `Dialog`, `Popover`, 
 </style>
 ```
 
-DryUI components do not accept `class=`. Override visuals by setting `--dry-*` custom properties on a `data-layout` wrapper, or via component props.
+DryUI components do not accept `class=`. Override visuals by setting real `--dry-*` custom properties on a `data-layout` wrapper, or via component props. Do not invent extra token aliases.
+
+## Svelte MCP
+
+When the official Svelte MCP is available, prefer it over memory for Svelte and SvelteKit specifics:
+
+- Setup names: local stdio command `npx -y @sveltejs/mcp`; remote URL `https://mcp.svelte.dev/mcp`; server name `svelte`.
+- Docs flow: call `list-sections` first, then `get-documentation` for all relevant sections.
+- Validation flow: run `svelte-autofixer` on changed `.svelte`, `.svelte.ts`, and `.svelte.js` files until it returns no actionable suggestions.
+- Skip `playground-link` for project files; it is only for throwaway snippets the user asks to open in the Svelte Playground.
 
 ## Svelte 5
 
@@ -305,7 +359,7 @@ Build the no-animation version first. Use CSS transitions, Svelte transitions, V
 
 ## Visual Checks
 
-For full-page, dashboard, and design-to-code work, run browser checks after build:
+For full-page, dashboard, prototype/workbench, and design-to-code work, run browser checks after build. Do not close visual work with SSR-only output, static markup inspection, HTTP 200, text presence, or build/check alone; those only prove the route exists, not that the interface renders correctly.
 
 - Mobile around `390px`.
 - Tablet around `820px`.
@@ -321,6 +375,16 @@ Check:
 - Screenshots are not blank, dark-on-dark, clipped, or overlapped.
 
 If a visual check fails, fix source discipline first: shell, areas, `src/layout.css`, then app paint.
+
+When Playwright is installed, run the bundled smoke helper as a coarse guardrail after screenshots:
+
+```sh
+node <skill-base-dir>/scripts/visual-smoke.mjs http://localhost:5174/dashboard --text "Dashboard" --viewport 390x844 --screenshot /tmp/dryui-mobile.png
+node <skill-base-dir>/scripts/visual-smoke.mjs http://localhost:5174/dashboard --text "Dashboard" --viewport 820x900 --screenshot /tmp/dryui-tablet.png
+node <skill-base-dir>/scripts/visual-smoke.mjs http://localhost:5174/dashboard --text "Dashboard" --viewport 1440x900 --screenshot /tmp/dryui-desktop.png
+```
+
+The helper catches non-200 routes, missing text, near-blank bodies, horizontal overflow, giant headers, zero-sized main/window regions, and obvious header/content overlap. It does not replace human screenshot review, and text-only checks are never sufficient for visual acceptance.
 
 ## Validation
 

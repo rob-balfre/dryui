@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, test } from 'bun:test';
-import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { resolve } from 'node:path';
 
@@ -46,6 +46,23 @@ function read(projectDir: string, path: string): string {
 	return readFileSync(resolve(projectDir, path), 'utf8');
 }
 
+function listTemplateFiles(prefix = ''): string[] {
+	const root = resolve(repoRoot, 'skills/dryui-init/templates');
+	const dir = resolve(root, prefix);
+	const files: string[] = [];
+	for (const entry of readdirSync(dir, { withFileTypes: true }).sort((a, b) =>
+		a.name.localeCompare(b.name)
+	)) {
+		const path = prefix ? `${prefix}/${entry.name}` : entry.name;
+		if (entry.isDirectory()) {
+			files.push(...listTemplateFiles(path));
+		} else if (entry.isFile() && entry.name !== '.DS_Store') {
+			files.push(path);
+		}
+	}
+	return files;
+}
+
 describe('E2E scaffold Adapter', () => {
 	test('stays anchored to the dryui-init golden consumer setup contract', () => {
 		const skill = readFileSync(resolve(repoRoot, DRYUI_INIT_SKILL_CONTRACT.sourcePath), 'utf8');
@@ -73,6 +90,7 @@ describe('E2E scaffold Adapter', () => {
 		expect(result.contractAnchor).toBe('golden-consumer-setup-contract');
 		expect(result.filesWritten).toContain('src/routes/+layout.svelte');
 		expect(result.filesWritten).toContain('src/layout.css');
+		expect(result.filesWritten).toContain('src/app.d.ts');
 		expect(result.filesWritten).toContain('AGENTS.md');
 		expect(result.filesWritten).toContain('CLAUDE.md');
 		expect(result.filesWritten).toContain('dryui.config.json');
@@ -84,6 +102,13 @@ describe('E2E scaffold Adapter', () => {
 		expect(readFileSync(logPath, 'utf8')).toContain(
 			'contract: skills/dryui-init/SKILL.md#golden-consumer-setup-contract'
 		);
+		expect(readFileSync(logPath, 'utf8')).toContain('templates: skills/dryui-init/templates');
+
+		for (const file of listTemplateFiles()) {
+			expect(read(projectDir, file)).toBe(
+				readFileSync(resolve(repoRoot, 'skills/dryui-init/templates', file), 'utf8')
+			);
+		}
 
 		const packageJson = JSON.parse(read(projectDir, 'package.json')) as {
 			scripts: Record<string, string>;
@@ -94,10 +119,14 @@ describe('E2E scaffold Adapter', () => {
 		expect(packageJson.scripts).toMatchObject({
 			dev: 'vite dev',
 			build: 'vite build',
-			check: 'svelte-kit sync && svelte-check --tsconfig ./tsconfig.json'
+			preview: 'vite preview',
+			prepare: 'svelte-kit sync || echo ""',
+			check: 'svelte-kit sync && svelte-check --tsconfig ./tsconfig.json',
+			'check:watch': 'svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch'
 		});
 		expect(packageJson.dependencies['@dryui/ui']?.startsWith('file:')).toBe(true);
 		expect(packageJson.dependencies['lucide-svelte']).toBe('^1.0.1');
+		expect(packageJson.devDependencies['@sveltejs/adapter-auto']).toBe('^7.0.1');
 		expect(packageJson.devDependencies['@dryui/primitives']?.startsWith('file:')).toBe(true);
 		expect(packageJson.devDependencies['@dryui/feedback']?.startsWith('file:')).toBe(true);
 		expect(packageJson.devDependencies['@dryui/lint']?.startsWith('file:')).toBe(true);
@@ -108,15 +137,16 @@ describe('E2E scaffold Adapter', () => {
 		);
 
 		const svelteConfig = read(projectDir, 'svelte.config.js');
+		expect(svelteConfig).toContain("import adapter from '@sveltejs/adapter-auto';");
 		expect(svelteConfig).toContain("import { dryuiLint } from '@dryui/lint';");
-		expect(svelteConfig).toContain(
-			"preprocess: [dryuiLint({ strict: true, exclude: ['/.svelte-kit/'] }), vitePreprocess()]"
-		);
+		expect(svelteConfig).toContain('preprocess: [dryuiLint({ strict: true })]');
+		expect(svelteConfig).toContain('runes: ({ filename }) =>');
 		expect(svelteConfig).not.toContain('init');
 
 		const viteConfig = read(projectDir, 'vite.config.ts');
 		expect(viteConfig).toContain("import { dryuiLayoutCss } from '@dryui/lint';");
 		expect(viteConfig.indexOf('dryuiLayoutCss()')).toBeLessThan(viteConfig.indexOf('sveltekit()'));
+		expect(viteConfig).toContain("noExternal: ['lucide-svelte']");
 
 		const rootLayout = read(projectDir, 'src/routes/+layout.svelte');
 		expect(rootLayout).toContain(
@@ -132,12 +162,22 @@ describe('E2E scaffold Adapter', () => {
 		const appCss = read(projectDir, 'src/app.css');
 		expect(appCss).not.toContain('color-scheme: light dark;');
 		expect(appCss).toContain('background: var(--dry-color-bg-base);');
-		expect(appCss).toContain('color: var(--dry-color-text);');
-		expect(appCss).toContain('container-type: inline-size;');
-		expect(appCss).toContain('container-name: page;');
+		expect(appCss).toContain('color: var(--dry-color-text-strong);');
+		const layoutCss = read(projectDir, 'src/layout.css');
+		expect(layoutCss).toContain('container: page / inline-size;');
+		expect(layoutCss).toContain("[data-layout='home']");
 		expect(read(projectDir, 'src/routes/+page.svelte')).toContain('@dryui/ui/heading');
 		expect(read(projectDir, 'AGENTS.md')).toContain('skills/dryui-build/SKILL.md');
+		expect(read(projectDir, 'AGENTS.md')).toContain('@dryui/ui');
+		expect(read(projectDir, 'AGENTS.md')).toContain('check-component.mjs --search');
+		expect(read(projectDir, 'AGENTS.md')).toContain(
+			'HTTP 200 or text presence alone is not enough'
+		);
 		expect(read(projectDir, 'CLAUDE.md')).toContain('skills/dryui-build/SKILL.md');
+		expect(read(projectDir, 'CLAUDE.md')).toContain(
+			'DryUI signals that should dominate the session'
+		);
+		expect(read(projectDir, 'CLAUDE.md')).toContain('matching text is not visual verification');
 		expect(read(projectDir, 'skills/dryui-build/SKILL.md')).toContain('## Theme');
 		expect(read(projectDir, '.agents/skills/dryui-build/SKILL.md')).toContain('## Theme');
 		expect(read(projectDir, '.claude/skills/dryui-build/SKILL.md')).toContain('## Theme');

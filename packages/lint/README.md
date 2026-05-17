@@ -19,6 +19,7 @@ import { dryuiLint, dryuiLayoutCss } from '@dryui/lint';
 - Strict `src/layout.css` checks for page-level grid, flex, container, spacing, and alignment CSS
 - `src/app.css` must set a global `body` font family when present
 - No `<!-- svelte-ignore css_unused_selector -->`
+- No leaked agent transcript/tool artifacts such as `toolu_*`, `<tool_use>`, `<tool_call>`, `<task-notification>`, `TaskOutput`, `TodoWrite`, or `analysis to=functions.exec_command`
 - Additional DryUI markup and component usage rules
 
 ## Install
@@ -115,4 +116,4 @@ Options:
 
 - This package validates code. It does not rewrite or transform your source.
 - It is meant to be used from `preprocess` in Svelte or SvelteKit config.
-- If you need component lookup, design guidance, or workspace auditing, use the DryUI MCP server or CLI packages instead of this package.
+- If you need component lookup or lint-rule explanations inside an agent session, use the `dryui-build` skill sidecar (`scripts/check-component.mjs`) and its bundled `data/component-manifest.json` / `data/lint-rules.json`.

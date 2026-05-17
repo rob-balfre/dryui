@@ -11,6 +11,8 @@
 	</Accordion.Item>
 	<Accordion.Item value="two">
 		<Accordion.Trigger>How do I install it?</Accordion.Trigger>
-		<Accordion.Content>Run bunx @dryui/cli init in a Svelte project.</Accordion.Content>
+		<Accordion.Content
+			>Run npx skills add rob-balfre/dryui, then follow dryui-init.</Accordion.Content
+		>
 	</Accordion.Item>
 </Accordion.Root>

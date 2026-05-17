@@ -315,7 +315,7 @@ export async function main(argv: readonly string[] = process.argv.slice(2)): Pro
 	}
 
 	if (first === 'ui') {
-		// Compatibility alias for the legacy `dryui feedback ui` form.
+		// Compatibility alias for the legacy nested feedback UI form.
 		return runUiCommand(parseArgs(argv.slice(1)));
 	}
 

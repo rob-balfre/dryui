@@ -6,3 +6,12 @@
    Selectors must be [data-layout="<name>"] or its [data-layout-area="<area>"] children.
    Responsive shifts use @container page (min-width: ...), never @media.
    Add [data-layout="<name>"] blocks here as routes need them. */
+
+[data-layout='home'] {
+	container: page / inline-size;
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	min-block-size: 100dvh;
+	gap: var(--dry-space-4);
+	align-content: start;
+}

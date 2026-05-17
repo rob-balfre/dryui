@@ -1,13 +1,14 @@
 # DryUI
 
-> Human-led, agent-assisted UI for building web apps with 164 reusable components, theme tokens, route patterns, and validation checks.
+> Human-led, agent-assisted UI for building web apps with 152 reusable components, theme tokens, route patterns, and validation checks.
 
 ## Packages
 
 - @dryui/primitives: Headless, unstyled components
 - @dryui/ui: Styled components with CSS variables and theme system
-- @dryui/mcp: compatibility MCP server with no runtime tools
-- @dryui/cli: small CLI for ambient context hooks and feedback tooling
+- @dryui/lint: Svelte/Vite validation for components, accessibility, tokens, and CSS discipline
+- @dryui/feedback: optional in-app visual feedback widget
+- @dryui/feedback-server: feedback dashboard and `dryui-feedback-mcp` server
 
 ## Human-Led Agent-Assisted Workflow
 
@@ -15,8 +16,9 @@ DryUI gives engineers and coding agents a shared UI system: reusable components,
 
 ## Agent Support
 
-- MCP tools: none
-- CLI commands: ambient, install-hook, feedback
+- Skills: dryui-build, dryui-init, dryui-feedback, dryui-live-feedback
+- Skill sidecars: component lookup and lint-rule explanations in dryui-build
+- Feedback MCP tools: `dryui-feedback-mcp` from @dryui/feedback-server
 
 ## First-party docs
 
@@ -30,7 +32,7 @@ npx skills add rob-balfre/dryui
 ```
 
 ```
-dryui feedback
+bunx dryui-feedback
 ```
 
 ```
@@ -172,7 +174,7 @@ Subpath import: @dryui/ui/input
 Props: size ('sm' | 'md' | 'lg'), Input density preset for compact, default, or spacious form layouts., accepted sm, md, lg, default 'md' | variant ('default' | 'ghost'), Visual style preset for the component., accepted default, ghost, default 'default' | value (string), Bindable text value for controlled input usage., default '', bindable | disabled (boolean), Prevents interaction and applies disabled styling., default false | type (string), Native input type such as text, email, password, or search.
 Data attributes: data-disabled (Present when the component or part is disabled.) | data-invalid (Present when the current field value is invalid.) | data-size | data-variant
 Accessibility: Pair Input with a visible Label or an aria-label so the field purpose is announced. | Use native type, autocomplete, and name attributes for expected keyboard and form behavior.
-Example: <Input type="email" bind:value={email} placeholder="you@example.com" />
+Example: <Field.Root required><Label>Email address</Label><Input type="email" name="email" autocomplete="email" /></Field.Root>
 
 ### Textarea
 Multi-line text input.
@@ -1214,7 +1216,7 @@ Subpath import: @dryui/ui/qr-code
 Props: value (string), Current controlled or bindable value., required | size (number), Size preset affecting density, spacing, or typography., default 200 | errorCorrection ('L' | 'M' | 'Q' | 'H'), accepted L, M, Q, H, default 'M' | fgColor (string) | bgColor (string)
 Data attributes: data-qr-canvas | data-qr-code | data-qr-wrapper | data-value
 Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
-Example: <QRCode>Content</QRCode>
+Example: <QRCode value="https://dryui.dev" size={160} errorCorrection="M" />
 
 ### CodeBlock
 Code display with optional line numbers and copy button.
@@ -1776,27 +1778,18 @@ All components support CSS variable theming. Override at the :root level or comp
 }
 ```
 
-## CLI
+## Feedback Dashboard
 
-The CLI is intentionally small. Use `npx skills add rob-balfre/dryui` for skill and editor setup; use `dryui` for ambient context hooks and feedback tooling.
-
-Before installing globally, always check `readlink ~/.bun/install/global/node_modules/@dryui/cli`. If it points at a local DryUI checkout's `packages/cli`, keep the link and use `bun run dev:link` plus `DRYUI_DEV=1` instead of reinstalling. Only install once with `bun install -g @dryui/cli@latest` (or `npm install -g @dryui/cli@latest`) when no local link exists and you are not iterating on DryUI source. MCP output uses TOON (token-optimized, agent-friendly) by default.
-
-Current command surface: ambient, install-hook, feedback.
+DryUI no longer ships a general-purpose CLI. Install the agent skills with `npx skills add rob-balfre/dryui`. For visual feedback, run the dashboard from @dryui/feedback-server:
 
 ```
-dryui
-dryui ambient
-dryui install-hook --dry-run
-dryui feedback
-dryui feedback --no-open
+bunx dryui-feedback
+bunx dryui-feedback --no-open
 ```
 
-No global install? Prefix any command with `bunx @dryui/cli …` or `npx -y @dryui/cli …` — same behaviour, slower on each call.
+## MCP Server & Skills
 
-## MCP Server & Skill
-
-DryUI guidance ships as skills. The DryUI MCP server is compatibility-only and exposes no runtime lookup/check tools; visual feedback uses the separate `dryui-feedback` MCP server.
+DryUI guidance ships as skills. Component lookup and lint-rule explanations live in the `dryui-build` skill sidecar; visual feedback uses the separate `dryui-feedback` MCP server from @dryui/feedback-server.
 
 ### Install
 
@@ -1806,7 +1799,6 @@ The recommended path is the upstream `npx skills` CLI (skills.sh standard):
 npx skills add rob-balfre/dryui
 ```
 
-That single command installs all six DryUI skills. Use `dryui feedback` for feedback tooling and MCP guidance when a project needs visual feedback.
+That command installs the DryUI skills. Use the `dryui-build` skill sidecar for component lookup and lint-rule explanations. Use `bunx dryui-feedback` when a project needs visual feedback.
 
-Available MCP tools:
-- none
+Feedback MCP tools come from `dryui-feedback-mcp` in @dryui/feedback-server.

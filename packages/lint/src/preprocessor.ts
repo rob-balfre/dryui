@@ -3,6 +3,11 @@ import { dirname } from 'node:path';
 import type { PreprocessorGroup } from 'svelte/compiler';
 import { checkScript, checkMarkup, checkStyle, type Violation } from './rules.js';
 import { lintRuleSeverity } from './lint-policy.js';
+import {
+	appendViolationLog,
+	formatViolationReport,
+	type ViolationLogFile
+} from './violation-report.js';
 
 export interface DryuiLintOptions {
 	strict?: boolean;
@@ -19,30 +24,43 @@ export interface DryuiLintOptions {
 	 * source during local builds.
 	 */
 	includeDryuiPackages?: boolean;
+	/**
+	 * Append violation reports to a log file. Pass true for .dryui/lint.log,
+	 * or pass a custom path. Relative paths resolve from process.cwd().
+	 */
+	logFile?: ViolationLogFile;
 }
 
-function formatViolation(filename: string, v: Violation): string {
-	return `[${v.rule}] ${filename}:${v.line} — ${v.message}`;
-}
-
-function report(filename: string, violations: Violation[], strict: boolean): void {
+function report(
+	filename: string,
+	source: string,
+	violations: Violation[],
+	strict: boolean,
+	logFile: ViolationLogFile
+): void {
 	if (violations.length === 0) return;
 
 	const blocking = violations.filter((v) => lintRuleSeverity(v.rule) === 'error');
 	const nonBlocking = violations.filter((v) => lintRuleSeverity(v.rule) !== 'error');
 
 	for (const v of nonBlocking) {
-		console.warn(formatViolation(filename, v));
+		const message = formatViolationReport(filename, [v], source);
+		appendViolationLog(logFile, message, { label: 'preprocessor' });
+		console.warn(message);
 	}
 
 	if (strict && blocking.length > 0) {
-		const messages = blocking.map((v) => formatViolation(filename, v)).join('\n');
-		throw new Error(`DryUI lint violations:\n${messages}`);
+		const messages = formatViolationReport(filename, blocking, source);
+		const report = `DryUI lint violations:\n${messages}`;
+		appendViolationLog(logFile, report, { label: 'preprocessor' });
+		throw new Error(report);
 	}
 
 	if (!strict) {
 		for (const v of blocking) {
-			console.warn(formatViolation(filename, v));
+			const message = formatViolationReport(filename, [v], source);
+			appendViolationLog(logFile, message, { label: 'preprocessor' });
+			console.warn(message);
 		}
 	}
 }
@@ -120,6 +138,7 @@ export function dryuiLint(options?: DryuiLintOptions): PreprocessorGroup {
 	const include = options?.include ?? [];
 	const exclude = options?.exclude ?? [];
 	const includeDryuiPackages = options?.includeDryuiPackages ?? false;
+	const logFile = options?.logFile;
 
 	return {
 		name: 'dryui-lint',
@@ -128,21 +147,21 @@ export function dryuiLint(options?: DryuiLintOptions): PreprocessorGroup {
 			const f = filename ?? 'unknown';
 			if (isExcluded(f, include, exclude, includeDryuiPackages)) return;
 			const violations = checkScript(content);
-			report(f, violations, strict);
+			report(f, content, violations, strict, logFile);
 		},
 
 		markup({ content, filename }: { content: string; filename?: string }) {
 			const f = filename ?? 'unknown';
 			if (isExcluded(f, include, exclude, includeDryuiPackages)) return;
 			const violations = checkMarkup(content, f);
-			report(f, violations, strict);
+			report(f, content, violations, strict, logFile);
 		},
 
 		style({ content, filename }: { content: string; filename?: string }) {
 			const f = filename ?? 'unknown';
 			if (isExcluded(f, include, exclude, includeDryuiPackages)) return;
 			const violations = checkStyle(content, {}, f);
-			report(f, violations, strict);
+			report(f, content, violations, strict, logFile);
 		}
 	};
 }

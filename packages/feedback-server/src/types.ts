@@ -129,8 +129,20 @@ export interface CreateAnnotationInput extends Omit<
 
 export interface UpdateAnnotationInput extends Partial<Omit<Annotation, 'id' | 'sessionId'>> {}
 
-export type SubmissionStatus = 'pending' | 'resolved';
+export type SubmissionStatus = 'pending' | 'processing' | 'resolved';
 export type SubmissionQueryStatus = SubmissionStatus | 'all';
+
+/**
+ * Identity of the AI worker that picked up a submission. The dashboard surfaces
+ * `name` (e.g. "Claude Code"), `model` ("claude-opus-4-7"), and `version` ("1.2.3")
+ * verbatim, so callers should populate whichever fields they know.
+ */
+export interface SubmissionWorker {
+	agent: SubmissionAgent;
+	name?: string;
+	model?: string;
+	version?: string;
+}
 export type SubmissionAgent =
 	| 'claude'
 	| 'codex'
@@ -255,6 +267,14 @@ export interface Submission {
 	agent?: SubmissionAgent;
 	/** Dispatch prefers this over the live server workspace so deeplinks survive the server being restarted from a different cwd. */
 	workspace?: string;
+	/** Worker that called `claim`. Cleared on `release`; preserved through `resolve` so completed history can name the AI. */
+	worker?: SubmissionWorker;
+	/** Set when the worker called `claim`. Stays set after resolve for the history view. */
+	processingStartedAt?: string;
+	/** Set when the worker (or human) marked the submission resolved. */
+	resolvedAt?: string;
+	/** `resolvedAt - processingStartedAt` (ms). Populated on resolve when both timestamps exist. */
+	durationMs?: number;
 }
 
 export interface CreateSubmissionImageInput {

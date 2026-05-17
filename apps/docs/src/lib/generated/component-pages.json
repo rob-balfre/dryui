@@ -311,7 +311,7 @@
       ],
       "rootImport": "import { Input } from '@dryui/ui'",
       "subpathImport": "import { Input } from '@dryui/ui/input'",
-      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Input } from '@dryui/ui';\n</script>\n\n<Input type=\"email\" bind:value={email} placeholder=\"you@example.com\" />"
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Input, Field, Label } from '@dryui/ui';\n</script>\n\n<Field.Root required>\n  <Label>Email address</Label>\n  <Input type=\"email\" bind:value={email} name=\"email\" autocomplete=\"email\" placeholder=\"you@example.com\" />\n</Field.Root>"
     },
     "Dialog": {
       "name": "Dialog",
@@ -513,7 +513,7 @@
       ],
       "rootImport": "import { Dialog } from '@dryui/ui'",
       "subpathImport": "import { Dialog } from '@dryui/ui/dialog'",
-      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Dialog, Button } from '@dryui/ui';\n</script>\n\n<Dialog.Root bind:open={showDialog}>\n  <Dialog.Trigger>\n    <Button>Open Dialog</Button>\n  </Dialog.Trigger>\n  <Dialog.Content>\n    <Dialog.Header>Confirm</Dialog.Header>\n    <p>Are you sure?</p>\n    <Dialog.Footer>\n      <Button variant=\"outline\" onclick={() => showDialog = false}>Cancel</Button>\n      <Button variant=\"solid\" onclick={handleConfirm}>Confirm</Button>\n    </Dialog.Footer>\n  </Dialog.Content>\n</Dialog.Root>"
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Dialog, Button, Text } from '@dryui/ui';\n</script>\n\n<Dialog.Root bind:open={showDialog}>\n  <Dialog.Trigger>\n    <Button>Open Dialog</Button>\n  </Dialog.Trigger>\n  <Dialog.Content>\n    <Dialog.Header>Confirm</Dialog.Header>\n    <Text>Are you sure?</Text>\n    <Dialog.Footer>\n      <Button variant=\"outline\" onclick={() => showDialog = false}>Cancel</Button>\n      <Button variant=\"solid\" onclick={handleConfirm}>Confirm</Button>\n    </Dialog.Footer>\n  </Dialog.Content>\n</Dialog.Root>"
     },
     "AlertDialog": {
       "name": "AlertDialog",
@@ -981,7 +981,7 @@
       ],
       "rootImport": "import { Drawer } from '@dryui/ui'",
       "subpathImport": "import { Drawer } from '@dryui/ui/drawer'",
-      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Drawer, Button } from '@dryui/ui';\n</script>\n\n<Drawer.Root bind:open={drawerOpen}>\n  <Drawer.Trigger>\n    <Button>Open Drawer</Button>\n  </Drawer.Trigger>\n  <Drawer.Content side=\"right\">\n    <Drawer.Header>Settings</Drawer.Header>\n    <p>Drawer body content.</p>\n  </Drawer.Content>\n</Drawer.Root>"
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Drawer, Button, Text } from '@dryui/ui';\n</script>\n\n<Drawer.Root bind:open={drawerOpen}>\n  <Drawer.Trigger>\n    <Button>Open Drawer</Button>\n  </Drawer.Trigger>\n  <Drawer.Content side=\"right\">\n    <Drawer.Header>Settings</Drawer.Header>\n    <Text>Drawer body content.</Text>\n  </Drawer.Content>\n</Drawer.Root>"
     },
     "Popover": {
       "name": "Popover",
@@ -1105,7 +1105,7 @@
       ],
       "rootImport": "import { Popover } from '@dryui/ui'",
       "subpathImport": "import { Popover } from '@dryui/ui/popover'",
-      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Popover, Button } from '@dryui/ui';\n</script>\n\n<Popover.Root bind:open={popoverOpen}>\n  <Popover.Trigger>\n    <Button variant=\"outline\">Info</Button>\n  </Popover.Trigger>\n  <Popover.Content>\n    <p>Popover details here.</p>\n  </Popover.Content>\n</Popover.Root>"
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Popover, Button, Text } from '@dryui/ui';\n</script>\n\n<Popover.Root bind:open={popoverOpen}>\n  <Popover.Trigger>\n    <Button variant=\"outline\">Info</Button>\n  </Popover.Trigger>\n  <Popover.Content>\n    <Text>Popover details here.</Text>\n  </Popover.Content>\n</Popover.Root>"
     },
     "Tooltip": {
       "name": "Tooltip",
@@ -2489,7 +2489,7 @@
       ],
       "rootImport": "import { Textarea } from '@dryui/ui'",
       "subpathImport": "import { Textarea } from '@dryui/ui/textarea'",
-      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Textarea } from '@dryui/ui';\n</script>\n\n<Textarea bind:value={message} placeholder=\"Write a message…\" />"
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Textarea, Field, Label } from '@dryui/ui';\n</script>\n\n<Field.Root>\n  <Label>Message</Label>\n  <Textarea bind:value={message} placeholder=\"Write a message…\" />\n</Field.Root>"
     },
     "PromptInput": {
       "name": "PromptInput",
@@ -2591,7 +2591,7 @@
       ],
       "rootImport": "import { PromptInput } from '@dryui/ui'",
       "subpathImport": "import { PromptInput } from '@dryui/ui/prompt-input'",
-      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { PromptInput } from '@dryui/ui';\n</script>\n\n<PromptInput>Content</PromptInput>"
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { PromptInput, Field, Label } from '@dryui/ui';\n</script>\n\n<Field.Root>\n  <Label>Prompt</Label>\n  <PromptInput>Content</PromptInput>\n</Field.Root>"
     },
     "NumberInput": {
       "name": "NumberInput",
@@ -2683,7 +2683,7 @@
       ],
       "rootImport": "import { NumberInput } from '@dryui/ui'",
       "subpathImport": "import { NumberInput } from '@dryui/ui/number-input'",
-      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { NumberInput } from '@dryui/ui';\n</script>\n\n<NumberInput bind:value={quantity} min={0} max={100} step={1} size=\"sm\" />"
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { NumberInput, Field, Label } from '@dryui/ui';\n</script>\n\n<Field.Root>\n  <Label>Quantity</Label>\n  <NumberInput bind:value={quantity} min={0} max={100} step={1} size=\"sm\" />\n</Field.Root>"
     },
     "Checkbox": {
       "name": "Checkbox",
@@ -2758,7 +2758,7 @@
       ],
       "rootImport": "import { Checkbox } from '@dryui/ui'",
       "subpathImport": "import { Checkbox } from '@dryui/ui/checkbox'",
-      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Checkbox } from '@dryui/ui';\n</script>\n\n<Checkbox bind:checked={agreed}>I agree to the terms</Checkbox>"
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Checkbox, Field, Label } from '@dryui/ui';\n</script>\n\n<Field.Root>\n  <Label>Terms</Label>\n  <Checkbox bind:checked={agreed} />\n</Field.Root>"
     },
     "RadioGroup": {
       "name": "RadioGroup",
@@ -2884,7 +2884,7 @@
       ],
       "rootImport": "import { RadioGroup } from '@dryui/ui'",
       "subpathImport": "import { RadioGroup } from '@dryui/ui/radio-group'",
-      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { RadioGroup } from '@dryui/ui';\n</script>\n\n<RadioGroup.Root>\n  <RadioGroup.Item>...</RadioGroup.Item>\n</RadioGroup.Root>"
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { RadioGroup, Field, Label } from '@dryui/ui';\n</script>\n\n<Field.Root>\n  <Label>Plan</Label>\n  <RadioGroup.Root>\n    <RadioGroup.Item>...</RadioGroup.Item>\n  </RadioGroup.Root>\n</Field.Root>"
     },
     "Select": {
       "name": "Select",
@@ -3118,7 +3118,7 @@
       ],
       "rootImport": "import { Select } from '@dryui/ui'",
       "subpathImport": "import { Select } from '@dryui/ui/select'",
-      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Select } from '@dryui/ui';\n</script>\n\n<Select.Root bind:value={selected} bind:open={selectOpen} name=\"selection\">\n  <Select.Trigger>\n    <Select.Value placeholder=\"Choose…\" />\n  </Select.Trigger>\n  <Select.Content>\n    <Select.Item value=\"a\">Alpha</Select.Item>\n    <Select.Item value=\"b\">Beta</Select.Item>\n  </Select.Content>\n</Select.Root>"
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Select, Field, Label } from '@dryui/ui';\n</script>\n\n<Field.Root required>\n  <Label>Billing country</Label>\n  <Select.Root bind:value={country} name=\"country\">\n    <Select.Trigger>\n      <Select.Value placeholder=\"Select a country\" />\n    </Select.Trigger>\n    <Select.Content>\n      <Select.Item value=\"us\">United States</Select.Item>\n      <Select.Item value=\"ca\">Canada</Select.Item>\n      <Select.Item value=\"gb\">United Kingdom</Select.Item>\n    </Select.Content>\n  </Select.Root>\n</Field.Root>"
     },
     "MultiSelectCombobox": {
       "name": "MultiSelectCombobox",
@@ -3484,7 +3484,7 @@
       ],
       "rootImport": "import { MultiSelectCombobox } from '@dryui/ui'",
       "subpathImport": "import { MultiSelectCombobox } from '@dryui/ui/multi-select-combobox'",
-      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { MultiSelectCombobox } from '@dryui/ui';\n</script>\n\n<MultiSelectCombobox.Root bind:value={selectedFrameworks} bind:query={frameworkQuery} name=\"frameworks\">\n  <MultiSelectCombobox.SelectionList>\n    {#each selectedFrameworks as framework}\n      <MultiSelectCombobox.SelectionItem value={framework}>\n        {framework}\n        <MultiSelectCombobox.SelectionRemove value={framework} />\n      </MultiSelectCombobox.SelectionItem>\n    {/each}\n  </MultiSelectCombobox.SelectionList>\n  <MultiSelectCombobox.Input placeholder=\"Search frameworks...\" />\n  <MultiSelectCombobox.Content>\n    <MultiSelectCombobox.Item value=\"svelte\">Svelte</MultiSelectCombobox.Item>\n    <MultiSelectCombobox.Item value=\"react\">React</MultiSelectCombobox.Item>\n  </MultiSelectCombobox.Content>\n</MultiSelectCombobox.Root>"
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { MultiSelectCombobox, Field, Label } from '@dryui/ui';\n</script>\n\n<Field.Root>\n  <Label>Frameworks</Label>\n  <MultiSelectCombobox.Root bind:value={selectedFrameworks} bind:query={frameworkQuery} name=\"frameworks\">\n    <MultiSelectCombobox.SelectionList>\n      {#each selectedFrameworks as framework}\n        <MultiSelectCombobox.SelectionItem value={framework}>\n          {framework}\n          <MultiSelectCombobox.SelectionRemove value={framework} />\n        </MultiSelectCombobox.SelectionItem>\n      {/each}\n    </MultiSelectCombobox.SelectionList>\n    <MultiSelectCombobox.Input placeholder=\"Search frameworks...\" />\n    <MultiSelectCombobox.Content>\n      <MultiSelectCombobox.Item value=\"svelte\">Svelte</MultiSelectCombobox.Item>\n      <MultiSelectCombobox.Item value=\"react\">React</MultiSelectCombobox.Item>\n    </MultiSelectCombobox.Content>\n  </MultiSelectCombobox.Root>\n</Field.Root>"
     },
     "SegmentedControl": {
       "name": "SegmentedControl",
@@ -3601,7 +3601,7 @@
       ],
       "rootImport": "import { SegmentedControl } from '@dryui/ui'",
       "subpathImport": "import { SegmentedControl } from '@dryui/ui/segmented-control'",
-      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { SegmentedControl } from '@dryui/ui';\n</script>\n\n<SegmentedControl.Root bind:value={tripType}>\n  <SegmentedControl.Item value=\"one-way\">One way</SegmentedControl.Item>\n  <SegmentedControl.Item value=\"round-trip\">Round trip</SegmentedControl.Item>\n  <SegmentedControl.Item value=\"multi-city\">Multi-city</SegmentedControl.Item>\n</SegmentedControl.Root>"
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { SegmentedControl, Field, Label } from '@dryui/ui';\n</script>\n\n<Field.Root>\n  <Label>Trip type</Label>\n  <SegmentedControl.Root bind:value={tripType}>\n    <SegmentedControl.Item value=\"one-way\">One way</SegmentedControl.Item>\n    <SegmentedControl.Item value=\"round-trip\">Round trip</SegmentedControl.Item>\n    <SegmentedControl.Item value=\"multi-city\">Multi-city</SegmentedControl.Item>\n  </SegmentedControl.Root>\n</Field.Root>"
     },
     "Slider": {
       "name": "Slider",
@@ -3725,7 +3725,7 @@
       ],
       "rootImport": "import { Slider } from '@dryui/ui'",
       "subpathImport": "import { Slider } from '@dryui/ui/slider'",
-      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Slider } from '@dryui/ui';\n</script>\n\n<Slider bind:value={volume} min={0} max={100} />"
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Slider, Field, Label } from '@dryui/ui';\n</script>\n\n<Field.Root>\n  <Label>Volume</Label>\n  <Slider bind:value={volume} min={0} max={100} />\n</Field.Root>"
     },
     "Toggle": {
       "name": "Toggle",
@@ -4182,7 +4182,7 @@
       ],
       "rootImport": "import { InputGroup } from '@dryui/ui'",
       "subpathImport": "import { InputGroup } from '@dryui/ui/input-group'",
-      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { InputGroup } from '@dryui/ui';\n</script>\n\n<InputGroup.Root>\n  <InputGroup.Prefix>...</InputGroup.Prefix>\n  <InputGroup.Input>...</InputGroup.Input>\n  <InputGroup.Suffix>...</InputGroup.Suffix>\n  <InputGroup.Separator>...</InputGroup.Separator>\n  <InputGroup.Action>...</InputGroup.Action>\n  <InputGroup.Select>...</InputGroup.Select>\n</InputGroup.Root>"
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { InputGroup, Field, Label } from '@dryui/ui';\n</script>\n\n<Field.Root>\n  <Label>Workspace URL</Label>\n  <InputGroup.Root>\n    <InputGroup.Prefix>...</InputGroup.Prefix>\n    <InputGroup.Input>...</InputGroup.Input>\n    <InputGroup.Suffix>...</InputGroup.Suffix>\n    <InputGroup.Separator>...</InputGroup.Separator>\n    <InputGroup.Action>...</InputGroup.Action>\n    <InputGroup.Select>...</InputGroup.Select>\n  </InputGroup.Root>\n</Field.Root>"
     },
     "OptionPicker": {
       "name": "OptionPicker",
@@ -4392,7 +4392,7 @@
       ],
       "rootImport": "import { OptionPicker } from '@dryui/ui'",
       "subpathImport": "import { OptionPicker } from '@dryui/ui/option-picker'",
-      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { OptionPicker } from '@dryui/ui';\n</script>\n\n<OptionPicker.Root>\n  <OptionPicker.Item>...</OptionPicker.Item>\n  <OptionPicker.Preview>...</OptionPicker.Preview>\n  <OptionPicker.Label>...</OptionPicker.Label>\n  <OptionPicker.Description>...</OptionPicker.Description>\n  <OptionPicker.Meta>...</OptionPicker.Meta>\n</OptionPicker.Root>"
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { OptionPicker, Field, Label } from '@dryui/ui';\n</script>\n\n<Field.Root>\n  <Label>Deployment target</Label>\n  <OptionPicker.Root>\n    <OptionPicker.Item>...</OptionPicker.Item>\n    <OptionPicker.Preview>...</OptionPicker.Preview>\n    <OptionPicker.Label>...</OptionPicker.Label>\n    <OptionPicker.Description>...</OptionPicker.Description>\n    <OptionPicker.Meta>...</OptionPicker.Meta>\n  </OptionPicker.Root>\n</Field.Root>"
     },
     "Container": {
       "name": "Container",
@@ -4457,7 +4457,7 @@
       ],
       "rootImport": "import { Container } from '@dryui/ui'",
       "subpathImport": "import { Container } from '@dryui/ui/container'",
-      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Container } from '@dryui/ui';\n</script>\n\n<Container>\n  <p>Centered content</p>\n</Container>"
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Container, Text } from '@dryui/ui';\n</script>\n\n<Container>\n  <Text>Centered content</Text>\n</Container>"
     },
     "Separator": {
       "name": "Separator",
@@ -9448,7 +9448,7 @@
       ],
       "rootImport": "import { Combobox } from '@dryui/ui'",
       "subpathImport": "import { Combobox } from '@dryui/ui/combobox'",
-      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Combobox } from '@dryui/ui';\n</script>\n\n<Combobox.Root bind:value={selectedFramework} name=\"framework\">\n  <Combobox.Input placeholder=\"Search frameworks...\" />\n  <Combobox.Content>\n    <Combobox.Item value=\"svelte\" index={0}>Svelte</Combobox.Item>\n    <Combobox.Item value=\"react\" index={1}>React</Combobox.Item>\n  </Combobox.Content>\n</Combobox.Root>"
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Combobox, Field, Label } from '@dryui/ui';\n</script>\n\n<Field.Root>\n  <Label>Framework</Label>\n  <Combobox.Root bind:value={selectedFramework} name=\"framework\">\n    <Combobox.Input placeholder=\"Search frameworks...\" />\n    <Combobox.Content>\n      <Combobox.Item value=\"svelte\" index={0}>Svelte</Combobox.Item>\n      <Combobox.Item value=\"react\" index={1}>React</Combobox.Item>\n    </Combobox.Content>\n  </Combobox.Root>\n</Field.Root>"
     },
     "DateField": {
       "name": "DateField",
@@ -9616,7 +9616,7 @@
       ],
       "rootImport": "import { DateField } from '@dryui/ui'",
       "subpathImport": "import { DateField } from '@dryui/ui/date-field'",
-      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { DateField } from '@dryui/ui';\n</script>\n\n<DateField.Root bind:value={departureDate} name=\"departureDate\">\n  <DateField.Segment type=\"month\" />\n  <DateField.Separator />\n  <DateField.Segment type=\"day\" />\n  <DateField.Separator />\n  <DateField.Segment type=\"year\" />\n</DateField.Root>"
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { DateField, Field, Label } from '@dryui/ui';\n</script>\n\n<Field.Root>\n  <Label>Departure date</Label>\n  <DateField.Root bind:value={departureDate} name=\"departureDate\">\n    <DateField.Segment type=\"month\" />\n    <DateField.Separator />\n    <DateField.Segment type=\"day\" />\n    <DateField.Separator />\n    <DateField.Segment type=\"year\" />\n  </DateField.Root>\n</Field.Root>"
     },
     "DatePicker": {
       "name": "DatePicker",
@@ -9838,7 +9838,7 @@
       ],
       "rootImport": "import { DatePicker } from '@dryui/ui'",
       "subpathImport": "import { DatePicker } from '@dryui/ui/date-picker'",
-      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { DatePicker } from '@dryui/ui';\n</script>\n\n<DatePicker.Root bind:value={departureDate} name=\"departureDate\">\n  <DatePicker.Trigger placeholder=\"Select departure date\" />\n  <DatePicker.Content>\n    <DatePicker.Calendar />\n  </DatePicker.Content>\n</DatePicker.Root>"
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { DatePicker, Field, Label } from '@dryui/ui';\n</script>\n\n<Field.Root>\n  <Label>Departure date</Label>\n  <DatePicker.Root bind:value={departureDate} name=\"departureDate\">\n    <DatePicker.Trigger placeholder=\"Select departure date\" />\n    <DatePicker.Content>\n      <DatePicker.Calendar />\n    </DatePicker.Content>\n  </DatePicker.Root>\n</Field.Root>"
     },
     "Calendar": {
       "name": "Calendar",
@@ -10203,7 +10203,7 @@
       ],
       "rootImport": "import { Calendar } from '@dryui/ui'",
       "subpathImport": "import { Calendar } from '@dryui/ui/calendar'",
-      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Calendar } from '@dryui/ui';\n</script>\n\n<Calendar.Root>\n  <Calendar.Header>...</Calendar.Header>\n  <Calendar.Grid>...</Calendar.Grid>\n  <Calendar.Week>...</Calendar.Week>\n  <Calendar.Prev>...</Calendar.Prev>\n  <Calendar.Next>...</Calendar.Next>\n  <Calendar.Heading>...</Calendar.Heading>\n  <Calendar.EventLegend>...</Calendar.EventLegend>\n</Calendar.Root>"
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Calendar, Field, Label } from '@dryui/ui';\n</script>\n\n<Field.Root>\n  <Label>Release date</Label>\n  <Calendar.Root>\n    <Calendar.Header>...</Calendar.Header>\n    <Calendar.Grid>...</Calendar.Grid>\n    <Calendar.Week>...</Calendar.Week>\n    <Calendar.Prev>...</Calendar.Prev>\n    <Calendar.Next>...</Calendar.Next>\n    <Calendar.Heading>...</Calendar.Heading>\n    <Calendar.EventLegend>...</Calendar.EventLegend>\n  </Calendar.Root>\n</Field.Root>"
     },
     "DateRangePicker": {
       "name": "DateRangePicker",
@@ -10460,7 +10460,7 @@
       ],
       "rootImport": "import { DateRangePicker } from '@dryui/ui'",
       "subpathImport": "import { DateRangePicker } from '@dryui/ui/date-range-picker'",
-      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { DateRangePicker } from '@dryui/ui';\n</script>\n\n<DateRangePicker.Root>\n  <DateRangePicker.Trigger>...</DateRangePicker.Trigger>\n  <DateRangePicker.Content>...</DateRangePicker.Content>\n  <DateRangePicker.Calendar>...</DateRangePicker.Calendar>\n  <DateRangePicker.Preset>...</DateRangePicker.Preset>\n</DateRangePicker.Root>"
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { DateRangePicker, Field, Label } from '@dryui/ui';\n</script>\n\n<Field.Root>\n  <Label>Travel dates</Label>\n  <DateRangePicker.Root>\n    <DateRangePicker.Trigger>...</DateRangePicker.Trigger>\n    <DateRangePicker.Content>...</DateRangePicker.Content>\n    <DateRangePicker.Calendar>...</DateRangePicker.Calendar>\n    <DateRangePicker.Preset>...</DateRangePicker.Preset>\n  </DateRangePicker.Root>\n</Field.Root>"
     },
     "Listbox": {
       "name": "Listbox",
@@ -10573,7 +10573,7 @@
       ],
       "rootImport": "import { Listbox } from '@dryui/ui'",
       "subpathImport": "import { Listbox } from '@dryui/ui/listbox'",
-      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Listbox } from '@dryui/ui';\n</script>\n\n<Listbox.Root>\n  <Listbox.Item>...</Listbox.Item>\n</Listbox.Root>"
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Listbox, Field, Label } from '@dryui/ui';\n</script>\n\n<Field.Root>\n  <Label>Assignee</Label>\n  <Listbox.Root>\n    <Listbox.Item>...</Listbox.Item>\n  </Listbox.Root>\n</Field.Root>"
     },
     "LogoMark": {
       "name": "LogoMark",
@@ -10931,7 +10931,7 @@
       ],
       "rootImport": "import { PinInput } from '@dryui/ui'",
       "subpathImport": "import { PinInput } from '@dryui/ui/pin-input'",
-      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { PinInput } from '@dryui/ui';\n</script>\n\n<PinInput.Root bind:value={pin} length={6} oncomplete={handleVerify}>\n  {#snippet children({ cells })}\n    <PinInput.Group>\n      {#each cells.slice(0, 3) as cell}\n        <PinInput.Cell {cell} />\n      {/each}\n    </PinInput.Group>\n    <PinInput.Separator />\n    <PinInput.Group>\n      {#each cells.slice(3) as cell}\n        <PinInput.Cell {cell} />\n      {/each}\n    </PinInput.Group>\n  {/snippet}\n</PinInput.Root>"
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { PinInput, Field, Label } from '@dryui/ui';\n</script>\n\n<Field.Root>\n  <Label>Verification code</Label>\n  <PinInput.Root bind:value={pin} length={6} oncomplete={handleVerify}>\n    {#snippet children({ cells })}\n      <PinInput.Group>\n        {#each cells.slice(0, 3) as cell}\n          <PinInput.Cell {cell} />\n        {/each}\n      </PinInput.Group>\n      <PinInput.Separator />\n      <PinInput.Group>\n        {#each cells.slice(3) as cell}\n          <PinInput.Cell {cell} />\n        {/each}\n      </PinInput.Group>\n    {/snippet}\n  </PinInput.Root>\n</Field.Root>"
     },
     "RangeCalendar": {
       "name": "RangeCalendar",
@@ -11093,7 +11093,7 @@
       ],
       "rootImport": "import { RangeCalendar } from '@dryui/ui'",
       "subpathImport": "import { RangeCalendar } from '@dryui/ui/range-calendar'",
-      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { RangeCalendar } from '@dryui/ui';\n</script>\n\n<RangeCalendar.Root>\n  <RangeCalendar.Grid>...</RangeCalendar.Grid>\n</RangeCalendar.Root>"
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { RangeCalendar, Field, Label } from '@dryui/ui';\n</script>\n\n<Field.Root>\n  <Label>Booking range</Label>\n  <RangeCalendar.Root>\n    <RangeCalendar.Grid>...</RangeCalendar.Grid>\n  </RangeCalendar.Root>\n</Field.Root>"
     },
     "Rating": {
       "name": "Rating",
@@ -11188,7 +11188,7 @@
       ],
       "rootImport": "import { Rating } from '@dryui/ui'",
       "subpathImport": "import { Rating } from '@dryui/ui/rating'",
-      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Rating } from '@dryui/ui';\n</script>\n\n<Rating bind:value={score} />"
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Rating, Field, Label } from '@dryui/ui';\n</script>\n\n<Field.Root>\n  <Label>Satisfaction</Label>\n  <Rating bind:value={score} />\n</Field.Root>"
     },
     "TimeInput": {
       "name": "TimeInput",
@@ -11275,7 +11275,7 @@
       ],
       "rootImport": "import { TimeInput } from '@dryui/ui'",
       "subpathImport": "import { TimeInput } from '@dryui/ui/time-input'",
-      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { TimeInput } from '@dryui/ui';\n\n  let time = $state('09:30');\n</script>\n\n<TimeInput bind:value={time} name=\"startTime\" />"
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { TimeInput, Field, Label } from '@dryui/ui';\n\n  let time = $state('09:30');\n</script>\n\n<Field.Root>\n  <Label>Start time</Label>\n  <TimeInput bind:value={time} name=\"startTime\" />\n</Field.Root>"
     },
     "TagsInput": {
       "name": "TagsInput",
@@ -11475,7 +11475,7 @@
       ],
       "rootImport": "import { TagsInput } from '@dryui/ui'",
       "subpathImport": "import { TagsInput } from '@dryui/ui/tags-input'",
-      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { TagsInput } from '@dryui/ui';\n</script>\n\n<TagsInput.Root>\n  <TagsInput.Input>...</TagsInput.Input>\n  <TagsInput.Tag>...</TagsInput.Tag>\n  <TagsInput.TagDelete>...</TagsInput.TagDelete>\n  <TagsInput.List>...</TagsInput.List>\n</TagsInput.Root>"
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { TagsInput, Field, Label } from '@dryui/ui';\n</script>\n\n<Field.Root>\n  <Label>Allowed origins</Label>\n  <TagsInput.Root>\n    <TagsInput.Input>...</TagsInput.Input>\n    <TagsInput.Tag>...</TagsInput.Tag>\n    <TagsInput.TagDelete>...</TagsInput.TagDelete>\n    <TagsInput.List>...</TagsInput.List>\n  </TagsInput.Root>\n</Field.Root>"
     },
     "FileUpload": {
       "name": "FileUpload",
@@ -11726,7 +11726,7 @@
       ],
       "rootImport": "import { FileUpload } from '@dryui/ui'",
       "subpathImport": "import { FileUpload } from '@dryui/ui/file-upload'",
-      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { FileUpload } from '@dryui/ui';\n</script>\n\n<FileUpload.Root>\n  <FileUpload.Dropzone>...</FileUpload.Dropzone>\n  <FileUpload.Trigger>...</FileUpload.Trigger>\n  <FileUpload.List>...</FileUpload.List>\n  <FileUpload.Item>...</FileUpload.Item>\n  <FileUpload.ItemDelete>...</FileUpload.ItemDelete>\n</FileUpload.Root>"
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { FileUpload, Field, Label } from '@dryui/ui';\n</script>\n\n<Field.Root>\n  <Label>Attachments</Label>\n  <FileUpload.Root>\n    <FileUpload.Dropzone>...</FileUpload.Dropzone>\n    <FileUpload.Trigger>...</FileUpload.Trigger>\n    <FileUpload.List>...</FileUpload.List>\n    <FileUpload.Item>...</FileUpload.Item>\n    <FileUpload.ItemDelete>...</FileUpload.ItemDelete>\n  </FileUpload.Root>\n</Field.Root>"
     },
     "FileSelect": {
       "name": "FileSelect",
@@ -11881,7 +11881,7 @@
       ],
       "rootImport": "import { FileSelect } from '@dryui/ui'",
       "subpathImport": "import { FileSelect } from '@dryui/ui/file-select'",
-      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { FileSelect } from '@dryui/ui';\n</script>\n\n<FileSelect.Root>\n  <FileSelect.Trigger>...</FileSelect.Trigger>\n  <FileSelect.Value>...</FileSelect.Value>\n  <FileSelect.Clear>...</FileSelect.Clear>\n</FileSelect.Root>"
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { FileSelect, Field, Label } from '@dryui/ui';\n</script>\n\n<Field.Root>\n  <Label>Project folder</Label>\n  <FileSelect.Root>\n    <FileSelect.Trigger>...</FileSelect.Trigger>\n    <FileSelect.Value>...</FileSelect.Value>\n    <FileSelect.Clear>...</FileSelect.Clear>\n  </FileSelect.Root>\n</Field.Root>"
     },
     "ColorPicker": {
       "name": "ColorPicker",
@@ -12145,7 +12145,7 @@
       ],
       "rootImport": "import { ColorPicker } from '@dryui/ui'",
       "subpathImport": "import { ColorPicker } from '@dryui/ui/color-picker'",
-      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { ColorPicker } from '@dryui/ui';\n</script>\n\n<ColorPicker.Root>\n  <ColorPicker.Area>...</ColorPicker.Area>\n  <ColorPicker.HueSlider>...</ColorPicker.HueSlider>\n  <ColorPicker.AlphaSlider>...</ColorPicker.AlphaSlider>\n  <ColorPicker.Input>...</ColorPicker.Input>\n  <ColorPicker.Swatch>...</ColorPicker.Swatch>\n  <ColorPicker.EyeDropper>...</ColorPicker.EyeDropper>\n  <ColorPicker.ChannelInput>...</ColorPicker.ChannelInput>\n</ColorPicker.Root>"
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { ColorPicker, Field, Label } from '@dryui/ui';\n</script>\n\n<Field.Root>\n  <Label>Brand color</Label>\n  <ColorPicker.Root>\n    <ColorPicker.Area>...</ColorPicker.Area>\n    <ColorPicker.HueSlider>...</ColorPicker.HueSlider>\n    <ColorPicker.AlphaSlider>...</ColorPicker.AlphaSlider>\n    <ColorPicker.Input>...</ColorPicker.Input>\n    <ColorPicker.Swatch>...</ColorPicker.Swatch>\n    <ColorPicker.EyeDropper>...</ColorPicker.EyeDropper>\n    <ColorPicker.ChannelInput>...</ColorPicker.ChannelInput>\n  </ColorPicker.Root>\n</Field.Root>"
     },
     "Portal": {
       "name": "Portal",
@@ -12535,7 +12535,7 @@
       ],
       "rootImport": "import { Reveal } from '@dryui/ui'",
       "subpathImport": "import { Reveal } from '@dryui/ui/reveal'",
-      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Reveal } from '@dryui/ui';\n</script>\n\n<Reveal variant=\"slide-up\" delay={120}>\n  <p>Stage content as it enters the viewport.</p>\n</Reveal>"
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Reveal, Text } from '@dryui/ui';\n</script>\n\n<Reveal variant=\"slide-up\" delay={120}>\n  <Text>Stage content as it enters the viewport.</Text>\n</Reveal>"
     },
     "Spotlight": {
       "name": "Spotlight",
@@ -12615,7 +12615,7 @@
       ],
       "rootImport": "import { Spotlight } from '@dryui/ui'",
       "subpathImport": "import { Spotlight } from '@dryui/ui/spotlight'",
-      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Spotlight } from '@dryui/ui';\n</script>\n\n<Spotlight intensity={32}>\n  <p>Hover to pull a radial highlight across the surface.</p>\n</Spotlight>"
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Spotlight, Text } from '@dryui/ui';\n</script>\n\n<Spotlight intensity={32}>\n  <Text>Hover to pull a radial highlight across the surface.</Text>\n</Spotlight>"
     },
     "Aurora": {
       "name": "Aurora",
@@ -12739,7 +12739,7 @@
       ],
       "rootImport": "import { Aurora } from '@dryui/ui'",
       "subpathImport": "import { Aurora } from '@dryui/ui/aurora'",
-      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Aurora } from '@dryui/ui';\n</script>\n\n<Aurora palette=\"ocean\">\n  <p>Ambient backgrounds stay native and no-dependency.</p>\n</Aurora>"
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Aurora, Text } from '@dryui/ui';\n</script>\n\n<Aurora palette=\"ocean\">\n  <Text>Ambient backgrounds stay native and no-dependency.</Text>\n</Aurora>"
     },
     "Noise": {
       "name": "Noise",
@@ -12832,7 +12832,7 @@
       ],
       "rootImport": "import { Noise } from '@dryui/ui'",
       "subpathImport": "import { Noise } from '@dryui/ui/noise'",
-      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Noise } from '@dryui/ui';\n</script>\n\n<Noise opacity={0.12} blend=\"soft-light\">\n  <p>Grain adds atmosphere without loading an external texture.</p>\n</Noise>"
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Noise, Text } from '@dryui/ui';\n</script>\n\n<Noise opacity={0.12} blend=\"soft-light\">\n  <Text>Grain adds atmosphere without loading an external texture.</Text>\n</Noise>"
     },
     "FloatButton": {
       "name": "FloatButton",
@@ -13138,7 +13138,7 @@
       ],
       "rootImport": "import { QRCode } from '@dryui/ui'",
       "subpathImport": "import { QRCode } from '@dryui/ui/qr-code'",
-      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { QRCode } from '@dryui/ui';\n</script>\n\n<QRCode>Content</QRCode>"
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { QRCode } from '@dryui/ui';\n</script>\n\n<QRCode value=\"https://dryui.dev\" size={160} errorCorrection=\"M\" />"
     },
     "CodeBlock": {
       "name": "CodeBlock",
@@ -14090,7 +14090,7 @@
       ],
       "rootImport": "import { DropZone } from '@dryui/ui'",
       "subpathImport": "import { DropZone } from '@dryui/ui/drop-zone'",
-      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { DropZone } from '@dryui/ui';\n</script>\n\n<DropZone>Content</DropZone>"
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { DropZone, Field, Label } from '@dryui/ui';\n</script>\n\n<Field.Root>\n  <Label>Upload files</Label>\n  <DropZone>Content</DropZone>\n</Field.Root>"
     },
     "Transfer": {
       "name": "Transfer",
@@ -14300,7 +14300,7 @@
       ],
       "rootImport": "import { Transfer } from '@dryui/ui'",
       "subpathImport": "import { Transfer } from '@dryui/ui/transfer'",
-      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Transfer } from '@dryui/ui';\n</script>\n\n<Transfer.Root>\n  <Transfer.List>...</Transfer.List>\n  <Transfer.Item>...</Transfer.Item>\n  <Transfer.Actions>...</Transfer.Actions>\n</Transfer.Root>"
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Transfer, Field, Label } from '@dryui/ui';\n</script>\n\n<Field.Root>\n  <Label>Team members</Label>\n  <Transfer.Root>\n    <Transfer.List>...</Transfer.List>\n    <Transfer.Item>...</Transfer.Item>\n    <Transfer.Actions>...</Transfer.Actions>\n  </Transfer.Root>\n</Field.Root>"
     },
     "RichTextEditor": {
       "name": "RichTextEditor",
@@ -14428,7 +14428,7 @@
       ],
       "rootImport": "import { RichTextEditor } from '@dryui/ui'",
       "subpathImport": "import { RichTextEditor } from '@dryui/ui/rich-text-editor'",
-      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { RichTextEditor } from '@dryui/ui';\n</script>\n\n<RichTextEditor.Root>\n  <RichTextEditor.Toolbar>...</RichTextEditor.Toolbar>\n  <RichTextEditor.Content>...</RichTextEditor.Content>\n</RichTextEditor.Root>"
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { RichTextEditor, Field, Label } from '@dryui/ui';\n</script>\n\n<Field.Root>\n  <Label>Release notes</Label>\n  <RichTextEditor.Root>\n    <RichTextEditor.Toolbar>...</RichTextEditor.Toolbar>\n    <RichTextEditor.Content>...</RichTextEditor.Content>\n  </RichTextEditor.Root>\n</Field.Root>"
     },
     "Tour": {
       "name": "Tour",
@@ -16652,7 +16652,7 @@
       ],
       "rootImport": "import { PhoneInput } from '@dryui/ui'",
       "subpathImport": "import { PhoneInput } from '@dryui/ui/phone-input'",
-      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { PhoneInput } from '@dryui/ui';\n</script>\n\n<PhoneInput bind:value={phone} defaultCountry=\"US\" placeholder=\"(555) 123-4567\" />"
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { PhoneInput, Field, Label } from '@dryui/ui';\n</script>\n\n<Field.Root>\n  <Label>Phone number</Label>\n  <PhoneInput bind:value={phone} defaultCountry=\"US\" placeholder=\"(555) 123-4567\" />\n</Field.Root>"
     },
     "DateTimeInput": {
       "name": "DateTimeInput",
@@ -16737,7 +16737,7 @@
       ],
       "rootImport": "import { DateTimeInput } from '@dryui/ui'",
       "subpathImport": "import { DateTimeInput } from '@dryui/ui/date-time-input'",
-      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { DateTimeInput } from '@dryui/ui';\n</script>\n\n<DateTimeInput bind:value={appointmentDate} name=\"appointment\" />"
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { DateTimeInput, Field, Label } from '@dryui/ui';\n</script>\n\n<Field.Root>\n  <Label>Appointment time</Label>\n  <DateTimeInput bind:value={appointmentDate} name=\"appointment\" />\n</Field.Root>"
     },
     "NotificationCenter": {
       "name": "NotificationCenter",
@@ -17823,7 +17823,7 @@
       ],
       "rootImport": "import { AlphaSlider } from '@dryui/ui'",
       "subpathImport": "import { AlphaSlider } from '@dryui/ui/alpha-slider'",
-      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { AlphaSlider } from '@dryui/ui';\n</script>\n\n<AlphaSlider>Content</AlphaSlider>"
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { AlphaSlider, Field, Label } from '@dryui/ui';\n</script>\n\n<Field.Root>\n  <Label>Opacity</Label>\n  <AlphaSlider>Content</AlphaSlider>\n</Field.Root>"
     },
     "Beam": {
       "name": "Beam",

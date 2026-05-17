@@ -1,10 +1,10 @@
 /* App-wide CSS lives here: visuals (color, background, border, font-*, box-shadow,
-   transition, opacity, z-index, transform). Page/section grid + flex layout
-   belongs in src/layout.css. */
-
-/* Required for `@container page (...)` queries in src/layout.css. */
+   transition, opacity, z-index, transform). Page/section grid, flex layout,
+   and container ownership belong in src/layout.css. */
 body {
-	container-type: inline-size;
-	container-name: page;
+	margin: 0;
+	background: var(--dry-color-bg-base);
+	color: var(--dry-color-text-strong);
 	font-family: var(--dry-font-sans);
+	overflow-x: clip;
 }

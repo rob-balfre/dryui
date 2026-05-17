@@ -1,4 +1,4 @@
 interface:
   display_name: 'DryUI'
   short_description: 'DryUI Svelte 5 components, page shells, and container-query layout'
-  default_prompt: 'Use $dryui to build a Svelte 5 UI with DryUI components, page shell layout, theme tokens, and visual checks.'
+  default_prompt: 'Use $dryui-build to build a Svelte 5 UI with DryUI components, page shell layout, theme tokens, component lookup, and visual smoke checks.'

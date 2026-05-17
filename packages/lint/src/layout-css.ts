@@ -11,6 +11,11 @@ import {
 import { checkStyle, type Violation } from './rules.js';
 import { createLintPolicy, type LintPolicy, type LintRuleId } from './lint-policy.js';
 import { evaluateLayoutContract, type LayoutContractDiagnostic } from './layout-contract.js';
+import {
+	appendViolationLog,
+	formatViolationReport,
+	type ViolationLogFile
+} from './violation-report.js';
 
 export interface LayoutCssCheckOptions {
 	readonly includeGenericStyleRules?: boolean;
@@ -30,6 +35,11 @@ export interface DryuiLayoutCssPluginOptions {
 	 * app CSS checks.
 	 */
 	readonly appFile?: string | false;
+	/**
+	 * Append violation reports to a log file. Pass true for .dryui/lint.log,
+	 * or pass a custom path. Relative paths resolve from the Vite project root.
+	 */
+	readonly logFile?: ViolationLogFile;
 }
 
 export interface VitePluginLike {
@@ -153,18 +163,30 @@ export function checkAppCss(content: string, filename = DEFAULT_APP_CSS_FILE): V
 	return violation ? [violation] : [];
 }
 
-function formatViolation(filename: string, violation: Violation): string {
-	return `[${violation.rule}] ${filename}:${violation.line} - ${violation.message}`;
+function layoutCssError(
+	filename: string,
+	source: string,
+	violations: readonly Violation[],
+	logFile: ViolationLogFile,
+	root: string
+): Error {
+	const messages = formatViolationReport(filename, violations, source);
+	const report = `DryUI layout.css violations:\n${messages}`;
+	appendViolationLog(logFile, report, { root, label: 'layout-css' });
+	return new Error(report);
 }
 
-function layoutCssError(filename: string, violations: readonly Violation[]): Error {
-	const messages = violations.map((violation) => formatViolation(filename, violation)).join('\n');
-	return new Error(`DryUI layout.css violations:\n${messages}`);
-}
-
-function appCssError(filename: string, violations: readonly Violation[]): Error {
-	const messages = violations.map((violation) => formatViolation(filename, violation)).join('\n');
-	return new Error(`DryUI app.css violations:\n${messages}`);
+function appCssError(
+	filename: string,
+	source: string,
+	violations: readonly Violation[],
+	logFile: ViolationLogFile,
+	root: string
+): Error {
+	const messages = formatViolationReport(filename, violations, source);
+	const report = `DryUI app.css violations:\n${messages}`;
+	appendViolationLog(logFile, report, { root, label: 'app-css' });
+	return new Error(report);
 }
 
 function normalizePath(path: string): string {
@@ -175,6 +197,7 @@ export function dryuiLayoutCss(options: DryuiLayoutCssPluginOptions = {}): ViteP
 	const relativeFile = options.file ?? DEFAULT_LAYOUT_CSS_FILE;
 	const relativeAppFile =
 		options.appFile === false ? null : (options.appFile ?? DEFAULT_APP_CSS_FILE);
+	const logFile = options.logFile;
 	let root = options.root ?? process.cwd();
 	let logger: { warn(message: string): void } = console;
 	let warnedMissing = false;
@@ -193,15 +216,19 @@ export function dryuiLayoutCss(options: DryuiLayoutCssPluginOptions = {}): ViteP
 			return;
 		}
 		warnedMissing = false;
-		const violations = checkLayoutCss(readFileSync(file, 'utf-8'), relativeFile);
-		if (violations.length > 0) throw layoutCssError(relativeFile, violations);
+		const source = readFileSync(file, 'utf-8');
+		const violations = checkLayoutCss(source, relativeFile);
+		if (violations.length > 0)
+			throw layoutCssError(relativeFile, source, violations, logFile, root);
 	};
 	const checkAppFile = () => {
 		if (!relativeAppFile) return;
 		const file = absoluteAppFile();
 		if (!file || !existsSync(file)) return;
-		const violations = checkAppCss(readFileSync(file, 'utf-8'), relativeAppFile);
-		if (violations.length > 0) throw appCssError(relativeAppFile, violations);
+		const source = readFileSync(file, 'utf-8');
+		const violations = checkAppCss(source, relativeAppFile);
+		if (violations.length > 0)
+			throw appCssError(relativeAppFile, source, violations, logFile, root);
 	};
 	const checkFiles = () => {
 		checkLayoutFile();

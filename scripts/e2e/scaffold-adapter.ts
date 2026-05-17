@@ -16,7 +16,8 @@ export const DRYUI_INIT_SKILL_CONTRACT = {
 	adapterRole: 'E2E scaffold Adapter for the dryui-init setup Interface',
 	requiredSkillMarkers: [
 		'## Golden Consumer Setup Contract',
-		'concrete Adapter',
+		'source of truth for a DryUI consumer setup',
+		'Fresh E2E scaffolds',
 		'npx skills add rob-balfre/dryui',
 		'@dryui/ui',
 		'@dryui/lint',
@@ -26,6 +27,8 @@ export const DRYUI_INIT_SKILL_CONTRACT = {
 		'dryui.config.json',
 		'dryuiLint({ strict: true })',
 		'dryuiLayoutCss()',
+		'AGENTS.md',
+		'CLAUDE.md',
 		'src/routes/+layout.svelte',
 		'src/layout.css'
 	] as const
@@ -67,6 +70,10 @@ export const REQUIRED_DRYUI_PACKAGES: readonly DryuiConsumerPackage[] = [
 const PACKAGE_JSON = 'package.json';
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const DRYUI_SKILLS_SOURCE = 'skills';
+const DRYUI_INIT_SKILL_DIR = 'skills/dryui-init';
+const DRYUI_INIT_TEMPLATES_SOURCE = `${DRYUI_INIT_SKILL_DIR}/templates`;
+const DRYUI_INIT_SETUP_FEEDBACK_SCRIPT = `${DRYUI_INIT_SKILL_DIR}/scripts/setup-feedback-agents.sh`;
+const DRYUI_INIT_BARE_SKELETON_SCRIPT = `${DRYUI_INIT_SKILL_DIR}/scripts/bare-skeleton.sh`;
 const DRYUI_BUILD_SKILL_OVERRIDE_ENV = 'DRYUI_E2E_DRYUI_BUILD_SKILL_OVERRIDE';
 const AGENT_SKILL_TARGETS = [
 	'skills',
@@ -144,12 +151,7 @@ function writeProjectFile(
 	files.push(path);
 }
 
-function copyProjectDirectory(
-	projectDir: string,
-	sourcePath: string,
-	targetPath: string,
-	files: string[]
-): void {
+function copyProjectDirectory(projectDir: string, sourcePath: string, targetPath: string): void {
 	const absSource = resolve(repoRoot, sourcePath);
 	if (!existsSync(absSource)) {
 		throw new Error(`E2E scaffold source missing at ${absSource}`);
@@ -160,12 +162,20 @@ function copyProjectDirectory(
 		recursive: true,
 		filter: (path) => !path.endsWith('/.DS_Store')
 	});
-	files.push(targetPath);
 }
 
 function copyDryuiAgentSkillBundle(projectDir: string, files: string[]): void {
+	const skillsRoot = resolve(repoRoot, DRYUI_SKILLS_SOURCE);
 	for (const target of AGENT_SKILL_TARGETS) {
-		copyProjectDirectory(projectDir, DRYUI_SKILLS_SOURCE, target, files);
+		for (const entry of readdirSync(skillsRoot, { withFileTypes: true }).sort((a, b) =>
+			a.name.localeCompare(b.name)
+		)) {
+			if (!entry.isDirectory() || !entry.name.startsWith('dryui-')) continue;
+			const skillPath = `${DRYUI_SKILLS_SOURCE}/${entry.name}`;
+			if (!existsSync(resolve(repoRoot, skillPath, 'SKILL.md'))) continue;
+			copyProjectDirectory(projectDir, skillPath, `${target}/${entry.name}`);
+		}
+		files.push(target);
 	}
 }
 
@@ -199,6 +209,96 @@ function installDependencies(projectDir: string): string {
 	return output;
 }
 
+const CONSUMER_SCRIPTS = {
+	dev: 'vite dev',
+	build: 'vite build',
+	preview: 'vite preview',
+	prepare: 'svelte-kit sync || echo ""',
+	check: 'svelte-kit sync && svelte-check --tsconfig ./tsconfig.json',
+	'check:watch': 'svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch'
+} as const;
+
+const CONSUMER_RUNTIME_DEPENDENCIES = {
+	'lucide-svelte': '^1.0.1'
+} as const;
+
+const CONSUMER_DEV_DEPENDENCIES = {
+	'@sveltejs/adapter-auto': '^7.0.1',
+	'@sveltejs/kit': '^2.57.0',
+	'@sveltejs/vite-plugin-svelte': '^7.0.0',
+	'@types/node': '^25.6.2',
+	svelte: '^5.55.2',
+	'svelte-check': '^4.4.6',
+	typescript: '^6.0.2',
+	vite: '^8.0.7'
+} as const;
+
+function assertContainsAll(source: string, sourcePath: string, markers: readonly string[]): void {
+	const missing = markers.filter((marker) => !source.includes(marker));
+	if (missing.length > 0) {
+		throw new Error(
+			`${DRYUI_INIT_SKILL_CONTRACT.adapterRole} drift: ${sourcePath} is missing ${missing
+				.map((marker) => JSON.stringify(marker))
+				.join(', ')}`
+		);
+	}
+}
+
+function verifyDryuiInitPackageContract(): void {
+	const scriptPath = resolve(repoRoot, DRYUI_INIT_BARE_SKELETON_SCRIPT);
+	if (!existsSync(scriptPath)) {
+		throw new Error(`dryui-init setup script missing at ${scriptPath}`);
+	}
+
+	const script = readFileSync(scriptPath, 'utf8');
+	const packageMarkers = [
+		...Object.entries(CONSUMER_SCRIPTS).map(
+			([name, value]) => `${JSON.stringify(name)}: ${JSON.stringify(value)}`
+		),
+		...Object.entries(CONSUMER_RUNTIME_DEPENDENCIES).map(
+			([name, value]) => `${JSON.stringify(name)}: ${JSON.stringify(value)}`
+		),
+		...Object.entries(CONSUMER_DEV_DEPENDENCIES).map(
+			([name, value]) => `${JSON.stringify(name)}: ${JSON.stringify(value)}`
+		),
+		'bun add @dryui/ui',
+		'bun add -d @dryui/lint @dryui/feedback @dryui/feedback-server',
+		'"@dryui/ui": "link:@dryui/ui"',
+		'"@dryui/lint": "link:@dryui/lint"',
+		'"@dryui/primitives": "link:@dryui/primitives"',
+		'"@dryui/feedback": "link:@dryui/feedback"',
+		'"@dryui/feedback-server": "link:@dryui/feedback-server"'
+	];
+
+	assertContainsAll(script, DRYUI_INIT_BARE_SKELETON_SCRIPT, packageMarkers);
+}
+
+function verifyDryuiInitFeedbackSetupContract(): void {
+	const scriptPath = resolve(repoRoot, DRYUI_INIT_SETUP_FEEDBACK_SCRIPT);
+	if (!existsSync(scriptPath)) {
+		throw new Error(`dryui-init feedback setup script missing at ${scriptPath}`);
+	}
+
+	const script = readFileSync(scriptPath, 'utf8');
+	const setupMarkers = [
+		`MCP_ENTRY_NPX='{"command":"npx","args":["-y","-p","@dryui/feedback-server","dryui-feedback-mcp"]}'`,
+		'for target in skills .agents/skills .claude/skills .codex/skills',
+		'rm -rf "$target/$skill_name"',
+		'.defaultAgent',
+		'.terminalApp',
+		'.detectedAgents',
+		'.configuredFiles',
+		'.mcpServer',
+		'codex: "~/.codex/config.toml"',
+		'gemini: "~/.gemini/settings.json"',
+		'windsurf: "~/.codeium/windsurf/mcp_config.json"',
+		'zed: "~/.config/zed/settings.json"',
+		'copilot: "~/.copilot/mcp-config.json"'
+	];
+
+	assertContainsAll(script, DRYUI_INIT_SETUP_FEEDBACK_SCRIPT, setupMarkers);
+}
+
 function scaffoldPackageJson(packages: Record<DryuiConsumerPackage, string>): string {
 	return (
 		JSON.stringify(
@@ -207,28 +307,17 @@ function scaffoldPackageJson(packages: Record<DryuiConsumerPackage, string>): st
 				version: '0.0.0',
 				private: true,
 				type: 'module',
-				scripts: {
-					dev: 'vite dev',
-					build: 'vite build',
-					preview: 'vite preview',
-					check: 'svelte-kit sync && svelte-check --tsconfig ./tsconfig.json'
-				},
+				scripts: CONSUMER_SCRIPTS,
 				dependencies: {
 					'@dryui/ui': packages['@dryui/ui'],
-					'lucide-svelte': '^1.0.1'
+					...CONSUMER_RUNTIME_DEPENDENCIES
 				},
 				devDependencies: {
 					'@dryui/feedback': packages['@dryui/feedback'],
 					'@dryui/feedback-server': packages['@dryui/feedback-server'],
 					'@dryui/lint': packages['@dryui/lint'],
 					'@dryui/primitives': packages['@dryui/primitives'],
-					'@types/node': '^25.6.2',
-					'@sveltejs/kit': '^2.59.0',
-					'@sveltejs/vite-plugin-svelte': '^7.0.0',
-					svelte: '^5.55.5',
-					'svelte-check': '^4.4.7',
-					typescript: '^6.0.3',
-					vite: '^8.0.10'
+					...CONSUMER_DEV_DEPENDENCIES
 				},
 				overrides: {
 					'@dryui/feedback': packages['@dryui/feedback'],
@@ -243,116 +332,6 @@ function scaffoldPackageJson(packages: Record<DryuiConsumerPackage, string>): st
 		) + '\n'
 	);
 }
-
-const SVELTE_CONFIG = `import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
-import { dryuiLint } from '@dryui/lint';
-
-function dryuiE2eAdapter() {
-	return {
-		name: 'dryui-e2e-adapter',
-		async adapt() {}
-	};
-}
-
-export default {
-	preprocess: [dryuiLint({ strict: true, exclude: ['/.svelte-kit/'] }), vitePreprocess()],
-	kit: {
-		adapter: dryuiE2eAdapter()
-	}
-};
-`;
-
-const VITE_CONFIG = `import { sveltekit } from '@sveltejs/kit/vite';
-import { dryuiLayoutCss } from '@dryui/lint';
-import { defineConfig } from 'vite';
-
-export default defineConfig({
-	plugins: [dryuiLayoutCss(), sveltekit()]
-});
-`;
-
-const TSCONFIG = `{
-  "extends": "./.svelte-kit/tsconfig.json",
-  "compilerOptions": {
-    "allowJs": true,
-    "checkJs": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "moduleResolution": "bundler",
-    "resolveJsonModule": true,
-    "skipLibCheck": true,
-    "sourceMap": true,
-    "strict": true
-  }
-}
-`;
-
-const APP_HTML = `<!doctype html>
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		%sveltekit.head%
-	</head>
-	<body data-sveltekit-preload-data="hover">
-		<div>%sveltekit.body%</div>
-	</body>
-</html>
-`;
-
-const APP_CSS = `html {
-	min-block-size: 100%;
-}
-
-body {
-	background: var(--dry-color-bg-base);
-	color: var(--dry-color-text);
-	min-block-size: 100%;
-	margin: 0;
-	container-type: inline-size;
-	container-name: page;
-	font-family: var(--dry-font-sans);
-}
-
-body > div {
-	min-block-size: 100%;
-}
-
-button,
-input,
-textarea,
-select {
-	font: inherit;
-}
-
-a {
-	color: inherit;
-}
-`;
-
-const LAYOUT_CSS = `/* Add [data-layout="<name>"] blocks here as routes need them. */
-`;
-
-const ROOT_LAYOUT = `<script lang="ts">
-	import '@dryui/ui/themes/default.css';
-	import '@dryui/ui/themes/dark.css';
-	import '../app.css';
-	import '../layout.css';
-
-	let { children } = $props();
-</script>
-
-{@render children()}
-`;
-
-const HOME_PAGE = `<script lang="ts">
-	import { Heading } from '@dryui/ui/heading';
-</script>
-
-<main data-layout="home">
-	<Heading level={1}>Hello DryUI</Heading>
-</main>
-`;
 
 const DRYUI_CONFIG = `{
   "$schema": "https://dryui.dev/config.schema.json",
@@ -376,22 +355,68 @@ const DRYUI_CONFIG = `{
 }
 `;
 
-const AGENTS_MD = `# AGENTS.md
+function listFilesRecursive(root: string, prefix = ''): string[] {
+	const dir = resolve(root, prefix);
+	const files: string[] = [];
+	for (const entry of readdirSync(dir, { withFileTypes: true }).sort((a, b) =>
+		a.name.localeCompare(b.name)
+	)) {
+		const relativePath = prefix ? `${prefix}/${entry.name}` : entry.name;
+		if (entry.isDirectory()) {
+			files.push(...listFilesRecursive(root, relativePath));
+		} else if (entry.isFile() && entry.name !== '.DS_Store') {
+			files.push(relativePath);
+		}
+	}
+	return files;
+}
 
-Generated DryUI E2E consumer project.
+function copyDryuiInitTemplates(projectDir: string, files: string[]): string[] {
+	const templateRoot = resolve(repoRoot, DRYUI_INIT_TEMPLATES_SOURCE);
+	if (!existsSync(templateRoot)) {
+		throw new Error(`dryui-init templates missing at ${templateRoot}`);
+	}
 
-- Before editing UI, load \`skills/dryui-build/SKILL.md\`.
-- For setup context only, use \`skills/dryui-init/SKILL.md\`.
-- Canonical DryUI skills are vendored into \`skills/\`, \`.agents/skills/\`, \`.claude/skills/\`, and \`.codex/skills/\` so isolated Codex and Claude runs do not depend on machine-local skill installs.
-- Keep route layout hooks in \`src/layout.css\`; keep visual styling in route/component CSS using DryUI tokens.
-`;
+	const templateFiles = listFilesRecursive(templateRoot);
+	if (templateFiles.length === 0) {
+		throw new Error(`dryui-init templates empty at ${templateRoot}`);
+	}
 
-const CLAUDE_MD = `# CLAUDE.md
+	for (const file of templateFiles) {
+		const content = readFileSync(resolve(templateRoot, file), 'utf8');
+		writeProjectFile(projectDir, file, content, files);
+	}
 
-Generated DryUI E2E consumer project.
+	return templateFiles;
+}
 
-Load \`skills/dryui-build/SKILL.md\` before implementing the requested UI. The same DryUI skills are also copied to \`.claude/skills/\` for Claude Code skill discovery.
-`;
+function firstDifferentLine(expected: string, actual: string): number {
+	const expectedLines = expected.split('\n');
+	const actualLines = actual.split('\n');
+	const max = Math.max(expectedLines.length, actualLines.length);
+	for (let i = 0; i < max; i++) {
+		if (expectedLines[i] !== actualLines[i]) return i + 1;
+	}
+	return 0;
+}
+
+function verifyProjectMatchesDryuiInitTemplates(
+	projectDir: string,
+	templateFiles: readonly string[]
+): void {
+	for (const file of templateFiles) {
+		const templatePath = resolve(repoRoot, DRYUI_INIT_TEMPLATES_SOURCE, file);
+		const projectPath = resolve(projectDir, file);
+		const expected = readFileSync(templatePath, 'utf8');
+		const actual = readFileSync(projectPath, 'utf8');
+		if (actual !== expected) {
+			const line = firstDifferentLine(expected, actual);
+			throw new Error(
+				`${DRYUI_INIT_SKILL_CONTRACT.adapterRole} drift: ${file} differs from ${DRYUI_INIT_TEMPLATES_SOURCE}/${file} at line ${line}`
+			);
+		}
+	}
+}
 
 export function scaffoldDryuiConsumerProject(
 	options: ScaffoldDryuiConsumerProjectOptions
@@ -402,29 +427,25 @@ export function scaffoldDryuiConsumerProject(
 	const filesWritten: string[] = [];
 	const logLines: string[] = [];
 	verifyDryuiInitSkillContract();
+	verifyDryuiInitPackageContract();
+	verifyDryuiInitFeedbackSetupContract();
 	const { manifestPath, packages } = readManifest(tarballsDir);
 
 	ensureEmptyProjectDir(projectDir);
 
 	writeProjectFile(projectDir, PACKAGE_JSON, scaffoldPackageJson(packages), filesWritten);
-	writeProjectFile(projectDir, 'AGENTS.md', AGENTS_MD, filesWritten);
-	writeProjectFile(projectDir, 'CLAUDE.md', CLAUDE_MD, filesWritten);
+	const templateFiles = copyDryuiInitTemplates(projectDir, filesWritten);
 	copyDryuiAgentSkillBundle(projectDir, filesWritten);
 	applyDryuiBuildSkillOverride(projectDir, logLines);
-	writeProjectFile(projectDir, 'svelte.config.js', SVELTE_CONFIG, filesWritten);
-	writeProjectFile(projectDir, 'vite.config.ts', VITE_CONFIG, filesWritten);
-	writeProjectFile(projectDir, 'tsconfig.json', TSCONFIG, filesWritten);
-	writeProjectFile(projectDir, 'src/app.html', APP_HTML, filesWritten);
-	writeProjectFile(projectDir, 'src/app.css', APP_CSS, filesWritten);
-	writeProjectFile(projectDir, 'src/layout.css', LAYOUT_CSS, filesWritten);
-	writeProjectFile(projectDir, 'src/routes/+layout.svelte', ROOT_LAYOUT, filesWritten);
-	writeProjectFile(projectDir, 'src/routes/+page.svelte', HOME_PAGE, filesWritten);
 	writeProjectFile(projectDir, 'dryui.config.json', DRYUI_CONFIG, filesWritten);
+	verifyProjectMatchesDryuiInitTemplates(projectDir, templateFiles);
 
 	logLines.push(
 		`contract: ${DRYUI_INIT_SKILL_CONTRACT.sourcePath}#${DRYUI_INIT_SKILL_CONTRACT.anchor}`
 	);
 	logLines.push(`adapter: ${DRYUI_INIT_SKILL_CONTRACT.adapterRole}`);
+	logLines.push(`templates: ${DRYUI_INIT_TEMPLATES_SOURCE}`);
+	logLines.push(`feedback setup contract: ${DRYUI_INIT_SETUP_FEEDBACK_SCRIPT}`);
 	logLines.push(`manifest: ${manifestPath}`);
 	logLines.push(`project: ${projectDir}`);
 	logLines.push(`files: ${filesWritten.join(', ')}`);

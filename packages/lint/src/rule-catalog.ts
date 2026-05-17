@@ -48,9 +48,9 @@ export const RULE_CATALOG = {
 		id: 'dryui/no-raw-element',
 		severity: 'error',
 		message:
-			'Raw <{tag}> is not allowed. Replace with a DryUI component when one exists. The data-layout escape hatch is ONLY for elements that are the root of a layout grid declared in src/layout.css. Use a unique, meaningful name like data-layout="article" or data-layout="dashboard". Do NOT silence this rule by bulk-adding data-layout="ui" / "wrapper" / "box" / "container" / "div": those names defeat the lint and produce unstyled output because no matching grid exists in src/layout.css.',
+			'Raw <{tag}> is not allowed. Replace with a DryUI component when one exists. If the element is page or section structure, use a unique data-layout name and declare the matching grid in src/layout.css. If it is reusable component anatomy, use a specific data-layout or data-layout-area hook styled inside that component and keep those part selectors out of src/layout.css. Do NOT silence this rule by bulk-adding data-layout="ui" / "wrapper" / "box" / "container" / "div": those names defeat the lint and produce unstyled output because no matching layout contract exists.',
 		suggestedFix:
-			'Replace raw markup with a DryUI component, or add data-layout="<unique-name>" only if you are also declaring that name as a grid in src/layout.css.'
+			'Replace raw markup with a DryUI component, or add a specific layout hook. Page/section hooks need a matching src/layout.css grid; component-internal hooks should be styled inside the component.'
 	},
 	'dryui/no-generic-layout-name': {
 		id: 'dryui/no-generic-layout-name',
@@ -74,6 +74,13 @@ export const RULE_CATALOG = {
 		message:
 			'Do not use <!-- svelte-ignore css_unused_selector -->. Fix the underlying CSS issue instead of suppressing the warning.',
 		suggestedFix: 'Remove the ignore comment and fix the unused selector.'
+	},
+	'dryui/no-transcript-artifact': {
+		id: 'dryui/no-transcript-artifact',
+		severity: 'error',
+		message:
+			'Generated transcript artifact "{artifact}" found in Svelte markup. Remove leaked agent/tool output from the file.',
+		suggestedFix: 'Delete the transcript artifact and keep only valid Svelte source.'
 	},
 	'dryui/no-svelte-element': {
 		id: 'dryui/no-svelte-element',

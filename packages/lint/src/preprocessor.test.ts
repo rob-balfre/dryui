@@ -1,4 +1,7 @@
 import { describe, test, expect, spyOn } from 'bun:test';
+import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { resolve } from 'node:path';
 import { dryuiLint } from './preprocessor.js';
 
 describe('dryuiLint preprocessor', () => {
@@ -139,6 +142,31 @@ describe('dryuiLint preprocessor', () => {
 		}).toThrow('dryui/no-flex');
 	});
 
+	test('strict mode writes violations to the configured log file', () => {
+		const root = mkdtempSync(resolve(tmpdir(), 'dryui-preprocessor-log-'));
+		const logFile = resolve(root, 'dryui-lint.log');
+		try {
+			const pp = dryuiLint({ strict: true, logFile });
+			try {
+				pp.style!({
+					content: '.foo { display: flex; }',
+					attributes: {},
+					markup: '',
+					filename: 'test.svelte'
+				});
+			} catch {
+				// expected violation
+			}
+			const log = readFileSync(logFile, 'utf-8');
+			expect(log).toContain('DryUI lint preprocessor');
+			expect(log).toContain('DryUI lint violations:');
+			expect(log).toContain('[dryui/no-flex] test.svelte:1');
+			expect(log).toContain('> 1 | .foo { display: flex; }');
+		} finally {
+			rmSync(root, { recursive: true, force: true });
+		}
+	});
+
 	test('strict mode throws on all: unset', () => {
 		const pp = dryuiLint({ strict: true });
 		expect(() => {
@@ -198,26 +226,31 @@ describe('dryuiLint preprocessor', () => {
 	});
 
 	test('hooks return undefined (no code transformation)', () => {
+		const spy = spyOn(console, 'warn').mockImplementation(() => {});
 		const pp = dryuiLint();
-		const scriptResult = pp.script!({
-			content: "import { Button } from '@dryui/ui';",
-			attributes: {},
-			markup: '',
-			filename: 'test.svelte'
-		});
-		const markupResult = pp.markup!({
-			content: '<div>hi</div>',
-			filename: 'test.svelte'
-		});
-		const styleResult = pp.style!({
-			content: '.foo { display: grid; }',
-			attributes: {},
-			markup: '',
-			filename: 'test.svelte'
-		});
-		expect(scriptResult).toBeUndefined();
-		expect(markupResult).toBeUndefined();
-		expect(styleResult).toBeUndefined();
+		try {
+			const scriptResult = pp.script!({
+				content: "import { Button } from '@dryui/ui';",
+				attributes: {},
+				markup: '',
+				filename: 'test.svelte'
+			});
+			const markupResult = pp.markup!({
+				content: '<div>hi</div>',
+				filename: 'test.svelte'
+			});
+			const styleResult = pp.style!({
+				content: '.foo { display: grid; }',
+				attributes: {},
+				markup: '',
+				filename: 'test.svelte'
+			});
+			expect(scriptResult).toBeUndefined();
+			expect(markupResult).toBeUndefined();
+			expect(styleResult).toBeUndefined();
+		} finally {
+			spy.mockRestore();
+		}
 	});
 
 	test('markup hook warns on raw native element when filename token does not match', () => {

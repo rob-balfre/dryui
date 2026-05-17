@@ -3,8 +3,16 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { z } from 'zod';
 import { FeedbackHttpClient } from './client.js';
 import { ensureSubmissionPresentationListResponse } from './submission-presentation.js';
-import type { SubmissionPresentationListInput } from './submission-presentation.js';
-import type { Annotation, SubmissionQueryStatus } from './types.js';
+import type {
+	SubmissionPresentation,
+	SubmissionPresentationListInput
+} from './submission-presentation.js';
+import type {
+	Annotation,
+	SubmissionAgent,
+	SubmissionQueryStatus,
+	SubmissionWorker
+} from './types.js';
 
 type FeedbackToolClient = Pick<
 	FeedbackHttpClient,
@@ -17,6 +25,8 @@ type FeedbackToolClient = Pick<
 	| 'resolveSubmission'
 > & {
 	getSubmissions(status?: SubmissionQueryStatus): Promise<SubmissionPresentationListInput>;
+	claimSubmission(id: string, worker: SubmissionWorker): Promise<SubmissionPresentation>;
+	releaseSubmission(id: string): Promise<SubmissionPresentation>;
 };
 
 type ToolRegistrar = Pick<McpServer, 'tool'>;
@@ -231,8 +241,63 @@ export function registerFeedbackTools(server: ToolRegistrar, client: FeedbackToo
 	);
 
 	tool(
+		'feedback_claim_submission',
+		'Mark a feedback submission as in-progress and record which AI picked it up. Call this immediately before starting work so the dashboard shows the submission is being processed and by whom. Pass `agent` (one of: claude, codex, gemini, opencode, copilot, copilot-vscode, cursor, windsurf, zed), plus the human-readable `name`, `model`, and `version` strings so the completed history can name the worker exactly.',
+		inputSchema({
+			submissionId: z.string().describe('Submission ID to claim'),
+			agent: z
+				.enum([
+					'claude',
+					'codex',
+					'gemini',
+					'opencode',
+					'copilot',
+					'copilot-vscode',
+					'cursor',
+					'windsurf',
+					'zed'
+				])
+				.describe('Dispatch agent identifier (matches the SubmissionAgent union)'),
+			name: z.string().optional().describe('Human-readable assistant name, e.g. "Claude Code".'),
+			model: z.string().optional().describe('Exact model identifier, e.g. "claude-opus-4-7".'),
+			version: z.string().optional().describe('Client/CLI version string, e.g. "1.4.0".')
+		}),
+		async ({ submissionId, agent, name, model, version }) => {
+			const worker: SubmissionWorker = {
+				agent: agent as SubmissionAgent,
+				...(name ? { name } : {}),
+				...(model ? { model } : {}),
+				...(version ? { version } : {})
+			};
+			const presentation = await client.claimSubmission(submissionId, worker);
+			return {
+				content: [
+					{
+						type: 'text',
+						text: `Claimed submission ${submissionId} at ${presentation.processingStartedAt}.`
+					}
+				]
+			};
+		}
+	);
+
+	tool(
+		'feedback_release_submission',
+		'Release a claimed submission back to the pending queue without resolving it. Call this if you decided not to apply the feedback after claiming, so the dashboard does not show the submission as stuck "Processing" forever.',
+		inputSchema({
+			submissionId: z.string().describe('Submission ID to release back to pending')
+		}),
+		async ({ submissionId }) => {
+			await client.releaseSubmission(submissionId);
+			return {
+				content: [{ type: 'text', text: `Submission ${submissionId} released back to pending.` }]
+			};
+		}
+	);
+
+	tool(
 		'feedback_resolve_submission',
-		'Mark a feedback submission as resolved after acting on it.',
+		'Mark a feedback submission as resolved after acting on it. The server captures resolved_at and computes duration_ms if the submission was claimed first.',
 		inputSchema({
 			submissionId: z.string().describe('Submission ID to resolve')
 		}),

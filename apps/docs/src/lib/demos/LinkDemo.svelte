@@ -4,9 +4,9 @@
 
 <div class="link-demo">
 	<p class="paragraph">
-		Scaffolding the project runs <Link href="#bunx-dryui">bunx @dryui/cli init</Link>. If you need
-		the full flag list, press <Kbd keys={['Ctrl', 'K']} /> and search for
-		<Link href="#cli-reference">CLI reference</Link>.
+		Install the agent skills with <Link href="#install">npx skills add rob-balfre/dryui</Link>. For
+		visual feedback, run <Kbd keys={['bunx']} />
+		<Link href="#feedback">dryui-feedback</Link>.
 	</p>
 
 	<p class="paragraph">
