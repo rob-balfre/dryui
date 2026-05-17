@@ -41,7 +41,7 @@
 {/if}
 
 <style>
-	:global([data-part='marker-content'].map-demo-marker) {
+	:global([data-part='marker-content'].map-demo-marker.mapboxgl-marker) {
 		background: transparent;
 		box-shadow: none;
 		padding: 0;
@@ -65,7 +65,7 @@
 			box-shadow 160ms ease;
 	}
 
-	:global([data-part='marker-content'].map-demo-marker:hover) .map-demo-pin {
+	:global([data-part='marker-content'].map-demo-marker.mapboxgl-marker:hover) .map-demo-pin {
 		transform: scale(1.15);
 		box-shadow:
 			0 0 0 1px oklch(72% 0.17 50 / 0.6),
