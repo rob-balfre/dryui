@@ -424,3 +424,81 @@ html [data-code-block][data-code-block] {
 		display: none !important;
 	}
 }
+
+[data-map-root] .mapboxgl-popup-content {
+	background: oklch(12% 0 0 / 0.78);
+	backdrop-filter: blur(14px) saturate(140%);
+	-webkit-backdrop-filter: blur(14px) saturate(140%);
+	color: var(--dry-color-text-strong);
+	border: 1px solid oklch(97% 0 0 / 0.14);
+	border-radius: var(--dry-radius-md, 0.5rem);
+	padding: 0.625rem 2rem 0.625rem 0.875rem;
+	box-shadow:
+		0 12px 32px oklch(0% 0 0 / 0.55),
+		0 2px 8px oklch(0% 0 0 / 0.3),
+		inset 0 1px 0 oklch(97% 0 0 / 0.05);
+	font:
+		500 0.8125rem/1.35 var(--dry-font-sans),
+		ui-sans-serif,
+		system-ui;
+	letter-spacing: 0.01em;
+}
+
+[data-map-root] .mapboxgl-popup-anchor-top .mapboxgl-popup-tip,
+[data-map-root] .mapboxgl-popup-anchor-top-left .mapboxgl-popup-tip,
+[data-map-root] .mapboxgl-popup-anchor-top-right .mapboxgl-popup-tip {
+	border-bottom-color: oklch(12% 0 0 / 0.78);
+}
+[data-map-root] .mapboxgl-popup-anchor-bottom .mapboxgl-popup-tip,
+[data-map-root] .mapboxgl-popup-anchor-bottom-left .mapboxgl-popup-tip,
+[data-map-root] .mapboxgl-popup-anchor-bottom-right .mapboxgl-popup-tip {
+	border-top-color: oklch(12% 0 0 / 0.78);
+}
+[data-map-root] .mapboxgl-popup-anchor-left .mapboxgl-popup-tip {
+	border-right-color: oklch(12% 0 0 / 0.78);
+}
+[data-map-root] .mapboxgl-popup-anchor-right .mapboxgl-popup-tip {
+	border-left-color: oklch(12% 0 0 / 0.78);
+}
+
+[data-map-root] .mapboxgl-popup-close-button {
+	position: absolute;
+	top: 0.25rem;
+	right: 0.25rem;
+	width: 1.5rem;
+	height: 1.5rem;
+	display: grid;
+	place-items: center;
+	background: transparent;
+	color: oklch(97% 0 0 / 0.6);
+	border: none;
+	border-radius: var(--dry-radius-sm, 0.25rem);
+	font-size: 1rem;
+	line-height: 1;
+	padding: 0;
+	cursor: pointer;
+	transition:
+		background 120ms ease,
+		color 120ms ease;
+}
+[data-map-root] .mapboxgl-popup-close-button:hover,
+[data-map-root] .mapboxgl-popup-close-button:focus-visible {
+	background: oklch(97% 0 0 / 0.1);
+	color: oklch(97% 0 0);
+	outline: none;
+}
+
+[data-map-root] .mapboxgl-ctrl-attrib {
+	background: oklch(8% 0 0 / 0.7) !important;
+	color: oklch(97% 0 0 / 0.55) !important;
+	font-size: 0.6875rem !important;
+	padding: 0.125rem 0.5rem !important;
+	border-radius: var(--dry-radius-sm, 0.25rem) 0 0 0 !important;
+}
+[data-map-root] .mapboxgl-ctrl-attrib a {
+	color: oklch(97% 0 0 / 0.75) !important;
+}
+[data-map-root] .mapboxgl-ctrl-logo {
+	opacity: 0.55;
+	filter: invert(1) brightness(1.1);
+}
